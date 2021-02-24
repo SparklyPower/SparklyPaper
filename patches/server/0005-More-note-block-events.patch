@@ -1,0 +1,110 @@
+From 50416a2ef110abe02e86b83bddc08464b8addb81 Mon Sep 17 00:00:00 2001
+From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
+Date: Thu, 11 Feb 2021 13:17:03 +0000
+Subject: [PATCH] More note block events
+
+---
+ .../java/net/minecraft/server/BlockNote.java  | 63 ++++++++++++++++---
+ 1 file changed, 56 insertions(+), 7 deletions(-)
+
+diff --git a/src/main/java/net/minecraft/server/BlockNote.java b/src/main/java/net/minecraft/server/BlockNote.java
+index 7111ba9c2..f8261543d 100644
+--- a/src/main/java/net/minecraft/server/BlockNote.java
++++ b/src/main/java/net/minecraft/server/BlockNote.java
+@@ -1,5 +1,12 @@
+ package net.minecraft.server;
+ 
++// Haricot start
++import ml.beancraft.haricot.event.block.NoteBlockPlaceEvent;
++import ml.beancraft.haricot.event.block.NoteBlockUpdateEvent;
++import org.bukkit.craftbukkit.block.CraftBlock;
++import org.bukkit.craftbukkit.block.impl.CraftNote;
++// Haricot end
++
+ public class BlockNote extends Block {
+ 
+     public static final BlockStateEnum<BlockPropertyInstrument> INSTRUMENT = BlockProperties.aI;
+@@ -13,12 +20,32 @@ public class BlockNote extends Block {
+ 
+     @Override
+     public IBlockData getPlacedState(BlockActionContext blockactioncontext) {
+-        return (IBlockData) this.getBlockData().set(BlockNote.INSTRUMENT, BlockPropertyInstrument.a(blockactioncontext.getWorld().getType(blockactioncontext.getClickPosition().down())));
++        // Haricot start - note block api
++        NoteBlockPlaceEvent event = new NoteBlockPlaceEvent(new CraftBlock(blockactioncontext.getWorld(), blockactioncontext.getClickPosition()),
++                new CraftNote(this.blockStateList.getBlockData()), blockactioncontext.getItemStack().asBukkitMirror());
++        event.callEvent();
++
++        return this.getBlockData().set(INSTRUMENT, BlockPropertyInstrument.valueOf(event.getData().getInstrument().getName().toUpperCase()))
++                .set(NOTE, (int) event.getData().getNote().getId())
++                .set(POWERED, event.getData().isPowered());
++        // Haricot end
+     }
+ 
+     @Override
+     public IBlockData updateState(IBlockData iblockdata, EnumDirection enumdirection, IBlockData iblockdata1, GeneratorAccess generatoraccess, BlockPosition blockposition, BlockPosition blockposition1) {
+-        return enumdirection == EnumDirection.DOWN ? (IBlockData) iblockdata.set(BlockNote.INSTRUMENT, BlockPropertyInstrument.a(iblockdata1)) : super.updateState(iblockdata, enumdirection, iblockdata1, generatoraccess, blockposition, blockposition1);
++        // Haricot start - note block api
++        NoteBlockUpdateEvent event = new NoteBlockUpdateEvent(new CraftBlock(generatoraccess, blockposition), new CraftNote(iblockdata),
++                new CraftNote(enumdirection == EnumDirection.DOWN ? iblockdata.set(BlockNote.INSTRUMENT, BlockPropertyInstrument.a(iblockdata1)) : iblockdata));
++        event.callEvent();
++
++        if (!event.isCancelled()) {
++            return iblockdata.set(INSTRUMENT, BlockPropertyInstrument.valueOf(event.getNewData().getInstrument().getName().toUpperCase()))
++                    .set(NOTE, (int) event.getNewData().getNote().getId())
++                    .set(POWERED, event.getNewData().isPowered());
++        } else {
++            return iblockdata;
++        }
++        // Haricot end
+     }
+ 
+     @Override
+@@ -31,7 +58,18 @@ public class BlockNote extends Block {
+                 iblockdata = world.getType(blockposition); // CraftBukkit - SPIGOT-5617: update in case changed in event
+             }
+ 
+-            world.setTypeAndData(blockposition, (IBlockData) iblockdata.set(BlockNote.POWERED, flag1), 3);
++            // Haricot start - note block api
++            NoteBlockUpdateEvent event = new NoteBlockUpdateEvent(new CraftBlock(world, blockposition), new CraftNote(iblockdata),
++                    new CraftNote(iblockdata.set(BlockNote.POWERED, flag1)));
++            event.callEvent();
++
++            if (!event.isCancelled()) {
++                world.setTypeAndData(blockposition, iblockdata
++                        .set(INSTRUMENT, BlockPropertyInstrument.valueOf(event.getNewData().getInstrument().getName().toUpperCase()))
++                        .set(NOTE, (int) event.getNewData().getNote().getId())
++                        .set(POWERED, event.getNewData().isPowered()), 3);
++            }
++            // Haricot end
+         }
+ 
+     }
+@@ -52,10 +90,21 @@ public class BlockNote extends Block {
+         if (world.isClientSide) {
+             return EnumInteractionResult.SUCCESS;
+         } else {
+-            iblockdata = (IBlockData) iblockdata.a((IBlockState) BlockNote.NOTE);
+-            world.setTypeAndData(blockposition, iblockdata, 3);
+-            this.play(world, blockposition, iblockdata); // CraftBukkit
+-            entityhuman.a(StatisticList.TUNE_NOTEBLOCK);
++            // Haricot start - note block api
++            NoteBlockUpdateEvent event = new NoteBlockUpdateEvent(new CraftBlock(world, blockposition), new CraftNote(iblockdata),
++                    new CraftNote(iblockdata.a(NOTE)));
++            event.callEvent();
++
++            if (!event.isCancelled()) {
++                IBlockData newData = iblockdata
++                        .set(INSTRUMENT, BlockPropertyInstrument.valueOf(event.getNewData().getInstrument().getName().toUpperCase()))
++                        .set(NOTE, (int) event.getNewData().getNote().getId())
++                        .set(POWERED, event.getNewData().isPowered());
++                world.setTypeAndData(blockposition, newData, 3);
++                this.play(world, blockposition, newData);
++                entityhuman.a(StatisticList.TUNE_NOTEBLOCK);
++            }
++            // Haricot end
+             return EnumInteractionResult.CONSUME;
+         }
+     }
+-- 
+2.25.1
+

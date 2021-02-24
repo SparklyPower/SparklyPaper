@@ -1,0 +1,54 @@
+From 742fb14262501f071993273011de76a2dabb28b5 Mon Sep 17 00:00:00 2001
+From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
+Date: Thu, 11 Feb 2021 11:31:38 +0000
+Subject: [PATCH] Fix NotePlayEvent
+
+---
+ .../java/net/minecraft/server/BlockNote.java  | 22 ++++++++++++-------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/src/main/java/net/minecraft/server/BlockNote.java b/src/main/java/net/minecraft/server/BlockNote.java
+index df69d00d3..7111ba9c2 100644
+--- a/src/main/java/net/minecraft/server/BlockNote.java
++++ b/src/main/java/net/minecraft/server/BlockNote.java
+@@ -39,10 +39,9 @@ public class BlockNote extends Block {
+     private void play(World world, BlockPosition blockposition, IBlockData data) { // CraftBukkit
+         if (world.getType(blockposition.up()).isAir()) {
+             // CraftBukkit start
+-            org.bukkit.event.block.NotePlayEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callNotePlayEvent(world, blockposition, data.get(BlockNote.INSTRUMENT), data.get(BlockNote.NOTE));
+-            if (!event.isCancelled()) {
+-                world.playBlockAction(blockposition, this, 0, 0);
+-            }
++            // Haricot start - move NotePlayEvent call to fix instrument/note changes
++            world.playBlockAction(blockposition, this, 0, 0);
++            // Haricot end
+             // CraftBukkit end
+         }
+ 
+@@ -71,12 +70,19 @@ public class BlockNote extends Block {
+ 
+     @Override
+     public boolean a(IBlockData iblockdata, World world, BlockPosition blockposition, int i, int j) {
+-        int k = (Integer) iblockdata.get(BlockNote.NOTE);
++        // Haricot start - move NotePlayEvent call to fix instrument/note changes
++        org.bukkit.event.block.NotePlayEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callNotePlayEvent(world, blockposition, iblockdata.get(BlockNote.INSTRUMENT), iblockdata.get(BlockNote.NOTE));
++
++        int k = event.getNote().getId();
+         float f = (float) Math.pow(2.0D, (double) (k - 12) / 12.0D);
+ 
+-        world.playSound((EntityHuman) null, blockposition, ((BlockPropertyInstrument) iblockdata.get(BlockNote.INSTRUMENT)).b(), SoundCategory.RECORDS, 3.0F, f);
+-        world.addParticle(Particles.NOTE, (double) blockposition.getX() + 0.5D, (double) blockposition.getY() + 1.2D, (double) blockposition.getZ() + 0.5D, (double) k / 24.0D, 0.0D, 0.0D);
+-        return true;
++        if (!event.isCancelled()) {
++            world.playSound((EntityHuman) null, blockposition, BlockPropertyInstrument.valueOf(event.getInstrument().getName().toUpperCase()).b(), SoundCategory.RECORDS, 3.0F, f);
++            world.addParticle(Particles.NOTE, (double) blockposition.getX() + 0.5D, (double) blockposition.getY() + 1.2D, (double) blockposition.getZ() + 0.5D, (double) k / 24.0D, 0.0D, 0.0D);
++            return true;
++        }
++        return false;
++        // Haricot end
+     }
+ 
+     @Override
+-- 
+2.25.1
+

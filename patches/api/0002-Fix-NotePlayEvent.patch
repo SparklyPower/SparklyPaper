@@ -1,0 +1,108 @@
+From 502314e373a9e4cf31d1778f63dfaad39b644198 Mon Sep 17 00:00:00 2001
+From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
+Date: Thu, 11 Feb 2021 11:27:24 +0000
+Subject: [PATCH] Fix NotePlayEvent
+
+---
+ src/main/java/org/bukkit/Instrument.java      | 29 +++++++++++++++----
+ .../org/bukkit/event/block/NotePlayEvent.java |  4 ---
+ 2 files changed, 24 insertions(+), 9 deletions(-)
+
+diff --git a/src/main/java/org/bukkit/Instrument.java b/src/main/java/org/bukkit/Instrument.java
+index 92194803..82ddb000 100644
+--- a/src/main/java/org/bukkit/Instrument.java
++++ b/src/main/java/org/bukkit/Instrument.java
+@@ -3,33 +3,34 @@ package org.bukkit;
+ import com.google.common.collect.Maps;
+ import java.util.Map;
+ import org.jetbrains.annotations.Nullable;
++import org.jetbrains.annotations.NotNull; // Haricot - add constructor for actual state value names
+ 
+ public enum Instrument {
+ 
+     /**
+      * Piano is the standard instrument for a note block.
+      */
+-    PIANO(0x0),
++    PIANO(0x0, "harp"), // Haricot - add constructor for actual state value names
+     /**
+      * Bass drum is normally played when a note block is on top of a
+      * stone-like block.
+      */
+-    BASS_DRUM(0x1),
++    BASS_DRUM(0x1, "basedrum"), // Haricot - add constructor for actual state value names
+     /**
+      * Snare drum is normally played when a note block is on top of a sandy
+      * block.
+      */
+-    SNARE_DRUM(0x2),
++    SNARE_DRUM(0x2, "snare"), // Haricot - add constructor for actual state value names
+     /**
+      * Sticks are normally played when a note block is on top of a glass
+      * block.
+      */
+-    STICKS(0x3),
++    STICKS(0x3, "hat"), // Haricot - add constructor for actual state value names
+     /**
+      * Bass guitar is normally played when a note block is on top of a wooden
+      * block.
+      */
+-    BASS_GUITAR(0x4),
++    BASS_GUITAR(0x4, "bass"), // Haricot - add constructor for actual state value names
+     /**
+      * Flute is normally played when a note block is on top of a clay block.
+      */
+@@ -81,8 +82,26 @@ public enum Instrument {
+ 
+     private Instrument(final int type) {
+         this.type = (byte) type;
++        this.value = this.name().toLowerCase(); // Haricot - add constructor for actual state value names
+     }
+ 
++    // Haricot start - add constructor for actual state value names
++    private final String value;
++
++    Instrument(final int type, final String value) {
++        this.type = (byte) type;
++        this.value = value;
++    }
++
++    /**
++     * Gets the name of the instrument, as found in the block state.
++     * @return the name of the instrument
++     */
++    public @NotNull String getName() {
++        return this.value;
++    }
++    // Haricot end
++
+     /**
+      * @return The type ID of this instrument.
+      * @deprecated Magic value
+diff --git a/src/main/java/org/bukkit/event/block/NotePlayEvent.java b/src/main/java/org/bukkit/event/block/NotePlayEvent.java
+index a3887067..676b31f6 100644
+--- a/src/main/java/org/bukkit/event/block/NotePlayEvent.java
++++ b/src/main/java/org/bukkit/event/block/NotePlayEvent.java
+@@ -58,9 +58,7 @@ public class NotePlayEvent extends BlockEvent implements Cancellable {
+      * Overrides the {@link Instrument} to be used.
+      *
+      * @param instrument the Instrument. Has no effect if null.
+-     * @deprecated no effect on newer Minecraft versions
+      */
+-    @Deprecated
+     public void setInstrument(@NotNull Instrument instrument) {
+         if (instrument != null) {
+             this.instrument = instrument;
+@@ -71,9 +69,7 @@ public class NotePlayEvent extends BlockEvent implements Cancellable {
+      * Overrides the {@link Note} to be played.
+      *
+      * @param note the Note. Has no effect if null.
+-     * @deprecated no effect on newer Minecraft versions
+      */
+-    @Deprecated
+     public void setNote(@NotNull Note note) {
+         if (note != null) {
+             this.note = note;
+-- 
+2.25.1
+

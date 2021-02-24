@@ -1,0 +1,151 @@
+From 10a10970b7e62160a78a4ce2a7a06f73676ba0a6 Mon Sep 17 00:00:00 2001
+From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
+Date: Thu, 11 Feb 2021 13:16:44 +0000
+Subject: [PATCH] More note block events
+
+---
+ .../event/block/NoteBlockPlaceEvent.java      | 44 ++++++++++
+ .../event/block/NoteBlockUpdateEvent.java     | 80 +++++++++++++++++++
+ 2 files changed, 124 insertions(+)
+ create mode 100644 src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java
+ create mode 100644 src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
+
+diff --git a/src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java
+new file mode 100644
+index 00000000..2a22bb7c
+--- /dev/null
++++ b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java
+@@ -0,0 +1,44 @@
++package ml.beancraft.haricot.event.block;
++
++import org.bukkit.block.Block;
++import org.bukkit.block.data.type.NoteBlock;
++import org.bukkit.event.HandlerList;
++import org.bukkit.event.block.BlockEvent;
++import org.bukkit.inventory.ItemStack;
++import org.jetbrains.annotations.NotNull;
++
++public class NoteBlockPlaceEvent extends BlockEvent {
++    private static final HandlerList handlers = new HandlerList();
++
++    private final ItemStack itemInHand;
++    private NoteBlock data;
++
++    public NoteBlockPlaceEvent(@NotNull Block block, @NotNull NoteBlock data, @NotNull ItemStack itemInHand) {
++        super(block);
++        this.data = data;
++        this.itemInHand = itemInHand;
++    }
++
++    public @NotNull ItemStack getItemInHand() {
++        return itemInHand;
++    }
++
++    public @NotNull NoteBlock getData() {
++        return data;
++    }
++
++    public void setData(@NotNull NoteBlock data) {
++        this.data = data;
++    }
++
++    @NotNull
++    @Override
++    public HandlerList getHandlers() {
++        return handlers;
++    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return handlers;
++    }
++}
+diff --git a/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
+new file mode 100644
+index 00000000..c1d8b37c
+--- /dev/null
++++ b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
+@@ -0,0 +1,80 @@
++package ml.beancraft.haricot.event.block;
++
++import org.apache.commons.lang.Validate;
++import org.bukkit.block.Block;
++import org.bukkit.block.data.type.NoteBlock;
++import org.bukkit.event.Cancellable;
++import org.bukkit.event.HandlerList;
++import org.bukkit.event.block.BlockEvent;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * Called when the data of a note block changes. Note that this may not be called for
++ * every note block update and might be called multiple times for one cause.
++ */
++public class NoteBlockUpdateEvent extends BlockEvent implements Cancellable {
++    private static final HandlerList handlers = new HandlerList();
++
++    private final NoteBlock oldData;
++    private NoteBlock newData;
++    private boolean cancelled;
++
++    /**
++     * Constructs a new note block update event.
++     * @param theBlock the block that is being updated
++     * @param oldData the data the block had before the update
++     * @param newData the data this block is going to have after the update
++     */
++    public NoteBlockUpdateEvent(@NotNull Block theBlock, @NotNull NoteBlock oldData, @NotNull NoteBlock newData) {
++        super(theBlock);
++        this.oldData = oldData;
++        this.newData = newData;
++        this.cancelled = false;
++    }
++
++    /**
++     * Gets the data of the note block before the update.
++     * @return the data
++     */
++    public @NotNull NoteBlock getOldData() {
++        return this.oldData;
++    }
++
++    /**
++     * Gets the data that the note block will have after this event.
++     * @return the data
++     */
++    public @NotNull NoteBlock getNewData() {
++        return this.newData;
++    }
++
++    /**
++     * Sets the data that the note block will have after this event.
++     * @param data the data
++     */
++    public void setNewData(@NotNull NoteBlock data) {
++        Validate.notNull(data, "Data cannot be null");
++        this.newData = data;
++    }
++
++    @Override
++    public boolean isCancelled() {
++        return cancelled;
++    }
++
++    @Override
++    public void setCancelled(boolean cancel) {
++        this.cancelled = cancel;
++    }
++
++    @NotNull
++    @Override
++    public HandlerList getHandlers() {
++        return handlers;
++    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return handlers;
++    }
++}
+-- 
+2.25.1
+
