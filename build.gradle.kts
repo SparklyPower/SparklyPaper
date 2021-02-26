@@ -19,7 +19,7 @@ toothpick {
     nmsRevision = "R0.1-SNAPSHOT"
 
     upstream = "Tuinity"
-    upstreamBranch = "origin/master"
+    upstreamBranch = "origin/dev/playerchunkloading"
 
     paperclipName = "launcher-sparklypaper"
 
