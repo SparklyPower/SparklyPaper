@@ -1,18 +1,12 @@
-From 10a10970b7e62160a78a4ce2a7a06f73676ba0a6 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
 Date: Thu, 11 Feb 2021 13:16:44 +0000
 Subject: [PATCH] More note block events
 
----
- .../event/block/NoteBlockPlaceEvent.java      | 44 ++++++++++
- .../event/block/NoteBlockUpdateEvent.java     | 80 +++++++++++++++++++
- 2 files changed, 124 insertions(+)
- create mode 100644 src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java
- create mode 100644 src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
 
 diff --git a/src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java
 new file mode 100644
-index 00000000..2a22bb7c
+index 0000000000000000000000000000000000000000..2a22bb7c80884bde59cafaff2b50f99d44504998
 --- /dev/null
 +++ b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockPlaceEvent.java
 @@ -0,0 +1,44 @@
@@ -62,7 +56,7 @@ index 00000000..2a22bb7c
 +}
 diff --git a/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
 new file mode 100644
-index 00000000..c1d8b37c
+index 0000000000000000000000000000000000000000..c1d8b37cb43d09244014963eb73f64e816d2b1cb
 --- /dev/null
 +++ b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
 @@ -0,0 +1,80 @@
@@ -146,6 +140,3 @@ index 00000000..c1d8b37c
 +        return handlers;
 +    }
 +}
--- 
-2.25.1
-

@@ -1,15 +1,11 @@
-From 502314e373a9e4cf31d1778f63dfaad39b644198 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
 Date: Thu, 11 Feb 2021 11:27:24 +0000
 Subject: [PATCH] Fix NotePlayEvent
 
----
- src/main/java/org/bukkit/Instrument.java      | 29 +++++++++++++++----
- .../org/bukkit/event/block/NotePlayEvent.java |  4 ---
- 2 files changed, 24 insertions(+), 9 deletions(-)
 
 diff --git a/src/main/java/org/bukkit/Instrument.java b/src/main/java/org/bukkit/Instrument.java
-index 92194803..82ddb000 100644
+index 92194803bcdfbcfdb99567835906ce9219eabd04..82ddb0008914d1782d039cf6bd78dd60edc8cec7 100644
 --- a/src/main/java/org/bukkit/Instrument.java
 +++ b/src/main/java/org/bukkit/Instrument.java
 @@ -3,33 +3,34 @@ package org.bukkit;
@@ -80,7 +76,7 @@ index 92194803..82ddb000 100644
       * @return The type ID of this instrument.
       * @deprecated Magic value
 diff --git a/src/main/java/org/bukkit/event/block/NotePlayEvent.java b/src/main/java/org/bukkit/event/block/NotePlayEvent.java
-index a3887067..676b31f6 100644
+index a3887067d1b65fb100ac1407a43c455f5d215510..676b31f6f38d4e85cd4bd16ccf42cbc39a5d8423 100644
 --- a/src/main/java/org/bukkit/event/block/NotePlayEvent.java
 +++ b/src/main/java/org/bukkit/event/block/NotePlayEvent.java
 @@ -58,9 +58,7 @@ public class NotePlayEvent extends BlockEvent implements Cancellable {
@@ -103,6 +99,3 @@ index a3887067..676b31f6 100644
      public void setNote(@NotNull Note note) {
          if (note != null) {
              this.note = note;
--- 
-2.25.1
-

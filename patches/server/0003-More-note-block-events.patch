@@ -1,14 +1,11 @@
-From 50416a2ef110abe02e86b83bddc08464b8addb81 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
 Date: Thu, 11 Feb 2021 13:17:03 +0000
 Subject: [PATCH] More note block events
 
----
- .../java/net/minecraft/server/BlockNote.java  | 63 ++++++++++++++++---
- 1 file changed, 56 insertions(+), 7 deletions(-)
 
 diff --git a/src/main/java/net/minecraft/server/BlockNote.java b/src/main/java/net/minecraft/server/BlockNote.java
-index 7111ba9c2..f8261543d 100644
+index 7111ba9c2119679cd915895370b2159d90396664..f8261543df1d602cd41662e15a66352a1219cacb 100644
 --- a/src/main/java/net/minecraft/server/BlockNote.java
 +++ b/src/main/java/net/minecraft/server/BlockNote.java
 @@ -1,5 +1,12 @@
@@ -105,6 +102,3 @@ index 7111ba9c2..f8261543d 100644
              return EnumInteractionResult.CONSUME;
          }
      }
--- 
-2.25.1
-

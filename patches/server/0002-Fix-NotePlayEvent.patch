@@ -1,14 +1,11 @@
-From 742fb14262501f071993273011de76a2dabb28b5 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
 Date: Thu, 11 Feb 2021 11:31:38 +0000
 Subject: [PATCH] Fix NotePlayEvent
 
----
- .../java/net/minecraft/server/BlockNote.java  | 22 ++++++++++++-------
- 1 file changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/src/main/java/net/minecraft/server/BlockNote.java b/src/main/java/net/minecraft/server/BlockNote.java
-index df69d00d3..7111ba9c2 100644
+index df69d00d3a38417e53f433cd1eb1f6cf3ec9b55b..7111ba9c2119679cd915895370b2159d90396664 100644
 --- a/src/main/java/net/minecraft/server/BlockNote.java
 +++ b/src/main/java/net/minecraft/server/BlockNote.java
 @@ -39,10 +39,9 @@ public class BlockNote extends Block {
@@ -49,6 +46,3 @@ index df69d00d3..7111ba9c2 100644
      }
  
      @Override
--- 
-2.25.1
-

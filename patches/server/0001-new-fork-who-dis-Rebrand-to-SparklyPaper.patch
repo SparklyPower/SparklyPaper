@@ -4,105 +4,18 @@ Date: Mon, 22 Feb 2021 17:44:11 -0300
 Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper
 
 
-diff --git a/pom.xml b/pom.xml
-index e83e4241a56fe131a75fe21cc1518992c089da2c..ef6d6019a5782d42ea6cd73f76e01f4e985771de 100644
---- a/pom.xml
-+++ b/pom.xml
-@@ -1,11 +1,11 @@
- <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-     <modelVersion>4.0.0</modelVersion>
--    <artifactId>tuinity</artifactId>
-+    <artifactId>sparklypaper</artifactId>
-     <packaging>jar</packaging>
-     <version>1.16.5-R0.1-SNAPSHOT</version>
--    <name>Tuinity-Server</name>
--    <url>https://github.com/Spottedleaf/Tuinity</url>
-+    <name>SparklyPaper-Server</name>
-+    <url>https://github.com/SparklyPower/SparklyPaper</url>
- 
-     <properties>
-         <!-- <skipTests>true</skipTests> Paper - This [was] not going to end well -->
-@@ -19,8 +19,8 @@
-     </properties>
- 
-     <parent>
--        <groupId>com.tuinity</groupId>
--        <artifactId>tuinity-parent</artifactId>
-+        <groupId>net.perfectdreams.sparklypaper</groupId>
-+        <artifactId>sparklypaper-parent</artifactId>
-         <version>dev-SNAPSHOT</version>
-         <relativePath>../pom.xml</relativePath>
-     </parent>
-@@ -183,7 +183,7 @@
- 
-     <!-- This builds a completely 'ready to start' jar with all dependencies inside -->
-     <build>
--        <finalName>tuinity-${minecraft.version}</finalName>
-+        <finalName>sparklypaper-${minecraft.version}</finalName> <!-- SparklyPaper -->
-         <defaultGoal>install</defaultGoal> <!-- Paper -->
-         <plugins>
-             <plugin>
-@@ -191,7 +191,7 @@
-                 <artifactId>gitdescribe-maven-plugin</artifactId>
-                 <version>1.3</version>
-                 <configuration>
--                    <outputPrefix>git-Tuinity-</outputPrefix> <!-- Tuinity -->
-+                    <outputPrefix>git-SparklyPaper-</outputPrefix> <!-- SparklyPaper -->
-                     <scmDirectory>..</scmDirectory>
-                 </configuration>
-                 <executions>
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 255bbd6e48b95c70fad02ba692c64c7579496827..bbe8902b6ace3c2bd9eb49192d9cd855e0a88565 100644
+index 7063f1da3654b382e26b0093ad5d0ff04a2b38c2..b6ee4e6e4c223f61874cc8c5817ed68df29e76b2 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-@@ -24,8 +24,8 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -28,8 +28,8 @@ public class PaperVersionFetcher implements VersionFetcher {
      @Nonnull
      @Override
-     public String getVersionMessage(@Nonnull String serverVersion) {
+     public Component getVersionMessage(@Nonnull String serverVersion) {
 -        String[] parts = serverVersion.substring("git-Tuinity-".length()).split("[-\\s]"); // Tuinity
--        String updateMessage = getUpdateStatusMessage("Spottedleaf/Tuinity", GITHUB_BRANCH_NAME, parts[0]); // Tuinity
+-        final Component updateMessage = getUpdateStatusMessage("Spottedleaf/Tuinity", GITHUB_BRANCH_NAME, parts[0]); // Tuinity
 +        String[] parts = serverVersion.substring("git-SparklyPaper-".length()).split("[-\\s]"); // SparklyPaper // Tuinity
-+        String updateMessage = getUpdateStatusMessage("SparklyPower/SparklyPaper", GITHUB_BRANCH_NAME, parts[0]); // SparklyPaper // Tuinity
-         String history = getHistory();
++        final Component updateMessage = getUpdateStatusMessage("SparklyPower/SparklyPaper", GITHUB_BRANCH_NAME, parts[0]); // SparklyPaper // Tuinity
+         final Component history = getHistory();
  
-         return history != null ? history + "\n" + updateMessage : updateMessage;
-diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 1768554b00ea0b7a57ebbed1f0bc5d8fd6f02f76..c08b6bfc2861d5ee227424ec5950b9a4d8ba3e5c 100644
---- a/src/main/java/net/minecraft/server/MinecraftServer.java
-+++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1513,7 +1513,7 @@ public abstract class MinecraftServer extends IAsyncTaskHandlerReentrant<TickTas
-     }
- 
-     public String getServerModName() {
--        return "Tuinity"; // Tuinity //Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-+        return "SparklyPaper"; // SparklyPaper // Tuinity //Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-     }
- 
-     public CrashReport b(CrashReport crashreport) {
-diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 44524e08bed8897e43e408b6f179bf798fed9b62..0272750bfb233fd3f2ae6a734f539a84a2dd5cb5 100644
---- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-+++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -231,7 +231,7 @@ import javax.annotation.Nullable; // Paper
- import javax.annotation.Nonnull; // Paper
- 
- public final class CraftServer implements Server {
--    private final String serverName = "Tuinity"; // Paper // Tuinity
-+    private final String serverName = "SparklyPaper"; // SparklyPaper // Paper // Tuinity
-     private final String serverVersion;
-     private final String bukkitVersion = Versioning.getBukkitVersion();
-     private final Logger logger = Logger.getLogger("Minecraft");
-diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 001b1e5197eaa51bfff9031aa6c69876c9a47960..a299350e03e805bf3ad155ee5380895a4c0e8b14 100644
---- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-+++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-@@ -11,7 +11,7 @@ public final class Versioning {
-     public static String getBukkitVersion() {
-         String result = "Unknown-Version";
- 
--        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.tuinity/tuinity-api/pom.properties"); // Tuinity
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/net.perfectdreams.sparklypaper/sparklypaper-api/pom.properties"); // SparklyPaper // Tuinity
-         Properties properties = new Properties();
- 
-         if (stream != null) {
+         return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
