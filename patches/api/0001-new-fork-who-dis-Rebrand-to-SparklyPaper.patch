@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper
 
 
 diff --git a/pom.xml b/pom.xml
-index 821df3413345c613eccff158f8081cf9ba848a14..e9e469ab4641f1830dff63b2090139074abaedfa 100644
+index 6c200882954adc4831307f3d6dfa3202571fb30b..9299aa2b3f41ed09113e6e20b5fbc3f57e8a748b 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -3,8 +3,8 @@

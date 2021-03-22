@@ -4,11 +4,11 @@ Date: Thu, 11 Feb 2021 11:31:38 +0000
 Subject: [PATCH] Fix NotePlayEvent
 
 
-diff --git a/src/main/java/net/minecraft/server/BlockNote.java b/src/main/java/net/minecraft/server/BlockNote.java
-index df69d00d3a38417e53f433cd1eb1f6cf3ec9b55b..7111ba9c2119679cd915895370b2159d90396664 100644
---- a/src/main/java/net/minecraft/server/BlockNote.java
-+++ b/src/main/java/net/minecraft/server/BlockNote.java
-@@ -39,10 +39,9 @@ public class BlockNote extends Block {
+diff --git a/src/main/java/net/minecraft/world/level/block/BlockNote.java b/src/main/java/net/minecraft/world/level/block/BlockNote.java
+index feec1db88b22a4d13ffd3034633da79ed41b94fe..5b07037c0501d3ecf0c82f40b78bd135b81dbb75 100644
+--- a/src/main/java/net/minecraft/world/level/block/BlockNote.java
++++ b/src/main/java/net/minecraft/world/level/block/BlockNote.java
+@@ -61,10 +61,9 @@ public class BlockNote extends Block {
      private void play(World world, BlockPosition blockposition, IBlockData data) { // CraftBukkit
          if (world.getType(blockposition.up()).isAir()) {
              // CraftBukkit start
@@ -22,7 +22,7 @@ index df69d00d3a38417e53f433cd1eb1f6cf3ec9b55b..7111ba9c2119679cd915895370b2159d
              // CraftBukkit end
          }
  
-@@ -71,12 +70,19 @@ public class BlockNote extends Block {
+@@ -93,12 +92,19 @@ public class BlockNote extends Block {
  
      @Override
      public boolean a(IBlockData iblockdata, World world, BlockPosition blockposition, int i, int j) {
