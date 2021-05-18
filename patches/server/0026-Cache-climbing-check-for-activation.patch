@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Paul Sauve <paul@technove.co>
+Date: Mon, 26 Apr 2021 10:52:56 -0500
+Subject: [PATCH] Cache climbing check for activation
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/EntityLiving.java b/src/main/java/net/minecraft/world/entity/EntityLiving.java
+index 74f80b6af18c0b91d9613384ca6bafd9c89f23a4..003e1f6dc8efbabcb2e0f7a6b379196f02203903 100644
+--- a/src/main/java/net/minecraft/world/entity/EntityLiving.java
++++ b/src/main/java/net/minecraft/world/entity/EntityLiving.java
+@@ -1745,6 +1745,19 @@ public abstract class EntityLiving extends Entity {
+         }
+     }
+ 
++    // Airplane start
++    private boolean cachedIsClimbing = false;
++    private BlockPosition lastClimbingPosition = null;
++
++    public boolean isClimbingCached() {
++        if (!this.getChunkCoordinates().equals(this.lastClimbingPosition)) {
++            this.cachedIsClimbing = this.isClimbing();
++            this.lastClimbingPosition = this.getChunkCoordinates();
++        }
++        return this.cachedIsClimbing;
++    }
++    // Airplane end
++
+     public IBlockData ds() {
+         return this.world.getType(this.getChunkCoordinates());
+     }
+diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
+index 5c2eaca0bc63c7880ee928aba6a24761737aa649..eae6d46e1f894f6eca966ca3ad51aca61153fc3e 100644
+--- a/src/main/java/org/spigotmc/ActivationRange.java
++++ b/src/main/java/org/spigotmc/ActivationRange.java
+@@ -297,7 +297,7 @@ public class ActivationRange
+         if ( entity instanceof EntityLiving )
+         {
+             EntityLiving living = (EntityLiving) entity;
+-            if ( living.isClimbing() || living.jumping || living.hurtTicks > 0 || living.effects.size() > 0 ) // Paper
++            if ( living.isClimbingCached() || living.jumping || living.hurtTicks > 0 || living.effects.size() > 0 ) // Paper // Airplane - use cached climbing
+             {
+                 return 1; // Paper
+             }

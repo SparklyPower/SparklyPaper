@@ -5,7 +5,7 @@ Subject: [PATCH] Reduce entity chunk ticking checks from 3 to 1
 
 
 diff --git a/src/main/java/net/minecraft/server/level/WorldServer.java b/src/main/java/net/minecraft/server/level/WorldServer.java
-index 49c8fc7f33edc7e6c5eb76544141d12153b52312..d13c6f4c368ca6fe3326b66d4c3ef94cf166e7e3 100644
+index 136faf61770011a830cc58259d1dad11830ca808..26379b411d35818bfe59c1b39e2f90417a67c969 100644
 --- a/src/main/java/net/minecraft/server/level/WorldServer.java
 +++ b/src/main/java/net/minecraft/server/level/WorldServer.java
 @@ -1083,11 +1083,12 @@ public class WorldServer extends World implements GeneratorAccessSeed {
