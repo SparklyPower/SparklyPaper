@@ -1,10 +1,1 @@
-import xyz.jpenilla.toothpick.loadDependencies
-import xyz.jpenilla.toothpick.loadRepositories
-
-repositories {
-    loadRepositories(project)
-}
-
-dependencies {
-    loadDependencies(project)
-}
+// Nothing here :P
