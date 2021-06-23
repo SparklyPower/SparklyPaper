@@ -1,0 +1,11 @@
+{
+  "vanillaJar": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/taskCache/downloadServerJar.jar",
+  "remappedJar": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/taskCache/minecraft.jar",
+  "decompiledJar": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/taskCache/decompileJar.jar",
+  "mcVersion": "1.17",
+  "libSourceDir": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/jars/minecraft-sources",
+  "libFile": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/data/ServerLibraries.txt",
+  "mappings": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/mappings/spigot-mojang+yarn-patched.tiny",
+  "notchToSpigotMappings": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/mappings/official-spigot.tiny",
+  "sourceMappings": "/mnt/c/Users/Leonardo/Documents/IdeaProjects/SparklyPaper-Redux/.gradle/caches/paperweight/upstreams/paper/.gradle/caches/paperweight/mappings/official-mojang+yarn.tiny"
+}
