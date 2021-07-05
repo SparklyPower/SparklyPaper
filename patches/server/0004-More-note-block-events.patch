@@ -1,0 +1,120 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Mon, 5 Jul 2021 00:06:53 -0300
+Subject: [PATCH] More note block events
+
+From Haricot, thanks Kezz! https://github.com/kezz/Haricot/blob/dffbe897cd6db773c06cfad6304e20b54c7aa980/patches/server/0005-More-note-block-events.patch
+
+diff --git a/src/main/java/net/minecraft/world/level/block/NoteBlock.java b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
+index 253709d7194d47bd8fb9e976967fd1e84b92fd51..3386e8a2f2cd5aefe30c1204ecd1c483b16fde07 100644
+--- a/src/main/java/net/minecraft/world/level/block/NoteBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
+@@ -21,6 +21,12 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
+ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+ import net.minecraft.world.level.block.state.properties.Property;
+ import net.minecraft.world.phys.BlockHitResult;
++// Haricot start
++import ml.beancraft.haricot.event.block.NoteBlockPlaceEvent;
++import ml.beancraft.haricot.event.block.NoteBlockUpdateEvent;
++import org.bukkit.craftbukkit.block.CraftBlock;
++import org.bukkit.craftbukkit.block.impl.CraftNote;
++// Haricot end
+ 
+ public class NoteBlock extends Block {
+ 
+@@ -35,12 +41,32 @@ public class NoteBlock extends Block {
+ 
+     @Override
+     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+-        return (BlockState) this.defaultBlockState().setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.byState(ctx.getLevel().getBlockState(ctx.getClickedPos().below())));
++        // Haricot start - note block api
++        NoteBlockPlaceEvent event = new NoteBlockPlaceEvent(new CraftBlock(ctx.getLevel(), ctx.getClickedPos()),
++                new CraftNote(this.getStateDefinition().any()), ctx.getItemInHand().asBukkitMirror());
++        event.callEvent();
++
++        return this.getStateDefinition().any().setValue(INSTRUMENT, NoteBlockInstrument.values()[event.getData().getInstrument().getType()])
++                .setValue(NOTE, (int) event.getData().getNote().getId())
++                .setValue(POWERED, event.getData().isPowered());
++        // Haricot end
+     }
+ 
+     @Override
+     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+-        return direction == Direction.DOWN ? (BlockState) state.setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.byState(neighborState)) : super.updateShape(state, direction, neighborState, world, pos, neighborPos);
++        // Haricot start - note block api
++        NoteBlockUpdateEvent event = new NoteBlockUpdateEvent(new CraftBlock(world, pos), new CraftNote(state),
++                new CraftNote(direction == Direction.DOWN ? state.setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.byState(neighborState)) : state));
++        event.callEvent();
++
++        if (!event.isCancelled()) {
++            return state.setValue(INSTRUMENT, NoteBlockInstrument.values()[event.getNewData().getInstrument().getType()])
++                    .setValue(NOTE, (int) event.getNewData().getNote().getId())
++                    .setValue(POWERED, event.getNewData().isPowered());
++        } else {
++            return state;
++        }
++        // Haricot end
+     }
+ 
+     @Override
+@@ -53,7 +79,22 @@ public class NoteBlock extends Block {
+                 state = world.getBlockState(pos); // CraftBukkit - SPIGOT-5617: update in case changed in event
+             }
+ 
+-            world.setBlock(pos, (BlockState) state.setValue(NoteBlock.POWERED, flag1), 3);
++            // Haricot start - note block api
++            NoteBlockUpdateEvent event = new NoteBlockUpdateEvent(new CraftBlock(world, pos), new CraftNote(state),
++                    new CraftNote(state.setValue(NoteBlock.POWERED, flag1)));
++            event.callEvent();
++
++            if (!event.isCancelled()) {
++                world.setBlock(
++                        pos,
++                        state
++                                .setValue(NoteBlock.INSTRUMENT, NoteBlockInstrument.values()[event.getNewData().getInstrument().getType()])
++                                .setValue(NoteBlock.NOTE, (int) event.getNewData().getNote().getId())
++                                .setValue(NoteBlock.POWERED, flag1),
++                        3
++                );
++            }
++            // Haricot end
+         }
+ 
+     }
+@@ -62,7 +103,7 @@ public class NoteBlock extends Block {
+         if (world.getBlockState(blockposition.above()).isAir()) {
+             // CraftBukkit start
+             // Paper start - move NotePlayEvent call to fix instrument/note changes
+-                world.blockEvent(blockposition, this, 0, 0);
++            world.blockEvent(blockposition, this, 0, 0);
+             // Paper end
+             // CraftBukkit end
+         }
+@@ -74,10 +115,23 @@ public class NoteBlock extends Block {
+         if (world.isClientSide) {
+             return InteractionResult.SUCCESS;
+         } else {
+-            state = (BlockState) state.cycle((Property) NoteBlock.NOTE);
+-            world.setBlock(pos, state, 3);
+-            this.play(world, pos, state); // CraftBukkit
+-            player.awardStat(Stats.TUNE_NOTEBLOCK);
++            // Haricot start - note block api
++            NoteBlockUpdateEvent event = new NoteBlockUpdateEvent(new CraftBlock(world, pos), new CraftNote(state),
++                    new CraftNote(state.cycle(NOTE)));
++            event.callEvent();
++
++            if (!event.isCancelled()) {
++                BlockState newData = state
++                        .setValue(INSTRUMENT, NoteBlockInstrument.values()[event.getNewData().getInstrument().getType()])
++                        .setValue(NOTE, (int) event.getNewData().getNote().getId())
++                        .setValue(POWERED, event.getNewData().isPowered());
++
++                world.setBlock(pos, newData, 3);
++                this.play(world, pos, state); // CraftBukkit
++                player.awardStat(Stats.TUNE_NOTEBLOCK);
++            }
++            // Haricot end
++
+             return InteractionResult.CONSUME;
+         }
+     }
