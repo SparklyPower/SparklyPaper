@@ -1,0 +1,39 @@
+# From Tuinity, thanks!
+# https://github.com/Tuinity/Tuinity/blob/d3a0c9bdacb75e9e87cf70adb3bfac492f037f2d/.github/workflows/build.yml
+name: Build SparklyPaper
+on: [ push, pull_request ]
+jobs:
+  build:
+    # Only run on PRs if the source branch is on someone else's repo
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 16 ]
+      fail-fast: true
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v2
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+      - name: Configure Git
+        run: |
+          git config --global user.email "no-reply@github.com"
+          git config --global user.name "Github Actions"
+      - name: Patch SparklyPaper
+        run: |
+          ./gradlew applyPatches --stacktrace --no-daemon
+      - name: Build SparklyPaper
+        run: |
+          ./gradlew build --stacktrace --no-daemon
+          ./gradlew paperclipJar --stacktrace --no-daemon
+      - name: Archive SparklyPaper Paperclip
+        uses: actions/upload-artifact@v2
+        with:
+          name: SparklyPaper
+          path: build/libs/SparklyPaper-1.17-R0.1-SNAPSHOT.jar
