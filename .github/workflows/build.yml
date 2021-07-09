@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: SparklyPaper
-          path: build/libs/SparklyPaper-1.17-R0.1-SNAPSHOT.jar
+          path: build/libs/SparklyPaper-*-SNAPSHOT.jar
