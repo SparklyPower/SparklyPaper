@@ -68,7 +68,7 @@ index 1ec307d705087eec9d867f9f8e8858ac388f3846..ecbae283bc99fcba1e48dcebe4f970e0
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 001b1e5197eaa51bfff9031aa6c69876c9a47960..ed1e1bc26078ba6d0eb37dd651d1409a50682df5 100644
+index 001b1e5197eaa51bfff9031aa6c69876c9a47960..5f8a74e5edaac1c5f158513a54d4d60eff737875 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
@@ -76,7 +76,7 @@ index 001b1e5197eaa51bfff9031aa6c69876c9a47960..ed1e1bc26078ba6d0eb37dd651d1409a
          String result = "Unknown-Version";
  
 -        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.tuinity/tuinity-api/pom.properties"); // Tuinity
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/net.sparklypower.sparklypaper/tuinity-api/pom.properties"); // SparklyPaper // Tuinity
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/net.sparklypower.sparklypaper/sparklypaper-api/pom.properties"); // SparklyPaper // Tuinity
          Properties properties = new Properties();
  
          if (stream != null) {
