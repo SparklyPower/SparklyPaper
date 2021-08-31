@@ -5,78 +5,52 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index f5a9c41fdbaede65cf4607737421571f0c344c1f..d4c24ddadf3547ad8877505fbc2d62adb79dd739 100644
+index b3687f632bbf06c933a6ef04dc2236ccf3c030b8..d9525259111d897656780b6a1cd09e10b572c9b9 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -35,7 +35,7 @@ repositories {
+@@ -29,8 +29,8 @@ repositories {
  }
  
  dependencies {
--    implementation(project(":Tuinity-API")) // Tuinity
-+    implementation(project(":SparklyPaper-API")) // SparklyPaper // Tuinity
-     implementation("io.papermc.paper:paper-mojangapi:1.17.1-R0.1-SNAPSHOT") // Tuinity
+-    implementation(project(":Paper-API"))
+-    implementation(project(":Paper-MojangAPI"))
++    implementation(project(":SparklyPaper-API")) // SparklyPaper // Paper
++    implementation("io.papermc.paper:paper-mojangapi:1.17.1-R0.1-SNAPSHOT") // SparklyPaper
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.12.1")
-@@ -88,7 +88,7 @@ tasks.jar {
+     implementation("net.minecrell:terminalconsoleappender:1.2.0")
+@@ -82,7 +82,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
--            "Implementation-Version" to "git-Tuinity-$implementationVersion", // Tuinity
-+            "Implementation-Version" to "git-SparklyPaper-$implementationVersion", // SparklyPaper // Tuinity
+-            "Implementation-Version" to "git-Paper-$implementationVersion",
++            "Implementation-Version" to "git-SparklyPaper-$implementationVersion", // SparklyPaper
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index d50b61876f15d95b836b3dd81d9c3492c91a8448..3b8bd8948d118d1d557d9c6c8a97a6818a785f1d 100644
---- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-+++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-@@ -29,8 +29,8 @@ public class PaperVersionFetcher implements VersionFetcher {
-     @Nonnull
-     @Override
-     public Component getVersionMessage(@Nonnull String serverVersion) {
--        String[] parts = serverVersion.substring("git-Tuinity-".length()).split("[-\\s]"); // Tuinity
--        final Component updateMessage = getUpdateStatusMessage("Spottedleaf/Tuinity", GITHUB_BRANCH_NAME, parts[0]); // Tuinity
-+        String[] parts = serverVersion.substring("git-SparklyPaper-".length()).split("[-\\s]"); // SparklyPaper // Tuinity
-+        final Component updateMessage = getUpdateStatusMessage("SparklyPower/SparklyPaper", GITHUB_BRANCH_NAME, parts[0]); // SparklyPaper // Tuinity
-         final Component history = getHistory();
- 
-         return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
-diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f25bb4214cffd0050241ea229b6acb0c16b2b0a5..c5390c532b62042c81103c750af6e88bbc5d3d88 100644
---- a/src/main/java/net/minecraft/server/MinecraftServer.java
-+++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1716,7 +1716,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
- 
-     @DontObfuscate
-     public String getServerModName() {
--        return "Tuinity"; // Tuinity - Tuinity > //Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-+        return "SparklyPaper"; // SparklyPaper - SparklyPaper > // Tuinity - Tuinity > //Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-     }
- 
-     public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 1ec307d705087eec9d867f9f8e8858ac388f3846..ecbae283bc99fcba1e48dcebe4f970e0734e9467 100644
+index 4687827c096ecf8872ab39b00fbf9261ba5c3689..8e4817cdd81964bb5c9399fe75d0bcdfc90dca2e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -239,7 +239,7 @@ import javax.annotation.Nullable; // Paper
+@@ -246,7 +246,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
--    private final String serverName = "Tuinity"; // Tuinity // Paper
-+    private final String serverName = "SparklyPaper"; // SparklyPaper // Tuinity // Paper
+-    private final String serverName = "Paper"; // Paper
++    private final String serverName = "SparklyPaper"; // SparklyPaper // Paper
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 001b1e5197eaa51bfff9031aa6c69876c9a47960..5f8a74e5edaac1c5f158513a54d4d60eff737875 100644
+index 774556a62eb240da42e84db4502e2ed43495be17..6195e5f3ba6ada0da46e96d0a00246f47d37f547 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
      public static String getBukkitVersion() {
          String result = "Unknown-Version";
  
--        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.tuinity/tuinity-api/pom.properties"); // Tuinity
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/net.sparklypower.sparklypaper/sparklypaper-api/pom.properties"); // SparklyPaper // Tuinity
+-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/io.papermc.paper/paper-api/pom.properties");
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/net.sparklypower.sparklypaper/sparklypaper-api/pom.properties");
          Properties properties = new Properties();
  
          if (stream != null) {
