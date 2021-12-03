@@ -31,7 +31,7 @@ allprojects {
 }
 
 subprojects {
-    tasks.withType<JavaCompile>().configureEach {
+    tasks.withType<JavaCompile>() {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(17)
     }
