@@ -1,27 +1,27 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Kieran Wallbanks <kieran.wallbanks@gmail.com>
-Date: Mon, 21 Jun 2021 14:23:50 +0100
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Thu, 2 Dec 2021 22:54:36 -0300
 Subject: [PATCH] Fix NotePlayEvent
 
 
 diff --git a/src/main/java/net/minecraft/world/level/block/NoteBlock.java b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
-index f8e58d9f71703139a736d93e7f1996e027a29444..253709d7194d47bd8fb9e976967fd1e84b92fd51 100644
+index 16e11e31077f160198e0b04abdfeabb97ed20c6f..b74da21b82ba8d82b2aea7d778f708c4cc689469 100644
 --- a/src/main/java/net/minecraft/world/level/block/NoteBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
-@@ -61,10 +61,9 @@ public class NoteBlock extends Block {
-     private void play(Level world, BlockPos blockposition, BlockState data) { // CraftBukkit
+@@ -60,10 +60,8 @@ public class NoteBlock extends Block {
+     private void playNote(Level world, BlockPos blockposition, BlockState data) { // CraftBukkit
          if (world.getBlockState(blockposition.above()).isAir()) {
              // CraftBukkit start
 -            org.bukkit.event.block.NotePlayEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callNotePlayEvent(world, blockposition, data.getValue(NoteBlock.INSTRUMENT), data.getValue(NoteBlock.NOTE));
 -            if (!event.isCancelled()) {
-+            // Paper start - move NotePlayEvent call to fix instrument/note changes
-                 world.blockEvent(blockposition, this, 0, 0);
+-                world.blockEvent(blockposition, this, 0, 0);
 -            }
-+            // Paper end
++            // Paper start - move NotePlayEvent call to fix instrument/note changes
++            world.blockEvent(blockposition, this, 0, 0);
              // CraftBukkit end
          }
  
-@@ -93,10 +92,14 @@ public class NoteBlock extends Block {
+@@ -92,10 +90,14 @@ public class NoteBlock extends Block {
  
      @Override
      public boolean triggerEvent(BlockState state, Level world, BlockPos pos, int type, int data) {
@@ -39,7 +39,7 @@ index f8e58d9f71703139a736d93e7f1996e027a29444..253709d7194d47bd8fb9e976967fd1e8
          return true;
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 72cfffd80ad76abe7cb16bc9133730338c07b6f6..2935a4d1dbfb04a0b43316f1adf8cbdc4acc8f9f 100644
+index d51c63496b55d64ac7ee6175bc364012df897891..d4d592bf4c5055774d1c985f17088fc537cac47d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -118,6 +118,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -82,7 +82,7 @@ index 72cfffd80ad76abe7cb16bc9133730338c07b6f6..2935a4d1dbfb04a0b43316f1adf8cbdc
      // Paper start
 diff --git a/src/test/java/org/bukkit/InstrumentTest.java b/src/test/java/org/bukkit/InstrumentTest.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f0847a52ca12bbd11f69b5d93bfde8ea39feb2ec
+index 0000000000000000000000000000000000000000..ae9b55ae367313f3f5e5a941b4620aba6623c262
 --- /dev/null
 +++ b/src/test/java/org/bukkit/InstrumentTest.java
 @@ -0,0 +1,29 @@
@@ -115,3 +115,4 @@ index 0000000000000000000000000000000000000000..f0847a52ca12bbd11f69b5d93bfde8ea
 +    }
 +
 +}
+\ No newline at end of file

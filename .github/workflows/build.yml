@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 16 ]
+        java: [ 17 ]
       fail-fast: true
     steps:
       - name: Checkout Git Repository
@@ -33,9 +33,9 @@ jobs:
       - name: Build SparklyPaper
         run: |
           ./gradlew build --stacktrace --no-daemon
-          ./gradlew paperclipJar --stacktrace --no-daemon
+          ./gradlew createReobfPaperclipJar --stacktrace --no-daemon
       - name: Archive SparklyPaper Paperclip
         uses: actions/upload-artifact@v2
         with:
           name: SparklyPaper
-          path: build/libs/SparklyPaper-*-SNAPSHOT.jar
+          path: build/libs/SparklyPaper-paperclip-*-SNAPSHOT.jar
