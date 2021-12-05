@@ -5,6 +5,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "SparklyPaper"
+rootProject.name = "sparklypaper"
 
-include("SparklyPaper-API", "SparklyPaper-Server")
+include("sparklypaper-api", "sparklypaper-server")

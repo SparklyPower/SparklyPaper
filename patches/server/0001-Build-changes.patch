@@ -1,27 +1,29 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrPowerGamerBR <git@mrpowergamerbr.com>
 Date: Sat, 12 Jun 2021 16:40:34 +0200
-Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper
+Subject: [PATCH] Build changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index cd74406039704e5a880f00b9b60bb7b1dedc5398..741cb05f82b1bff397ce7ddbbacbb886c18313e5 100644
+index cd74406039704e5a880f00b9b60bb7b1dedc5398..c4dfc34277e59143d346725c9ef2bfbcee59bc06 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -18,8 +18,8 @@ repositories {
+@@ -18,8 +18,12 @@ repositories {
  }
  
  dependencies {
 -    implementation(project(":paper-api"))
 -    implementation(project(":paper-mojangapi"))
-+    implementation(project(":SparklyPaper-API")) // SparklyPaper
-+    implementation("io.papermc.paper:paper-mojangapi:1.18-R0.1-SNAPSHOT") { // SparklyPaper
-+        exclude("io.papermc.paper", "paper-api") // https://github.com/PaperMC/paperweight/issues/124#issuecomment-984667033
-+    }    
++    // SparklyPaper start
++    implementation(project(":sparklypaper-api"))
++    implementation("io.papermc.paper:paper-mojangapi:1.18-R0.1-SNAPSHOT") {
++        exclude("io.papermc.paper", "paper-api")
++    }
++    // SparklyPaper end
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -67,7 +67,7 @@ tasks.jar {
+@@ -67,7 +71,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
@@ -30,7 +32,7 @@ index cd74406039704e5a880f00b9b60bb7b1dedc5398..741cb05f82b1bff397ce7ddbbacbb886
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-@@ -158,7 +158,7 @@ fun TaskContainer.registerRunTask(
+@@ -158,7 +162,7 @@ fun TaskContainer.registerRunTask(
      name: String,
      block: JavaExec.() -> Unit
  ): TaskProvider<JavaExec> = register<JavaExec>(name) {
@@ -40,7 +42,7 @@ index cd74406039704e5a880f00b9b60bb7b1dedc5398..741cb05f82b1bff397ce7ddbbacbb886
      standardInput = System.`in`
      workingDir = rootProject.layout.projectDirectory
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 893badbe321fa974cb82f5f11ab590bb3827f8b8..27721a41be01995269bc651256012fe0618292fc 100644
+index 893badbe321fa974cb82f5f11ab590bb3827f8b8..4aba540f4bc8014548cc10818472431dfa6b2ede 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1708,7 +1708,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -53,7 +55,7 @@ index 893badbe321fa974cb82f5f11ab590bb3827f8b8..27721a41be01995269bc651256012fe0
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index d938dc26886aa8a64c11db5e49fe5639bc27e1fb..5c48af69f47c7c90b8feb59f8c67727f75af32ea 100644
+index d938dc26886aa8a64c11db5e49fe5639bc27e1fb..d941957dee45911626f62e55f598490a60d6c818 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -255,7 +255,7 @@ import javax.annotation.Nullable; // Paper
@@ -66,7 +68,7 @@ index d938dc26886aa8a64c11db5e49fe5639bc27e1fb..5c48af69f47c7c90b8feb59f8c67727f
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 774556a62eb240da42e84db4502e2ed43495be17..9bc7b99b5b39a8ffe4118b8d86f5b8065c4fe460 100644
+index 774556a62eb240da42e84db4502e2ed43495be17..21f39bd0c33ef2635249298e6a247afba8b05742 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {

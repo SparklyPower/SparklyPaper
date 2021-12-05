@@ -2,6 +2,7 @@ import io.papermc.paperweight.util.constants.*
 
 plugins {
     java
+    `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.1.0" apply false
     id("io.papermc.paperweight.patcher") version "1.3.1"
 }
@@ -19,9 +20,9 @@ dependencies {
     paperclip("io.papermc:paperclip:3.0.2")
 }
 
-
 allprojects {
     apply(plugin = "java")
+    apply(plugin = "maven-publish")
 
     java {
         toolchain {
@@ -31,7 +32,7 @@ allprojects {
 }
 
 subprojects {
-    tasks.withType<JavaCompile>() {
+    tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(17)
     }
@@ -49,7 +50,7 @@ subprojects {
 }
 
 paperweight {
-    serverProject.set(project(":SparklyPaper-Server"))
+    serverProject.set(project(":sparklypaper-server"))
 
     remapRepo.set("https://maven.fabricmc.net/")
     decompileRepo.set("https://files.minecraftforge.net/maven/")
@@ -57,10 +58,56 @@ paperweight {
     usePaperUpstream(providers.gradleProperty("paperRef")) {
         withPaperPatcher {
             apiPatchDir.set(layout.projectDirectory.dir("patches/api"))
-            apiOutputDir.set(layout.projectDirectory.dir("SparklyPaper-API"))
+            apiOutputDir.set(layout.projectDirectory.dir("sparklypaper-api"))
 
             serverPatchDir.set(layout.projectDirectory.dir("patches/server"))
-            serverOutputDir.set(layout.projectDirectory.dir("SparklyPaper-Server"))
+            serverOutputDir.set(layout.projectDirectory.dir("sparklypaper-server"))
         }
     }
 }
+
+//
+// Everything below here is optional if you don't care about publishing API or dev bundles to your repository
+//
+
+/* tasks.generateDevelopmentBundle {
+    apiCoordinates.set("com.example.paperfork:sparklypaper-api")
+    mojangApiCoordinates.set("io.papermc.paper:paper-mojangapi")
+    libraryRepositories.set(
+        listOf(
+            "https://repo.maven.apache.org/maven2/",
+            "https://libraries.minecraft.net/",
+            "https://papermc.io/repo/repository/maven-public/",
+            "https://maven.quiltmc.org/repository/release/",
+            // "https://my.repo/", // This should be a repo hosting your API (in this example, 'com.example.paperfork:forktest-api')
+        )
+    )
+}
+
+allprojects {
+    // Publishing API:
+    // ./gradlew :ForkTest-API:publish[ToMavenLocal]
+    publishing {
+        repositories {
+            maven {
+                name = "myRepoSnapshots"
+                url = uri("https://my.repo/")
+                // See Gradle docs for how to provide credentials to PasswordCredentials
+                // https://docs.gradle.org/current/samples/sample_publishing_credentials.html
+                credentials(PasswordCredentials::class)
+            }
+        }
+    }
+}
+
+publishing {
+    // Publishing dev bundle:
+    // ./gradlew publishDevBundlePublicationTo(MavenLocal|MyRepoSnapshotsRepository) -PpublishDevBundle
+    if (project.hasProperty("publishDevBundle")) {
+        publications.create<MavenPublication>("devBundle") {
+            artifact(tasks.generateDevelopmentBundle) {
+                artifactId = "dev-bundle"
+            }
+        }
+    }
+} */
