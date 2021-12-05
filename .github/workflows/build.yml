@@ -38,4 +38,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: SparklyPaper
-          path: build/libs/SparklyPaper-paperclip-*-reobf.jar
+          path: build/libs/sparklypaper-paperclip-*-reobf.jar
