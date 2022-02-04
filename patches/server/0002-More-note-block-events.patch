@@ -6,7 +6,7 @@ Subject: [PATCH] More note block events
 From Haricot, thanks Kezz! https://github.com/kezz/Haricot/blob/dffbe897cd6db773c06cfad6304e20b54c7aa980/patches/server/0005-More-note-block-events.patch
 
 diff --git a/src/main/java/net/minecraft/world/level/block/NoteBlock.java b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
-index b74da21b82ba8d82b2aea7d778f708c4cc689469..b45345e73b9a05e87a0dae4c56f27e725bfbede8 100644
+index 0e106bcc1f882877a5e444a2621466c6e4696d42..ca11f7a9f7f79e3050f351bb433dbf31f0738393 100644
 --- a/src/main/java/net/minecraft/world/level/block/NoteBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
 @@ -20,6 +20,12 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -81,7 +81,7 @@ index b74da21b82ba8d82b2aea7d778f708c4cc689469..b45345e73b9a05e87a0dae4c56f27e72
          }
  
      }
-@@ -72,10 +113,23 @@ public class NoteBlock extends Block {
+@@ -73,10 +114,23 @@ public class NoteBlock extends Block {
          if (world.isClientSide) {
              return InteractionResult.SUCCESS;
          } else {

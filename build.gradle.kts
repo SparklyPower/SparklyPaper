@@ -4,7 +4,7 @@ plugins {
     java
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.1.0" apply false
-    id("io.papermc.paperweight.patcher") version "1.3.1"
+    id("io.papermc.paperweight.patcher") version "1.3.4"
 }
 
 repositories {
@@ -70,8 +70,8 @@ paperweight {
 // Everything below here is optional if you don't care about publishing API or dev bundles to your repository
 //
 
-/* tasks.generateDevelopmentBundle {
-    apiCoordinates.set("com.example.paperfork:sparklypaper-api")
+tasks.generateDevelopmentBundle {
+    apiCoordinates.set("net.sparklypower.sparklypaper:sparklypaper-api")
     mojangApiCoordinates.set("io.papermc.paper:paper-mojangapi")
     libraryRepositories.set(
         listOf(
@@ -79,7 +79,7 @@ paperweight {
             "https://libraries.minecraft.net/",
             "https://papermc.io/repo/repository/maven-public/",
             "https://maven.quiltmc.org/repository/release/",
-            // "https://my.repo/", // This should be a repo hosting your API (in this example, 'com.example.paperfork:forktest-api')
+            "https://repo.perfectdreams.net/", // This should be a repo hosting your API (in this example, 'com.example.paperfork:forktest-api')
         )
     )
 }
@@ -90,8 +90,8 @@ allprojects {
     publishing {
         repositories {
             maven {
-                name = "myRepoSnapshots"
-                url = uri("https://my.repo/")
+                name = "PerfectDreams"
+                url = uri("https://repo.perfectdreams.net/")
                 // See Gradle docs for how to provide credentials to PasswordCredentials
                 // https://docs.gradle.org/current/samples/sample_publishing_credentials.html
                 credentials(PasswordCredentials::class)
@@ -110,4 +110,4 @@ publishing {
             }
         }
     }
-} */
+}
