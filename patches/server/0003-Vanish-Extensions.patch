@@ -1,0 +1,344 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Breno Santos <git@breno.ooo>
+Date: Wed, 9 Feb 2022 12:18:22 -0500
+Subject: [PATCH] Vanish-Extensions
+
+
+diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
+index 2e6e86439173ebdb13b9cebd1e266e91335c1e2d..588332286b3b8a454156ac8ecbd6585041f8de05 100644
+--- a/src/main/java/net/minecraft/server/level/ChunkMap.java
++++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
+@@ -109,6 +109,7 @@ import org.apache.logging.log4j.Logger;
+ import org.bukkit.entity.Player;
+ // CraftBukkit end
+ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet; // Paper
++import net.minecraft.world.entity.projectile.Projectile; // SparklyPaper
+ 
+ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider {
+ 
+@@ -2343,6 +2344,16 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+                     flag = false;
+                 }
+                 // CraftBukkit end
++
++                // SparklyPaper start
++                if (this.entity instanceof Projectile projectile) {
++                    if (projectile.getOwner() instanceof ServerPlayer shooter) {
++                        if (!player.getBukkitEntity().canSee(shooter.getBukkitEntity())) {
++                            flag = false;
++                        }
++                    }
++                }
++                // SparklyPaper end
+                 if (flag) {
+                     if (this.seenBy.add(player.connection)) {
+                         this.serverEntity.addPairing(player);
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java b/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java
+index 3d3dcb47720055f550d17d1f106a2c0e59de2919..49e24699e63983f22e16c5b58533b8b88a667709 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/AbstractArrow.java
+@@ -554,6 +554,8 @@ public abstract class AbstractArrow extends Projectile {
+     @Override
+     public void playerTouch(Player player) {
+         if (!this.level.isClientSide && (this.inGround || this.isNoPhysics()) && this.shakeTime <= 0) {
++            if (!canPickup(player)) return; // SparklyPaper
++
+             // CraftBukkit start
+             ItemStack itemstack = this.getPickupItem();
+             if (this.pickup == Pickup.ALLOWED && !itemstack.isEmpty() && player.getInventory().canHold(itemstack) > 0) {
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+index 15744949537430d8d8ae71ea72481126c9aff7bd..f2573f59ce6d3dcd4b4166ac90e5b7dca530a291 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/Projectile.java
+@@ -9,6 +9,8 @@ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+ import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer; // SparklyPaper
++import net.minecraft.sounds.SoundEvent; // SparklyPaper
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EntityType;
+@@ -234,6 +236,21 @@ public abstract class Projectile extends Entity {
+         }
+     }
+ 
++    // SparklyPaper start
++    @Override
++    public void playSound(SoundEvent sound, float volume, float pitch) {
++        ServerPlayer entityplayer = (this.cachedOwner instanceof ServerPlayer player) ? player : null;
++        this.level.playSound(entityplayer, this.getX(), this.getY(), this.getZ(), sound, this.getSoundSource(), volume, pitch);
++    }
++
++    protected boolean canPickup(Player player) {
++        if (player instanceof ServerPlayer serverplayer && this.tracker != null) {
++            return this.tracker.seenBy.contains(serverplayer.connection);
++        }
++        return true;
++    }
++    // SparklyPaper end
++
+     protected void updateRotation() {
+         Vec3 vec3d = this.getDeltaMovement();
+         double d0 = vec3d.horizontalDistance();
+diff --git a/src/main/java/net/minecraft/world/entity/projectile/ThrownTrident.java b/src/main/java/net/minecraft/world/entity/projectile/ThrownTrident.java
+index a367f50b0e3fe9e7a1b87892a8c98e88bd678f6f..e27170972afe494f250a7c62efc8e6c4fbc8b993 100644
+--- a/src/main/java/net/minecraft/world/entity/projectile/ThrownTrident.java
++++ b/src/main/java/net/minecraft/world/entity/projectile/ThrownTrident.java
+@@ -181,6 +181,8 @@ public class ThrownTrident extends AbstractArrow {
+ 
+     @Override
+     public void playerTouch(Player player) {
++        if (!canPickup(player)) return; // SparklyPaper
++
+         if (this.ownedBy(player) || this.getOwner() == null) {
+             super.playerTouch(player);
+         }
+diff --git a/src/main/java/net/minecraft/world/item/BowItem.java b/src/main/java/net/minecraft/world/item/BowItem.java
+index 08d597db1a5345a343777a01427655e6bf2c926b..35ec4006b22b88bc62f38d459e4bbd6cc5a92f42 100644
+--- a/src/main/java/net/minecraft/world/item/BowItem.java
++++ b/src/main/java/net/minecraft/world/item/BowItem.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.world.item;
+ 
+ import java.util.function.Predicate;
++import net.minecraft.server.level.ServerPlayer; // SparklyPaper
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.sounds.SoundSource;
+ import net.minecraft.stats.Stats;
+@@ -92,7 +93,10 @@ public class BowItem extends ProjectileWeaponItem implements Vanishable {
+                         // CraftBukkit end
+                     }
+ 
+-                    world.playSound((Player) null, entityhuman.getX(), entityhuman.getY(), entityhuman.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (world.getRandom().nextFloat() * 0.4F + 1.2F) + f * 0.5F);
++                    // SparklyPaper start
++                    ServerPlayer shooter = (entityhuman instanceof ServerPlayer serverplayer) ? serverplayer : null;
++                    world.playSound(shooter, entityhuman.getX(), entityhuman.getY(), entityhuman.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (world.getRandom().nextFloat() * 0.4F + 1.2F) + f * 0.5F);
++                    // SparklyPaper end
+                     if (!flag1 && !entityhuman.getAbilities().instabuild) {
+                         itemstack1.shrink(1);
+                         if (itemstack1.isEmpty()) {
+diff --git a/src/main/java/net/minecraft/world/item/CrossbowItem.java b/src/main/java/net/minecraft/world/item/CrossbowItem.java
+index c0c211c7227f4ce5d1e0e433419425e6bb13046f..ede90fdef267d60f58943a6b28f8de3ca02dd918 100644
+--- a/src/main/java/net/minecraft/world/item/CrossbowItem.java
++++ b/src/main/java/net/minecraft/world/item/CrossbowItem.java
+@@ -101,7 +101,10 @@ public class CrossbowItem extends ProjectileWeaponItem implements Vanishable {
+             CrossbowItem.setCharged(stack, true);
+             SoundSource soundcategory = user instanceof Player ? SoundSource.PLAYERS : SoundSource.HOSTILE;
+ 
+-            world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.CROSSBOW_LOADING_END, soundcategory, 1.0F, 1.0F / (world.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F);
++            // SparklyPaper start
++            ServerPlayer shooter = (user instanceof ServerPlayer serverplayer) ? serverplayer : null;
++            world.playSound(shooter, user.getX(), user.getY(), user.getZ(), SoundEvents.CROSSBOW_LOADING_END, soundcategory, 1.0F, 1.0F / (world.getRandom().nextFloat() * 0.5F + 1.0F) + 0.2F);
++            // SparklyPaper end
+         }
+ 
+     }
+@@ -276,7 +279,11 @@ public class CrossbowItem extends ProjectileWeaponItem implements Vanishable {
+                 }
+             }
+             // CraftBukkit end
+-            world.playSound((Player) null, shooter.getX(), shooter.getY(), shooter.getZ(), SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, soundPitch);
++
++            // SparklyPaper start
++            ServerPlayer servershooter = (shooter instanceof ServerPlayer serverplayer) ? serverplayer : null;
++            world.playSound(servershooter, shooter.getX(), shooter.getY(), shooter.getZ(), SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, soundPitch);
++            // SparklyPaper end
+         }
+     }
+ 
+@@ -354,6 +361,7 @@ public class CrossbowItem extends ProjectileWeaponItem implements Vanishable {
+             SoundEvent soundeffect = this.getStartSound(j);
+             SoundEvent soundeffect1 = j == 0 ? SoundEvents.CROSSBOW_LOADING_MIDDLE : null;
+             float f = (float) (stack.getUseDuration() - remainingUseTicks) / (float) CrossbowItem.getChargeDuration(stack);
++            ServerPlayer shooter = (user instanceof ServerPlayer serverplayer) ? serverplayer : null; // SparklyPaper
+ 
+             if (f < 0.2F) {
+                 this.startSoundPlayed = false;
+@@ -362,12 +370,12 @@ public class CrossbowItem extends ProjectileWeaponItem implements Vanishable {
+ 
+             if (f >= 0.2F && !this.startSoundPlayed) {
+                 this.startSoundPlayed = true;
+-                world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), soundeffect, SoundSource.PLAYERS, 0.5F, 1.0F);
++                world.playSound(shooter, user.getX(), user.getY(), user.getZ(), soundeffect, SoundSource.PLAYERS, 0.5F, 1.0F); // SparklyPaper
+             }
+ 
+             if (f >= 0.5F && soundeffect1 != null && !this.midLoadSoundPlayed) {
+                 this.midLoadSoundPlayed = true;
+-                world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), soundeffect1, SoundSource.PLAYERS, 0.5F, 1.0F);
++                world.playSound(shooter, user.getX(), user.getY(), user.getZ(), soundeffect1, SoundSource.PLAYERS, 0.5F, 1.0F); // SparklyPaper
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/item/EggItem.java b/src/main/java/net/minecraft/world/item/EggItem.java
+index 58cb992c5defec2f092755cbde661ff10f38bf9d..fdbbfd455976a539e828318a476306cf85c32c88 100644
+--- a/src/main/java/net/minecraft/world/item/EggItem.java
++++ b/src/main/java/net/minecraft/world/item/EggItem.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.item;
+ 
++import net.minecraft.server.level.ServerPlayer; // SparklyPaper
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.sounds.SoundSource;
+ import net.minecraft.stats.Stats;
+@@ -44,7 +45,11 @@ public class EggItem extends Item {
+             }
+             // Paper end
+         }
+-        world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.EGG_THROW, SoundSource.PLAYERS, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++
++        // SparklyPaper start
++        ServerPlayer thrower = (user instanceof ServerPlayer serverplayer) ? serverplayer : null;
++        world.playSound(thrower, user.getX(), user.getY(), user.getZ(), SoundEvents.EGG_THROW, SoundSource.PLAYERS, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++        // SparklyPaper end
+ 
+         /* // Paper start - moved up
+         user.awardStat(Stats.ITEM_USED.get(this));
+diff --git a/src/main/java/net/minecraft/world/item/EnderEyeItem.java b/src/main/java/net/minecraft/world/item/EnderEyeItem.java
+index 46ca1a11930c57813fbcbab7de7dd2fd47241f64..e8481c172791b591ea7421cd5a73d1b8e7e9f6cf 100644
+--- a/src/main/java/net/minecraft/world/item/EnderEyeItem.java
++++ b/src/main/java/net/minecraft/world/item/EnderEyeItem.java
+@@ -112,7 +112,10 @@ public class EnderEyeItem extends Item {
+                         CriteriaTriggers.USED_ENDER_EYE.trigger((ServerPlayer) user, blockposition);
+                     }
+ 
+-                    world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENDER_EYE_LAUNCH, SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++                    // SparklyPaper start
++                    ServerPlayer thrower = (user instanceof ServerPlayer serverplayer) ? serverplayer : null;
++                    world.playSound(thrower, user.getX(), user.getY(), user.getZ(), SoundEvents.ENDER_EYE_LAUNCH, SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++                    // SparklyPaper end
+                     world.levelEvent((Player) null, 1003, user.blockPosition(), 0);
+                     if (!user.getAbilities().instabuild) {
+                         itemstack.shrink(1);
+diff --git a/src/main/java/net/minecraft/world/item/EnderpearlItem.java b/src/main/java/net/minecraft/world/item/EnderpearlItem.java
+index 749ab72edc0d2e9c6f1161415ab8d59d3d6ca976..3a198c35d9ee0e99a6fe13f606602d5c5413b999 100644
+--- a/src/main/java/net/minecraft/world/item/EnderpearlItem.java
++++ b/src/main/java/net/minecraft/world/item/EnderpearlItem.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.item;
+ 
++import net.minecraft.server.level.ServerPlayer; // SparklyPaper
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.sounds.SoundSource;
+ import net.minecraft.stats.Stats;
+@@ -34,7 +35,10 @@ public class EnderpearlItem extends Item {
+                     ((net.minecraft.server.level.ServerPlayer) user).getBukkitEntity().updateInventory();
+                 }
+ 
+-                world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENDER_PEARL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (net.minecraft.world.entity.Entity.SHARED_RANDOM.nextFloat() * 0.4F + 0.8F));
++                // SparklyPaper start
++                ServerPlayer thrower = (user instanceof ServerPlayer serverplayer) ? serverplayer : null;
++                world.playSound(thrower, user.getX(), user.getY(), user.getZ(), SoundEvents.ENDER_PEARL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (net.minecraft.world.entity.Entity.SHARED_RANDOM.nextFloat() * 0.4F + 0.8F));
++                // SparklyPaper end
+                 user.awardStat(Stats.ITEM_USED.get(this));
+                 user.getCooldowns().addCooldown(this, 20);
+             } else {
+diff --git a/src/main/java/net/minecraft/world/item/FishingRodItem.java b/src/main/java/net/minecraft/world/item/FishingRodItem.java
+index 7a4ae2d69f530182f44a31eebd1c2e44ada5e44b..a49c2e2627aba0bc7029b9874e0d1499f6eb0523 100644
+--- a/src/main/java/net/minecraft/world/item/FishingRodItem.java
++++ b/src/main/java/net/minecraft/world/item/FishingRodItem.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.item;
+ 
++import net.minecraft.server.level.ServerPlayer; // SparklyPaper
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.sounds.SoundSource;
+ import net.minecraft.stats.Stats;
+@@ -33,7 +34,10 @@ public class FishingRodItem extends Item implements Vanishable {
+                 });
+             }
+ 
+-            world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.FISHING_BOBBER_RETRIEVE, SoundSource.NEUTRAL, 1.0F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++            // SparklyPaper start
++            ServerPlayer angler = (user instanceof ServerPlayer serverplayer) ? serverplayer : null;
++            world.playSound(angler, user.getX(), user.getY(), user.getZ(), SoundEvents.FISHING_BOBBER_RETRIEVE, SoundSource.NEUTRAL, 1.0F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++            // SparklyPaper end
+             world.gameEvent(user, GameEvent.FISHING_ROD_REEL_IN, (Entity) user);
+         } else {
+             // world.playSound((EntityHuman) null, entityhuman.getX(), entityhuman.getY(), entityhuman.getZ(), SoundEffects.FISHING_BOBBER_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
+@@ -50,7 +54,10 @@ public class FishingRodItem extends Item implements Vanishable {
+                     user.fishing = null;
+                     return InteractionResultHolder.pass(itemstack);
+                 }
+-                world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.FISHING_BOBBER_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++                // SparklyPaper start
++                ServerPlayer angler = (user instanceof ServerPlayer serverplayer) ? serverplayer : null;
++                world.playSound(angler, user.getX(), user.getY(), user.getZ(), SoundEvents.FISHING_BOBBER_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
++                // SparklyPaper end
+                 world.addFreshEntity(entityfishinghook);
+                 // CraftBukkit end
+             }
+diff --git a/src/main/java/net/minecraft/world/item/TridentItem.java b/src/main/java/net/minecraft/world/item/TridentItem.java
+index 998758be827efbcb7693ed36ab1dffc0ef0369bf..e07cf5f7c79dd58fc78cd37e3cbf517eb5adadd9 100644
+--- a/src/main/java/net/minecraft/world/item/TridentItem.java
++++ b/src/main/java/net/minecraft/world/item/TridentItem.java
+@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
+ import com.google.common.collect.ImmutableMultimap.Builder;
+ import com.google.common.collect.Multimap;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.server.level.ServerPlayer; // SparklyPaper
+ import net.minecraft.sounds.SoundEvent;
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.sounds.SoundSource;
+@@ -96,7 +97,10 @@ public class TridentItem extends Item implements Vanishable {
+                             entitythrowntrident.tridentItem = stack.copy(); // SPIGOT-4511 update since damage call moved
+                             // CraftBukkit end
+ 
+-                            world.playSound((Player) null, (Entity) entitythrowntrident, SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 1.0F, 1.0F);
++                            // SparklyPaper start
++                            ServerPlayer shooter = (entityhuman instanceof ServerPlayer serverplayer) ? serverplayer : null;
++                            world.playSound(shooter, (Entity) entitythrowntrident, SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 1.0F, 1.0F);
++                            // SparklyPaper end
+                             if (!entityhuman.getAbilities().instabuild) {
+                                 entityhuman.getInventory().removeItem(stack);
+                             }
+@@ -144,7 +148,10 @@ public class TridentItem extends Item implements Vanishable {
+                             soundeffect = SoundEvents.TRIDENT_RIPTIDE_1;
+                         }
+ 
+-                        world.playSound((Player) null, (Entity) entityhuman, soundeffect, SoundSource.PLAYERS, 1.0F, 1.0F);
++                        // SparklyPaper start
++                        ServerPlayer shooter = (entityhuman instanceof ServerPlayer serverplayer) ? serverplayer : null;
++                        world.playSound(shooter, (Entity) entityhuman, SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 1.0F, 1.0F);
++                        // SparklyPaper end
+                     }
+ 
+                 }
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index 4247dcb003626535dbb997f48ad9f61380bd17e9..b520bdc5ef2ca6645f760cca5fcdf2433f67f22f 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -26,12 +26,14 @@ import net.minecraft.core.SectionPos;
+ import net.minecraft.core.particles.ParticleOptions;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.protocol.Packet;
++import net.minecraft.network.protocol.game.ClientboundSoundPacket; // SparklyPaper
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.MCUtil;
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.level.ChunkHolder;
+ import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer; // SparklyPaper
+ import net.minecraft.sounds.SoundEvent;
+ import net.minecraft.sounds.SoundSource;
+ import net.minecraft.tags.TagContainer;
+@@ -888,6 +890,18 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         return !this.dimensionType().hasFixedTime() && !this.isDay();
+     }
+ 
++    // SparklyPaper start
++    public void playSound(@Nullable ServerPlayer player, double x, double y, double z, SoundEvent sound, SoundSource category, float volume, float pitch) {
++        Packet<?> packet = new ClientboundSoundPacket(sound, category, x, y, z, volume, pitch);
++        if (player != null) player.connection.send(packet);
++        MinecraftServer.getServer().getPlayerList().broadcast(player, x, y, z, volume > 1.0F ? (double) (16.0F * volume) : 16.0D, this.dimension(), packet);
++    }
++
++    public void playSound(@Nullable ServerPlayer player, Entity entity, SoundEvent sound, SoundSource category, float volume, float pitch) {
++        playSound(player, entity.getX(), entity.getY(), entity.getZ(), sound, category, volume, pitch);
++    }
++    // SparklyPaper end
++
+     @Override
+     public void playSound(@Nullable Player player, BlockPos pos, SoundEvent sound, SoundSource category, float volume, float pitch) {
+         this.playSound(player, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, sound, category, volume, pitch);
