@@ -56,13 +56,13 @@ index 0000000000000000000000000000000000000000..2a22bb7c80884bde59cafaff2b50f99d
 +}
 diff --git a/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c1d8b37cb43d09244014963eb73f64e816d2b1cb
+index 0000000000000000000000000000000000000000..747a850b8604adfec67893910b776634e04d2497
 --- /dev/null
 +++ b/src/main/java/ml/beancraft/haricot/event/block/NoteBlockUpdateEvent.java
 @@ -0,0 +1,80 @@
 +package ml.beancraft.haricot.event.block;
 +
-+import org.apache.commons.lang.Validate;
++import org.apache.commons.lang3.Validate;
 +import org.bukkit.block.Block;
 +import org.bukkit.block.data.type.NoteBlock;
 +import org.bukkit.event.Cancellable;

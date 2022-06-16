@@ -6,12 +6,12 @@ Subject: [PATCH] More note block events
 From Haricot, thanks Kezz! https://github.com/kezz/Haricot/blob/dffbe897cd6db773c06cfad6304e20b54c7aa980/patches/server/0005-More-note-block-events.patch
 
 diff --git a/src/main/java/net/minecraft/world/level/block/NoteBlock.java b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
-index 0e106bcc1f882877a5e444a2621466c6e4696d42..ca11f7a9f7f79e3050f351bb433dbf31f0738393 100644
+index c14eb4f7decdbcd6176d3bff95d595a947d4ec95..4e45e2d7c262d7f3746ce0d1c9675fe0c75b7972 100644
 --- a/src/main/java/net/minecraft/world/level/block/NoteBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/NoteBlock.java
-@@ -20,6 +20,12 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
- import net.minecraft.world.level.block.state.properties.IntegerProperty;
+@@ -23,6 +23,12 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
  import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+ import net.minecraft.world.level.gameevent.GameEvent;
  import net.minecraft.world.phys.BlockHitResult;
 +// Haricot start
 +import ml.beancraft.haricot.event.block.NoteBlockPlaceEvent;
@@ -22,7 +22,7 @@ index 0e106bcc1f882877a5e444a2621466c6e4696d42..ca11f7a9f7f79e3050f351bb433dbf31
  
  public class NoteBlock extends Block {
  
-@@ -34,12 +40,32 @@ public class NoteBlock extends Block {
+@@ -37,12 +43,32 @@ public class NoteBlock extends Block {
  
      @Override
      public BlockState getStateForPlacement(BlockPlaceContext ctx) {
@@ -57,7 +57,7 @@ index 0e106bcc1f882877a5e444a2621466c6e4696d42..ca11f7a9f7f79e3050f351bb433dbf31
      }
  
      @Override
-@@ -52,7 +78,22 @@ public class NoteBlock extends Block {
+@@ -55,7 +81,22 @@ public class NoteBlock extends Block {
                  state = world.getBlockState(pos); // CraftBukkit - SPIGOT-5617: update in case changed in event
              }
  
@@ -81,13 +81,13 @@ index 0e106bcc1f882877a5e444a2621466c6e4696d42..ca11f7a9f7f79e3050f351bb433dbf31
          }
  
      }
-@@ -73,10 +114,23 @@ public class NoteBlock extends Block {
+@@ -80,10 +121,22 @@ public class NoteBlock extends Block {
          if (world.isClientSide) {
              return InteractionResult.SUCCESS;
          } else {
 -            state = (BlockState) state.cycle(NoteBlock.NOTE);
 -            world.setBlock(pos, state, 3);
--            this.playNote(world, pos, state); // CraftBukkit
+-            this.playNote(player, world, pos, state); // CraftBukkit
 -            player.awardStat(Stats.TUNE_NOTEBLOCK);
 +            // Haricot start - note block api
 +            NoteBlockUpdateEvent event = new NoteBlockUpdateEvent(new CraftBlock(world, pos), new CraftNote(state),
@@ -101,11 +101,10 @@ index 0e106bcc1f882877a5e444a2621466c6e4696d42..ca11f7a9f7f79e3050f351bb433dbf31
 +                        .setValue(POWERED, event.getNewData().isPowered());
 +
 +                world.setBlock(pos, newData, 3);
-+                this.playNote(world, pos, state); // CraftBukkit
++                this.playNote(player, world, pos, state); // CraftBukkit
 +                player.awardStat(Stats.TUNE_NOTEBLOCK);
 +            }
 +            // Haricot end
-+
              return InteractionResult.CONSUME;
          }
      }
