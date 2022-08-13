@@ -16,7 +16,7 @@ index 68b8f275f9c9e77a949ca29749a05b469bcdb910..2c9b86a203c9d01d4e8da370a7c5d564
 -    implementation(project(":paper-mojangapi"))
 +    // SparklyPaper start
 +    implementation(project(":sparklypaper-api"))
-+    implementation("io.papermc.paper:paper-mojangapi:1.19-R0.1-SNAPSHOT") {
++    implementation("io.papermc.paper:paper-mojangapi:1.19.2-R0.1-SNAPSHOT") {
 +        exclude("io.papermc.paper", "paper-api")
 +    }
 +    // SparklyPaper end
