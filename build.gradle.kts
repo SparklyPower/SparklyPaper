@@ -15,8 +15,8 @@ repositories {
 }
 
 dependencies {
-    remapper("net.fabricmc:tiny-remapper:0.8.1:fat")
-    decompiler("net.minecraftforge:forgeflower:1.5.498.22")
+    remapper("net.fabricmc:tiny-remapper:0.8.2:fat")
+    decompiler("net.minecraftforge:forgeflower:1.5.605.7")
     paperclip("io.papermc:paperclip:3.0.2")
 }
 
