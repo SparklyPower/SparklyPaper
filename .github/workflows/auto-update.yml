@@ -1,0 +1,36 @@
+name: Automatically update Paper commit hash
+on:
+  workflow_dispatch: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SparklyPaper Repository
+        uses: actions/checkout@v3
+        
+      - name: Checkout Paper Repository
+        uses: actions/checkout@v3
+        with:
+          repository: "PaperMC/Paper"
+      
+      - name: Get Paper Latest Commit Hash
+        id: paperRef
+        run: |
+          cd Paper
+          ::set-output paperRef=${git rev-parse HEAD}
+          
+      - name: Update paperRef in SparklyPaper 
+        id: paperRef
+        run: |
+          sed -i "s/\paperRef=@.*/paperRef=$PAPER_REF/" SparklyPaper/gradle.properties
+        env:
+          PAPER_REF: ${{ steps.paperRef.outputs.paperRef }}
+          
+      - name: Write to repository
+        run: |
+          cd SparklyPaper
+          git add gradle.properties
+          git config user.name "Loritta Morenitta"
+          git config user.email 47356322+LorittaMorenitta@users.noreply.github.com
+          git commit -m "Update Paper"
+          git push
