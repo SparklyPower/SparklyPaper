@@ -16,6 +16,7 @@ jobs:
       - name: Get Paper Latest Commit Hash
         id: paperRef
         run: |
+          cd ..
           ls
           cd Paper
           ::set-output paperRef=${git rev-parse HEAD}
