@@ -20,7 +20,6 @@ jobs:
           ::set-output paperRef=${git rev-parse HEAD}
           
       - name: Update paperRef in SparklyPaper 
-        id: paperRef
         run: |
           sed -i "s/\paperRef=@.*/paperRef=$PAPER_REF/" SparklyPaper/gradle.properties
         env:
