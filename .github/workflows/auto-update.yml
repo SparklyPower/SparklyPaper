@@ -7,19 +7,22 @@ jobs:
     steps:
       - name: Checkout SparklyPaper Repository
         uses: actions/checkout@v3
+        with:
+          path: 'SparklyPaper'
         
       - name: Checkout Paper Repository
         uses: actions/checkout@v3
         with:
+          path: 'Paper'
           repository: "PaperMC/Paper"
       
       - name: Get Paper Latest Commit Hash
         id: paperRef
         run: |
-          cd ..
           ls
           cd Paper
           ::set-output paperRef=${git rev-parse HEAD}
+          cd ..
           
       - name: Update paperRef in SparklyPaper 
         run: |
