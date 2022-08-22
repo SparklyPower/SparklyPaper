@@ -21,7 +21,7 @@ jobs:
         run: |
           ls
           cd Paper
-          ::set-output paperRef=${git rev-parse HEAD}
+          echo ::set-output paperRef=${git rev-parse HEAD}
           cd ..
           
       - name: Update paperRef in SparklyPaper 
@@ -36,5 +36,5 @@ jobs:
           git add gradle.properties
           git config user.name "Loritta Morenitta"
           git config user.email 47356322+LorittaMorenitta@users.noreply.github.com
-          git commit -m "Update Paper"
+          git commit -m "Updated Upstream (Paper)"
           git push
