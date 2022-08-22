@@ -1,6 +1,8 @@
 name: Automatically update Paper commit hash
 on:
   workflow_dispatch: {}
+  schedule:
+    - cron: "0 0 * * *"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +28,7 @@ jobs:
           
       - name: Update paperRef in SparklyPaper 
         run: |
-          sed -i "s/\paperRef=@.*/paperRef=$PAPER_REF/" SparklyPaper/gradle.properties
+          sed -i "s/\paperRef=.*/paperRef=$PAPER_REF/" SparklyPaper/gradle.properties
         env:
           PAPER_REF: ${{ steps.paperRef.outputs.paperRef }}
           
