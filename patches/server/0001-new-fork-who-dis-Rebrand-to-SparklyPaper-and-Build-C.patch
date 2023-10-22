@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a79461457ea19339f47572c70705d655ebc55276..768a691649d9146c7c975a3b25258551d0b6df0a 100644
+index a79461457ea19339f47572c70705d655ebc55276..d43c3f2e17f9ef48ec458f9c94478cfd02db6edb 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import io.papermc.paperweight.util.*
@@ -17,7 +17,7 @@ index a79461457ea19339f47572c70705d655ebc55276..768a691649d9146c7c975a3b25258551
      id("com.github.johnrengelman.shadow")
  }
  
-@@ -13,8 +15,14 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
+@@ -13,8 +15,15 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
  val alsoShade: Configuration by configurations.creating
  
  dependencies {
@@ -25,6 +25,7 @@ index a79461457ea19339f47572c70705d655ebc55276..768a691649d9146c7c975a3b25258551
 -    implementation(project(":paper-mojangapi"))
 +    // SparklyPaper start
 +    implementation(project(":sparklypaper-api"))
++    implementation(kotlin("reflect"))
 +    implementation("io.papermc.paper:paper-mojangapi:1.20.2-R0.1-SNAPSHOT") {
 +        exclude("io.papermc.paper", "paper-api")
 +    }
@@ -34,7 +35,7 @@ index a79461457ea19339f47572c70705d655ebc55276..768a691649d9146c7c975a3b25258551
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -70,7 +78,7 @@ tasks.jar {
+@@ -70,7 +79,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
@@ -43,7 +44,7 @@ index a79461457ea19339f47572c70705d655ebc55276..768a691649d9146c7c975a3b25258551
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-@@ -154,7 +162,7 @@ fun TaskContainer.registerRunTask(
+@@ -154,7 +163,7 @@ fun TaskContainer.registerRunTask(
      name: String,
      block: JavaExec.() -> Unit
  ): TaskProvider<JavaExec> = register<JavaExec>(name) {

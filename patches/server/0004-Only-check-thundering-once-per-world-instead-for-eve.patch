@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sun, 22 Oct 2023 12:27:26 -0300
+Subject: [PATCH] Only check thundering once per world instead for every chunk
+
+For some reason the isThundering check is consuming ~3% of CPU time when profiled so, instead of checking the thunder every chunk, we can cache the result and reuse on the same chunk tick
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
+index 17b6925b46f8386dcfc561483693de516465ec12..8f57bf4fffae352b1f81220b94def01c81af7f5e 100644
+--- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
++++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
+@@ -598,6 +598,7 @@ public class ServerChunkCache extends ChunkSource {
+             }
+             // Paper end - optimise chunk tick iteration
+ 
++            this.level.isCurrentlyThundering = this.level.isThundering_old(); // SparklyPaper - Only check thundering once per world instead for every chunk
+             int chunksTicked = 0; // Paper
+             // Paper start - optimise chunk tick iteration
+             io.papermc.paper.util.player.NearbyPlayers nearbyPlayers = this.chunkMap.getNearbyPlayers(); // Paper - optimise chunk tick iteration
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index aa9c56fb95d5e438e85aced984631493b84c8556..10adb0b41b4140c1361572f868b2595b0511590d 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -184,6 +184,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+     private int tileTickPosition;
+     public final Map<Explosion.CacheKey, Float> explosionDensityCache = new HashMap<>(); // Paper - Optimize explosions
+     public java.util.ArrayDeque<net.minecraft.world.level.block.RedstoneTorchBlock.Toggle> redstoneUpdateInfos; // Paper - Move from Map in BlockRedstoneTorch to here
++    public boolean isCurrentlyThundering; // SparklyPaper - Only check if the world is currently thundering once instead for every chunk
+ 
+     // Paper start - fix and optimise world upgrading
+     // copied from below
+@@ -1612,7 +1613,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         this.rainLevel = f1;
+     }
+ 
++    // SparklyPaper start - Only check thundering once per world instead for every chunk
+     public boolean isThundering() {
++        return isCurrentlyThundering;
++    }
++    public boolean isThundering_old() {
++        // SparklyPaper end
+         return this.dimensionType().hasSkyLight() && !this.dimensionType().hasCeiling() ? (double) this.getThunderLevel(1.0F) > 0.9D : false;
+     }
+ 
