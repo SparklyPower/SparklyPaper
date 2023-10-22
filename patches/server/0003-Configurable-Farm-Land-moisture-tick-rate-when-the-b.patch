@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sun, 22 Oct 2023 10:47:22 -0300
+Subject: [PATCH] Configurable Farm Land moisture tick rate when the block is
+ already moisturised
+
+The isNearWater check is costly, especially if you have a lot of farm lands. If the block is already moistured, we can change the tick rate of it to avoid these expensive isNearWater checks
+
+diff --git a/src/main/java/net/minecraft/world/level/block/FarmBlock.java b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
+index 5946f06f63b5694034bd027984a4925b0831d439..590a573a9b5099d3062031dc54978993cdd912ad 100644
+--- a/src/main/java/net/minecraft/world/level/block/FarmBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
+@@ -85,6 +85,7 @@ public class FarmBlock extends Block {
+     @Override
+     public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+         int i = (Integer) state.getValue(FarmBlock.MOISTURE);
++        if (i > 0 && world.sparklyPaperConfig.getTickRates().getFarmWhenMoisturised() != 1 && (world.sparklyPaperConfig.getTickRates().getFarmWhenMoisturised() < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % world.sparklyPaperConfig.getTickRates().getFarmWhenMoisturised() != 0)) { return; } // SparklyPaper
+ 
+         if (!FarmBlock.isNearWater(world, pos) && !world.isRainingAt(pos.above())) {
+             if (i > 0) {

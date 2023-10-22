@@ -1,0 +1,294 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sun, 22 Oct 2023 09:35:07 -0300
+Subject: [PATCH] SparklyPaper config files
+
+
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index dbccbcb9b44e4efacdf53c2d161115cc20b36cff..1d1fb9eb784e52371d7a50446f4d46714875506c 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -218,6 +218,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         thread.start(); // Paper - start console thread after MinecraftServer.console & PaperConfig are initialized
+         io.papermc.paper.command.PaperCommands.registerCommands(this);
+         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics();
++        // SparklyPaper start
++        try {
++            net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.init((java.io.File) options.valueOf("sparklypaper-settings"));
++        } catch (Exception e) {
++            DedicatedServer.LOGGER.error("Unable to load server configuration", e);
++            return false;
++        }
++        net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
++        // SparklyPaper end
+         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // load version history now
+         io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // init PaperBrigadierProvider
+         // Paper end
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index ea8a0961190e9aafda4fed6fecd85097c141040a..aa9c56fb95d5e438e85aced984631493b84c8556 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -176,6 +176,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+     // Paper end
+ 
+     public final com.destroystokyo.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
++    public net.sparklypower.sparklypaper.configs.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
+     public final co.aikar.timings.WorldTimingsHandler timings; // Paper
+     public static BlockPos lastPhysicsProblem; // Spigot
+     private org.spigotmc.TickLimiter entityLimiter;
+@@ -213,6 +214,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+     protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator, java.util.concurrent.Executor executor) { // Paper - Async-Anti-Xray - Pass executor
+         this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) worlddatamutable).getLevelName()); // Spigot
+         this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper
++        this.sparklyPaperConfig = net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getWorldSettings(((net.minecraft.world.level.storage.PrimaryLevelData) worlddatamutable).getLevelName()); // SparklyPaper
+         this.generator = gen;
+         this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
+ 
+diff --git a/src/main/java/net/sparklypower/sparklypaper/commands/SparklyPaperCommand.java b/src/main/java/net/sparklypower/sparklypaper/commands/SparklyPaperCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bc0ec96f91f7c9ab9f9a865a50f69707fab8fd27
+--- /dev/null
++++ b/src/main/java/net/sparklypower/sparklypaper/commands/SparklyPaperCommand.java
+@@ -0,0 +1,65 @@
++package net.sparklypower.sparklypaper.commands;
++
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.ServerLevel;
++import net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils;
++import org.bukkit.ChatColor;
++import org.bukkit.Location;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++
++import java.io.File;
++import java.util.Collections;
++import java.util.List;
++import java.util.stream.Collectors;
++import java.util.stream.Stream;
++
++public class SparklyPaperCommand extends Command {
++    public SparklyPaperCommand(String name) {
++        super(name);
++        this.description = "SparklyPaper related commands";
++        this.usageMessage = "/sparklypaper [reload | version]";
++        this.setPermission("bukkit.command.sparklypaper");
++    }
++
++    @Override
++    public List<String> tabComplete(CommandSender sender, String alias, String[] args, Location location) throws IllegalArgumentException {
++        if (args.length == 1) {
++            return Stream.of("reload", "version")
++                .filter(arg -> arg.startsWith(args[0].toLowerCase()))
++                .collect(Collectors.toList());
++        }
++        return Collections.emptyList();
++    }
++
++    @Override
++    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
++        if (!testPermission(sender)) return true;
++
++        if (args.length != 1) {
++            sender.sendMessage(ChatColor.RED + "Usage: " + usageMessage);
++            return false;
++        }
++
++        if (args[0].equalsIgnoreCase("reload")) {
++            Command.broadcastCommandMessage(sender, ChatColor.RED + "Please note that this command is not supported and may cause issues.");
++            Command.broadcastCommandMessage(sender, ChatColor.RED + "If you encounter any issues please use the /stop command to restart your server.");
++
++            MinecraftServer console = MinecraftServer.getServer();
++            SparklyPaperConfigUtils.INSTANCE.init((File) console.options.valueOf("sparklypaper-settings"));
++            for (ServerLevel level : console.getAllLevels()) {
++                level.sparklyPaperConfig = SparklyPaperConfigUtils.INSTANCE.getWorldSettings(level.serverLevelData.getLevelName());
++            }
++            console.server.reloadCount++;
++
++            Command.broadcastCommandMessage(sender, ChatColor.GREEN + "SparklyPaper config reload complete.");
++        } else if (args[0].equalsIgnoreCase("version")) {
++            Command verCmd = org.bukkit.Bukkit.getServer().getCommandMap().getCommand("version");
++            if (verCmd != null) {
++                return verCmd.execute(sender, commandLabel, new String[0]);
++            }
++        }
++
++        return true;
++    }
++}
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 38460bef2c55264b145c3e21b314eeb88b812d41..b2262f35ed18a59b6496d686a7ec9eca1e30e554 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -117,6 +117,7 @@ import net.minecraft.world.level.storage.WorldData;
+ import net.minecraft.world.level.storage.loot.LootDataManager;
+ import net.minecraft.world.level.validation.ContentValidationException;
+ import net.minecraft.world.phys.Vec3;
++import net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils;
+ import org.bukkit.BanList;
+ import org.bukkit.Bukkit;
+ import org.bukkit.ChatColor;
+@@ -1039,6 +1040,7 @@ public final class CraftServer implements Server {
+ 
+         org.spigotmc.SpigotConfig.init((File) console.options.valueOf("spigot-settings")); // Spigot
+         this.console.paperConfigurations.reloadConfigs(this.console);
++        net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.init((File) console.options.valueOf("sparklypaper-settings")); // SparklyPaper
+         for (ServerLevel world : this.console.getAllLevels()) {
+             // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
+             world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters, config.spawnAnimals); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
+@@ -1054,6 +1056,7 @@ public final class CraftServer implements Server {
+                 }
+             }
+             world.spigotConfig.init(); // Spigot
++            world.sparklyPaperConfig = SparklyPaperConfigUtils.INSTANCE.getWorldSettings(world.serverLevelData.getLevelName()); // SparklyPaper
+         }
+ 
+         Plugin[] pluginClone = pluginManager.getPlugins().clone(); // Paper
+@@ -1069,6 +1072,7 @@ public final class CraftServer implements Server {
+         this.reloadData();
+         org.spigotmc.SpigotConfig.registerCommands(); // Spigot
+         io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
++        net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this.console); // SparklyPaper
+         this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
+         this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index e4cacb17f56c618bef19e1165c07aac86af61150..86e351daf1bcf33d0a26fd58b930a55a9a3b0ea8 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -173,6 +173,14 @@ public class Main {
+                         .describedAs("Jar file");
+                 // Paper end
+ 
++                // SparklyPaper Start
++                acceptsAll(asList("sparklypaper", "sparklypaper-settings"), "File for SparklyPaper settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("sparklypaper.yml"))
++                        .describedAs("Yml file");
++                // SparklyPaper end
++
+                 // Paper start
+                 acceptsAll(asList("server-name"), "Name of the server")
+                         .withRequiredArg()
+diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/SparklyPaperCommands.kt b/src/main/kotlin/net/sparklypower/sparklypaper/SparklyPaperCommands.kt
+new file mode 100644
+index 0000000000000000000000000000000000000000..614e64ce6bf5bb7fab5758250927a0d3949d0917
+--- /dev/null
++++ b/src/main/kotlin/net/sparklypower/sparklypaper/SparklyPaperCommands.kt
+@@ -0,0 +1,22 @@
++package net.sparklypower.sparklypaper
++
++import net.minecraft.server.MinecraftServer
++import net.sparklypower.sparklypaper.commands.SparklyPaperCommand
++import org.bukkit.command.Command
++import org.checkerframework.checker.nullness.qual.NonNull
++import org.checkerframework.framework.qual.DefaultQualifier
++
++@DefaultQualifier(NonNull::class)
++object SparklyPaperCommands {
++    private val COMMANDS = mapOf(
++        "sparklypaper" to SparklyPaperCommand("sparklypaper")
++    )
++
++    fun registerCommands(server: MinecraftServer) {
++        COMMANDS.forEach { (s: String, command: Command) ->
++            server.server.commandMap.register(
++                s, "SparklyPaper", command
++            )
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt
+new file mode 100644
+index 0000000000000000000000000000000000000000..1965b785204edcb8199bfe8b7ab1c86892c848c0
+--- /dev/null
++++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt
+@@ -0,0 +1,10 @@
++package net.sparklypower.sparklypaper.configs
++
++import kotlinx.serialization.SerialName
++import kotlinx.serialization.Serializable
++
++@Serializable
++class SparklyPaperConfig(
++    @SerialName("world-settings")
++    val worldSettings: Map<String, SparklyPaperWorldConfig>
++)
+\ No newline at end of file
+diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
+new file mode 100644
+index 0000000000000000000000000000000000000000..82a29b23429e31d78e09fa23e8c87cec76ba63bd
+--- /dev/null
++++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
+@@ -0,0 +1,46 @@
++package net.sparklypower.sparklypaper.configs
++
++import com.charleskorn.kaml.Yaml
++import com.google.common.base.Throwables
++import kotlinx.serialization.SerializationException
++import kotlinx.serialization.decodeFromString
++import kotlinx.serialization.encodeToString
++import org.bukkit.Bukkit
++import java.io.File
++import java.util.logging.Level
++
++object SparklyPaperConfigUtils {
++    val yaml = Yaml()
++    lateinit var config: SparklyPaperConfig
++
++    fun init(configFile: File) {
++        // Write default config if the file doesn't exist
++        if (!configFile.exists()) {
++            configFile.writeText(
++                yaml.encodeToString(
++                    SparklyPaperConfig(
++                        mapOf(
++                            "default" to SparklyPaperWorldConfig(
++                                SparklyPaperWorldConfig.TickRates(
++                                    farmWhenMoisturised = 1
++                                )
++                            )
++                        )
++                    )
++                )
++            )
++        }
++
++        val loadedConfig = try {
++            yaml.decodeFromString<SparklyPaperConfig>(configFile.readText())
++        } catch (e: SerializationException) {
++            Bukkit.getLogger().log(Level.SEVERE, "Could not load sparklypaper.yml, please correct your syntax errors", e)
++            throw Throwables.propagate(e)
++        }
++        config = loadedConfig
++    }
++
++    fun getWorldSettings(levelName: String): SparklyPaperWorldConfig {
++        return config.worldSettings[levelName] ?: config.worldSettings["default"] ?: error("Missing default world-settings in sparklypaper.yml!")
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
+new file mode 100644
+index 0000000000000000000000000000000000000000..190954d4533e53247f9a4af878a08ce96eee2ebd
+--- /dev/null
++++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
+@@ -0,0 +1,16 @@
++package net.sparklypower.sparklypaper.configs
++
++import kotlinx.serialization.SerialName
++import kotlinx.serialization.Serializable
++
++@Serializable
++class SparklyPaperWorldConfig(
++    @SerialName("tick-rates")
++    val tickRates: TickRates
++) {
++    @Serializable
++    data class TickRates(
++        @SerialName("farm-when-moisturised")
++        val farmWhenMoisturised: Int
++    )
++}
+\ No newline at end of file
