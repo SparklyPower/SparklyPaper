@@ -1,0 +1,106 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sat, 28 Oct 2023 19:02:12 -0300
+Subject: [PATCH] Optimize heavy EntityLookup.ArrayIterable.<init>() calls on
+ tickChunks
+
+For some reason, on SparklyPower allocating an ArrayIterable is expensive, taking around ~2.5% of tick time (I have no idea why tho), because tickChunks() only uses this for the NaturalSpawner, let's avoid the array allocation by passing thru the raw array data + size
+
+diff --git a/src/main/java/io/papermc/paper/chunk/system/entity/EntityLookup.java b/src/main/java/io/papermc/paper/chunk/system/entity/EntityLookup.java
+index 15ee41452992714108efe53b708b5a4e1da7c1ff..f5a5796dda9e0e05ed9afc069c241dedd9aaffa0 100644
+--- a/src/main/java/io/papermc/paper/chunk/system/entity/EntityLookup.java
++++ b/src/main/java/io/papermc/paper/chunk/system/entity/EntityLookup.java
+@@ -198,6 +198,12 @@ public final class EntityLookup implements LevelEntityGetter<Entity> {
+         return Arrays.copyOf(this.accessibleEntities.getRawData(), this.accessibleEntities.size(), Entity[].class);
+     }
+ 
++    // SparklyPaper start - Optimize heavy EntityLookup$ArrayIterable.<init>() calls on tickChunks
++    public EntityList getAccessibleEntities() {
++        return this.accessibleEntities;
++    }
++    // SparklyPaper end
++
+     @Override
+     public <U extends Entity> void get(final EntityTypeTest<Entity, U> filter, final AbortableIterationConsumer<U> action) {
+         final Int2ReferenceOpenHashMap<Entity> entityCopy;
+diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
+index f8270b78ab0d561e55301e989d80fe7b4118337a..e51d06140153e7f9a6e41b20addf02ec94e0f72c 100644
+--- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
++++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
+@@ -545,9 +545,9 @@ public class ServerChunkCache extends ChunkSource {
+                     }
+                     // Paper end - per player mob spawning backoff
+                 }
+-                spawnercreature_d = NaturalSpawner.createState(l, this.level.getAllEntities(), this::getFullChunk, null, true);
++                spawnercreature_d = NaturalSpawner.createState(l, this.level.getEntityLookup().getAccessibleEntities().getRawData(), this.level.getEntityLookup().getAccessibleEntities().size(), this::getFullChunk, null, true); // SparklyPaper - Optimize heavy EntityLookup$ArrayIterable.<init>() calls on tickChunks
+             } else {
+-                spawnercreature_d = NaturalSpawner.createState(l, this.level.getAllEntities(), this::getFullChunk, !this.level.paperConfig().entities.spawning.perPlayerMobSpawns ? new LocalMobCapCalculator(this.chunkMap) : null, false);
++                spawnercreature_d = NaturalSpawner.createState(l, this.level.getEntityLookup().getAccessibleEntities().getRawData(), this.level.getEntityLookup().getAccessibleEntities().size(), this::getFullChunk, !this.level.paperConfig().entities.spawning.perPlayerMobSpawns ? new LocalMobCapCalculator(this.chunkMap) : null, false); // SparklyPaper - Optimize heavy EntityLookup$ArrayIterable.<init>() calls on tickChunks
+             }
+             // Paper end
+             this.level.timings.countNaturalMobs.stopTiming(); // Paper - timings
+diff --git a/src/main/java/net/minecraft/world/level/NaturalSpawner.java b/src/main/java/net/minecraft/world/level/NaturalSpawner.java
+index 9c2d62feff1816f5729060c6192269a5b2d34153..78bcb0af0735fe0ccf68ed06d8dc78d6e8c37064 100644
+--- a/src/main/java/net/minecraft/world/level/NaturalSpawner.java
++++ b/src/main/java/net/minecraft/world/level/NaturalSpawner.java
+@@ -74,7 +74,60 @@ public final class NaturalSpawner {
+         return createState(spawningChunkCount, entities, chunkSource, densityCapper, false);
+     }
+ 
++    // SparklyPaper start - Optimize heavy EntityLookup$ArrayIterable.<init>() calls on tickChunks
++    public static NaturalSpawner.SpawnState createState(int spawningChunkCount, Entity[] entities, int count, NaturalSpawner.ChunkGetter chunkSource, LocalMobCapCalculator densityCapper, boolean countMobs) {
++        PotentialCalculator spawnercreatureprobabilities = new PotentialCalculator();
++        Object2IntOpenHashMap<MobCategory> object2intopenhashmap = new Object2IntOpenHashMap();
++
++        for (int index = 0; count > index; index++) {
++            Entity entity = entities[index];
++
++            if (entity instanceof Mob) {
++                Mob entityinsentient = (Mob) entity;
++
++                if (entityinsentient.isPersistenceRequired() || entityinsentient.requiresCustomPersistence()) {
++                    continue;
++                }
++            }
++
++            MobCategory enumcreaturetype = entity.getType().getCategory();
++
++            if (enumcreaturetype != MobCategory.MISC) {
++                // Paper start - Only count natural spawns
++                if (!entity.level().paperConfig().entities.spawning.countAllMobsForSpawning &&
++                    !(entity.spawnReason == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL ||
++                        entity.spawnReason == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CHUNK_GEN)) {
++                    continue;
++                }
++                // Paper end
++                BlockPos blockposition = entity.blockPosition();
++
++                chunkSource.query(ChunkPos.asLong(blockposition), (chunk) -> {
++                    MobSpawnSettings.MobSpawnCost biomesettingsmobs_b = NaturalSpawner.getRoughBiome(blockposition, chunk).getMobSettings().getMobSpawnCost(entity.getType());
++
++                    if (biomesettingsmobs_b != null) {
++                        spawnercreatureprobabilities.addCharge(entity.blockPosition(), biomesettingsmobs_b.charge());
++                    }
++
++                    if (densityCapper != null && entity instanceof Mob) { // Paper
++                        densityCapper.addMob(chunk.getPos(), enumcreaturetype);
++                    }
++
++                    object2intopenhashmap.addTo(enumcreaturetype, 1);
++                    // Paper start
++                    if (countMobs) {
++                        chunk.level.getChunkSource().chunkMap.updatePlayerMobTypeMap(entity);
++                    }
++                    // Paper end
++                });
++            }
++        }
++
++        return new NaturalSpawner.SpawnState(spawningChunkCount, object2intopenhashmap, spawnercreatureprobabilities, densityCapper);
++    }
++
+     public static NaturalSpawner.SpawnState createState(int spawningChunkCount, Iterable<Entity> entities, NaturalSpawner.ChunkGetter chunkSource, LocalMobCapCalculator densityCapper, boolean countMobs) {
++        // SparklyPaper end
+         // Paper end
+         PotentialCalculator spawnercreatureprobabilities = new PotentialCalculator();
+         Object2IntOpenHashMap<MobCategory> object2intopenhashmap = new Object2IntOpenHashMap();
