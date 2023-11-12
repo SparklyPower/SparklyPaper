@@ -5,7 +5,7 @@ Subject: [PATCH] SparklyPaper config files
 
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 2b5d82fbf4e7ec32d0c53dd3e8207b1dba708bbd..c67f33a21f0061ff910653b6a911648967145d19 100644
+index cf605aa56adf7f80d3b409f60a92a5ca7ae8fd07..8c20221736419bcb9c3e570af624eef8e6fc3b09 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -218,6 +218,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -116,7 +116,7 @@ index 0000000000000000000000000000000000000000..bc0ec96f91f7c9ab9f9a865a50f69707
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 8c5bf002fb437d192132ef90324a095dd064fea8..9dad8611d887e80207385c36c8983104903d092d 100644
+index aaf04e2be3ed707e51a81d2b1c58dda6f7a8092a..bcc98faf17782c3d7ba576b7d605446a9a4d864b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -117,6 +117,7 @@ import net.minecraft.world.level.storage.WorldData;
@@ -127,7 +127,7 @@ index 8c5bf002fb437d192132ef90324a095dd064fea8..9dad8611d887e80207385c36c8983104
  import org.bukkit.BanList;
  import org.bukkit.Bukkit;
  import org.bukkit.ChatColor;
-@@ -1039,6 +1040,7 @@ public final class CraftServer implements Server {
+@@ -1041,6 +1042,7 @@ public final class CraftServer implements Server {
  
          org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);
@@ -135,7 +135,7 @@ index 8c5bf002fb437d192132ef90324a095dd064fea8..9dad8611d887e80207385c36c8983104
          for (ServerLevel world : this.console.getAllLevels()) {
              // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
              world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters, config.spawnAnimals); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
-@@ -1054,6 +1056,7 @@ public final class CraftServer implements Server {
+@@ -1056,6 +1058,7 @@ public final class CraftServer implements Server {
                  }
              }
              world.spigotConfig.init(); // Spigot
@@ -143,7 +143,7 @@ index 8c5bf002fb437d192132ef90324a095dd064fea8..9dad8611d887e80207385c36c8983104
          }
  
          Plugin[] pluginClone = pluginManager.getPlugins().clone(); // Paper
-@@ -1069,6 +1072,7 @@ public final class CraftServer implements Server {
+@@ -1071,6 +1074,7 @@ public final class CraftServer implements Server {
          this.reloadData();
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
@@ -201,10 +201,10 @@ index 0000000000000000000000000000000000000000..614e64ce6bf5bb7fab5758250927a0d3
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..1965b785204edcb8199bfe8b7ab1c86892c848c0
+index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c24dc8ac41
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,17 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import kotlinx.serialization.SerialName
@@ -212,16 +212,23 @@ index 0000000000000000000000000000000000000000..1965b785204edcb8199bfe8b7ab1c868
 +
 +@Serializable
 +class SparklyPaperConfig(
++    @SerialName("parallel-world-ticking")
++    val parallelWorldTicking: ParallelWorldTicking,
 +    @SerialName("world-settings")
 +    val worldSettings: Map<String, SparklyPaperWorldConfig>
-+)
++) {
++    @Serializable
++    class ParallelWorldTicking(
++        val threads: Int
++    )
++}
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..82a29b23429e31d78e09fa23e8c87cec76ba63bd
+index 0000000000000000000000000000000000000000..fbbb11c1a62a28a251c35261fb29e6267a08c1a3
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,49 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import com.charleskorn.kaml.Yaml
@@ -243,6 +250,9 @@ index 0000000000000000000000000000000000000000..82a29b23429e31d78e09fa23e8c87cec
 +            configFile.writeText(
 +                yaml.encodeToString(
 +                    SparklyPaperConfig(
++                        SparklyPaperConfig.ParallelWorldTicking(
++                            threads = 8
++                        ),
 +                        mapOf(
 +                            "default" to SparklyPaperWorldConfig(
 +                                SparklyPaperWorldConfig.TickRates(

@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a79461457ea19339f47572c70705d655ebc55276..d43c3f2e17f9ef48ec458f9c94478cfd02db6edb 100644
+index 79beac737c17412913983614bd478d33e3c6ed58..8adfd75d66cbd3e3afafc0ea167d1e6568c4adbe 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import io.papermc.paperweight.util.*
@@ -54,7 +54,7 @@ index a79461457ea19339f47572c70705d655ebc55276..d43c3f2e17f9ef48ec458f9c94478cfd
      standardInput = System.`in`
      workingDir = rootProject.layout.projectDirectory
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 97745f0bab8d82d397c6c2a5775aed92bca0a034..0dfd9a2f9195ec018ed5069f43908b8c0e09edbd 100644
+index 8f31413c939cc2b0454ad3d9a1b618dbae449d00..25367df06a8a6e8b0b3a56652a5fb1c70a15632d 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1697,7 +1697,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -67,10 +67,10 @@ index 97745f0bab8d82d397c6c2a5775aed92bca0a034..0dfd9a2f9195ec018ed5069f43908b8c
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index b7e7e6ed60f55d2ab5e4fcefb3638ad1768c3b7f..38460bef2c55264b145c3e21b314eeb88b812d41 100644
+index 9c08303de2891de92e06de8a939a618b7a6f7321..aaf04e2be3ed707e51a81d2b1c58dda6f7a8092a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -267,7 +267,7 @@ import javax.annotation.Nullable; // Paper
+@@ -269,7 +269,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -93,7 +93,7 @@ index 774556a62eb240da42e84db4502e2ed43495be17..22e504565de83f976c8b2996f0b2207b
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 50c72e5db369a180f425eaaa0411cb8871bc3463..682077870a3607afc7ec66ed6e8dcf8484c63fd0 100644
+index 40dcdf6885e99b26283a9ea2bd4d4bf6ec358e71..d502b0d45bc950a586049dd5cd242319da5ba721 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -155,14 +155,14 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
