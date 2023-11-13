@@ -341,32 +341,6 @@ index f9063e2282f89e97a378f06822cde0a64ab03f9a..98abe711f63c0a112ef969bd74bda81f
      }
 +    // SparklyPaper end
  }
-diff --git a/src/main/java/net/minecraft/Util.java b/src/main/java/net/minecraft/Util.java
-index 5c1503f5b173138fc9e918d5562a981ca8b66d06..5f9249526c88970cb18d45fd917ebabad2c77809 100644
---- a/src/main/java/net/minecraft/Util.java
-+++ b/src/main/java/net/minecraft/Util.java
-@@ -98,6 +98,10 @@ public class Util {
-         }
-     });
-     // Paper end - don't submit BLOCKING PROFILE LOOKUPS to the world gen thread
-+    // SparklyPaper start - parallel world ticking
-+    @Nullable
-+    public static java.util.concurrent.ThreadPoolExecutor SERVERLEVEL_TICK_EXECUTOR = null;
-+    // SparklyPaper end
-     private static final ExecutorService IO_POOL = makeIoExecutor();
-     private static final DateTimeFormatter FILENAME_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss", Locale.ROOT);
-     public static final long NANOS_PER_MILLI = 1000000L;
-@@ -219,6 +223,10 @@ public class Util {
-     public static void shutdownExecutors() {
-         shutdownExecutor(BACKGROUND_EXECUTOR);
-         shutdownExecutor(IO_POOL);
-+        // SparklyPaper start - parallel world ticking
-+        if (SERVERLEVEL_TICK_EXECUTOR != null)
-+            shutdownExecutor(SERVERLEVEL_TICK_EXECUTOR);
-+        // SparklyPaper end
-     }
- 
-     private static void shutdownExecutor(ExecutorService service) {
 diff --git a/src/main/java/net/minecraft/core/dispenser/AbstractProjectileDispenseBehavior.java b/src/main/java/net/minecraft/core/dispenser/AbstractProjectileDispenseBehavior.java
 index 155bd3d6d9c7d3cac7fd04de8210301251d1e17a..f51d90f54ae693e7e9c8aa0ea14af9fdd26351f9 100644
 --- a/src/main/java/net/minecraft/core/dispenser/AbstractProjectileDispenseBehavior.java
@@ -583,7 +557,7 @@ index 6f2adf2334e35e8a617a4ced0c1af2abf32bbd8d..a5ea9df0a021ed820c0c1ccb612caebd
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 81b47185a939dc2d7e9e0bda16bb910ef9424d23..12ff402c72e45afc06557e3f31ef5002eec5eee4 100644
+index a308b52c26c2bb1bfee9f50e03480676b53e602f..e48cb1a99f6876393eaaa98eeca41c0a5eb6b52c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -160,6 +160,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
@@ -594,10 +568,26 @@ index 81b47185a939dc2d7e9e0bda16bb910ef9424d23..12ff402c72e45afc06557e3f31ef5002
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -1523,6 +1524,65 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -308,6 +309,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     // Paper start - lag compensation
+     public static final long SERVER_INIT = System.nanoTime();
+     // Paper end - lag compensation
++    // SparklyPaper - parallel world ticking
++    public java.util.concurrent.Semaphore serverLevelTickingSemaphore = null;
++    // SparklyPaper end
+ 
+     public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
+         AtomicReference<S> atomicreference = new AtomicReference();
+@@ -1523,63 +1527,124 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.isIteratingOverLevels = true; // Paper
          Iterator iterator = this.getAllLevels().iterator(); // Paper - move down
+-        while (iterator.hasNext()) {
+-            ServerLevel worldserver = (ServerLevel) iterator.next();
+-            worldserver.updateLagCompensationTick(); // Paper - lag compensation
+-            worldserver.hasPhysicsEvent =  org.bukkit.event.block.BlockPhysicsEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper
+-            net.minecraft.world.level.block.entity.HopperBlockEntity.skipHopperEvents = worldserver.paperConfig().hopper.disableMoveEvent || org.bukkit.event.inventory.InventoryMoveItemEvent.getHandlerList().getRegisteredListeners().length == 0; // Paper
+-            worldserver.hasEntityMoveEvent =  io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper
 +        // SparklyPaper start - parallel world ticking
 +        java.util.ArrayDeque<java.util.concurrent.Future<ServerLevel>> tasks = new java.util.ArrayDeque<>();
 +        // while (iterator.hasNext()) { // SparklyPaper - commented out to cause diff when upstream changes this code
@@ -657,12 +647,27 @@ index 81b47185a939dc2d7e9e0bda16bb910ef9424d23..12ff402c72e45afc06557e3f31ef5002
 +        //    this.profiler.pop();
 +        //    worldserver.explosionDensityCache.clear(); // Paper - Optimize explosions
 +        // }
-         while (iterator.hasNext()) {
-             ServerLevel worldserver = (ServerLevel) iterator.next();
-             worldserver.updateLagCompensationTick(); // Paper - lag compensation
-@@ -1530,56 +1590,55 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-             net.minecraft.world.level.block.entity.HopperBlockEntity.skipHopperEvents = worldserver.paperConfig().hopper.disableMoveEvent || org.bukkit.event.inventory.InventoryMoveItemEvent.getHandlerList().getRegisteredListeners().length == 0; // Paper
-             worldserver.hasEntityMoveEvent =  io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper
++        try {
++            while (iterator.hasNext()) {
++                ServerLevel worldserver = (ServerLevel) iterator.next();
++                worldserver.updateLagCompensationTick(); // Paper - lag compensation
++                worldserver.hasPhysicsEvent =  org.bukkit.event.block.BlockPhysicsEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper
++                net.minecraft.world.level.block.entity.HopperBlockEntity.skipHopperEvents = worldserver.paperConfig().hopper.disableMoveEvent || org.bukkit.event.inventory.InventoryMoveItemEvent.getHandlerList().getRegisteredListeners().length == 0; // Paper
++                worldserver.hasEntityMoveEvent =  io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper
++
++                serverLevelTickingSemaphore.acquire();
++                tasks.add(
++                    worldserver.tickExecutor.submit(() -> {
++                        try {
++                            io.papermc.paper.util.TickThread.ServerLevelTickThread currentThread = (io.papermc.paper.util.TickThread.ServerLevelTickThread) Thread.currentThread();
++                            currentThread.currentlyTickingServerLevel = worldserver;
++
++                            long i = Util.getNanos(); // SparklyPaper - track world's MSPT
++                            worldserver.tick(shouldKeepTicking);
++                            for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
++                                regionManager.recalculateRegions();
++                            }
++                            worldserver.explosionDensityCache.clear(); // Paper - Optimize explosions
  
 -            this.profiler.push(() -> {
 -                return worldserver + " " + worldserver.dimension().location();
@@ -674,52 +679,22 @@ index 81b47185a939dc2d7e9e0bda16bb910ef9424d23..12ff402c72e45afc06557e3f31ef5002
 -                this.profiler.pop();
 -            }
 -            // CraftBukkit end */
-+            tasks.add(
-+                net.minecraft.Util.SERVERLEVEL_TICK_EXECUTOR.submit(() -> {
-+                    try {
-+                        io.papermc.paper.util.TickThread.ServerLevelTickThread currentThread = (io.papermc.paper.util.TickThread.ServerLevelTickThread) Thread.currentThread();
-+                        currentThread.setName("serverlevel-tick-worker [" + worldData.getLevelName() + "]");
-+                        currentThread.currentlyTickingServerLevel = worldserver;
-+
-+                        long i = Util.getNanos(); // SparklyPaper - track world's MSPT
-+                        worldserver.tick(shouldKeepTicking);
-+                        worldserver.explosionDensityCache.clear(); // Paper - Optimize explosions
++                            // SparklyPaper start - track world's MSPT
++                            long j = Util.getNanos() - i;
  
 -            this.profiler.push("tick");
-+                        // SparklyPaper start - track world's MSPT
-+                        long j = this.tickTimes[this.tickCount % 100] = Util.getNanos() - i;
-+
-+                        // These are from the "tickServer" function
-+                        worldserver.tickTimes5s.add(this.tickCount, j);
-+                        worldserver.tickTimes10s.add(this.tickCount, j);
-+                        worldserver.tickTimes60s.add(this.tickCount, j);
-+                        // SparklyPaper end
-+
-+                        currentThread.currentlyTickingServerLevel = null; // Reset current ticking level
-+                    } catch (Throwable throwable) {
-+                        // Spigot Start
-+                        CrashReport crashreport;
-+                        try {
-+                            crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
-+                        } catch (Throwable t) {
-+                            if (throwable instanceof ThreadDeath) { throw (ThreadDeath)throwable; } // Paper
-+                            throw new RuntimeException("Error generating crash report", t);
-+                        }
-+                        // Spigot End
++                            // These are from the "tickServer" function
++                            worldserver.tickTimes5s.add(this.tickCount, j);
++                            worldserver.tickTimes10s.add(this.tickCount, j);
++                            worldserver.tickTimes60s.add(this.tickCount, j);
++                            // SparklyPaper end
  
-+                        worldserver.fillReportDetails(crashreport);
-+                        throw new ReportedException(crashreport);
-+                    }
-+                }, worldserver)
-+            );
-+        }
-+        while (!tasks.isEmpty()) {
-             try {
+-            try {
 -                worldserver.timings.doTick.startTiming(); // Spigot
 -                long i = Util.getNanos(); // SparklyPaper - track world's MSPT
 -                worldserver.tick(shouldKeepTicking);
 -                // SparklyPaper start - track world's MSPT
--                long j = this.tickTimes[this.tickCount % 100] = Util.getNanos() - i;
+-                long j = Util.getNanos() - i;
 -
 -                // These are from the "tickServer" function
 -                worldserver.tickTimes5s.add(this.tickCount, j);
@@ -727,10 +702,9 @@ index 81b47185a939dc2d7e9e0bda16bb910ef9424d23..12ff402c72e45afc06557e3f31ef5002
 -                worldserver.tickTimes60s.add(this.tickCount, j);
 -                // SparklyPaper end
 -                // Paper start
-+                ServerLevel worldserver = tasks.pop().get();
-                 for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
-                     regionManager.recalculateRegions();
-                 }
+-                for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
+-                    regionManager.recalculateRegions();
+-                }
 -                // Paper end
 -                worldserver.timings.doTick.stopTiming(); // Spigot
 -            } catch (Throwable throwable) {
@@ -743,23 +717,44 @@ index 81b47185a939dc2d7e9e0bda16bb910ef9424d23..12ff402c72e45afc06557e3f31ef5002
 -                    throw new RuntimeException("Error generating crash report", t);
 -                }
 -                // Spigot End
--
++                            currentThread.currentlyTickingServerLevel = null; // Reset current ticking level
++                        } catch (Throwable throwable) {
++                            // Spigot Start
++                            CrashReport crashreport;
++                            try {
++                                crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
++                            } catch (Throwable t) {
++                                if (throwable instanceof ThreadDeath) { throw (ThreadDeath)throwable; } // Paper
++                                throw new RuntimeException("Error generating crash report", t);
++                            }
++                            // Spigot End
+ 
 -                worldserver.fillReportDetails(crashreport);
 -                throw new ReportedException(crashreport);
-+            } catch (java.lang.InterruptedException | java.util.concurrent.ExecutionException e) {
-+                throw new RuntimeException(e); // Propagate exception
++                            worldserver.fillReportDetails(crashreport);
++                            throw new ReportedException(crashreport);
++                        } finally {
++                            serverLevelTickingSemaphore.release();
++                        }
++                    }, worldserver)
++                );
              }
--
+ 
 -            this.profiler.pop();
 -            this.profiler.pop();
 -            worldserver.explosionDensityCache.clear(); // Paper - Optimize explosions
++            while (!tasks.isEmpty()) {
++                tasks.pop().get();
++            }
++        } catch (java.lang.InterruptedException | java.util.concurrent.ExecutionException e) {
++            throw new RuntimeException(e); // Propagate exception
          }
 +        // SparklyPaper end
          this.isIteratingOverLevels = false; // Paper
  
          this.profiler.popPush("connection");
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 8c20221736419bcb9c3e570af624eef8e6fc3b09..bcd04c04c27a83ca56f05d5aa25f8a103b0c072d 100644
+index 8c20221736419bcb9c3e570af624eef8e6fc3b09..52f7b6cc6f410e353ec8a5836d23d47c5c934675 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -17,6 +17,7 @@ import java.util.Collections;
@@ -778,13 +773,12 @@ index 8c20221736419bcb9c3e570af624eef8e6fc3b09..bcd04c04c27a83ca56f05d5aa25f8a10
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -226,6 +228,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -226,6 +228,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
              return false;
          }
          net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
-+        Util.SERVERLEVEL_TICK_EXECUTOR = new java.util.concurrent.ThreadPoolExecutor(SparklyPaperConfigUtils.config.getParallelWorldTicking().getThreads(), SparklyPaperConfigUtils.config.getParallelWorldTicking().getThreads(), 0L, TimeUnit.MILLISECONDS, new java.util.concurrent.LinkedBlockingQueue(), new net.sparklypower.sparklypaper.ServerLevelTickExecutorThreadFactory()); // SparklyPaper - parallel world ticking; // SparklyPaper - parallel world ticking
-+        int serverLevelTickWorkerCount = Util.SERVERLEVEL_TICK_EXECUTOR.prestartAllCoreThreads(); // SparklyPaper - parallel world ticking
-+        DedicatedServer.LOGGER.info("Using " + serverLevelTickWorkerCount + " threads for parallel world ticking"); // SparklyPaper - parallel world ticking
++        serverLevelTickingSemaphore = new java.util.concurrent.Semaphore(net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getConfig().getParallelWorldTicking().getThreads()); // SparklyPaper - parallel world ticking
++        DedicatedServer.LOGGER.info("Using " + serverLevelTickingSemaphore.availablePermits() + " permits for parallel world ticking"); // SparklyPaper - parallel world ticking
          // SparklyPaper end
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // load version history now
          io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // init PaperBrigadierProvider
@@ -847,10 +841,18 @@ index 8c33a12ca879c46893150d6adfb8aa4d397c6b4c..7088c8e8a7eba566fa91f5fa2995cd72
                  }
              }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 3fe14f5f135249ea9004589a86ed372aeb4667f8..49109a1c59f6b069ee636d0031754446b0cdc062 100644
+index 3fe14f5f135249ea9004589a86ed372aeb4667f8..3e3f92cb5b740badf78133b0a942794860ddd1bb 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -703,7 +703,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -216,6 +216,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+     private final boolean tickTime;
+     private final RandomSequences randomSequences;
+     public long lastMidTickExecuteFailure; // Paper - execute chunk tasks mid tick
++    public java.util.concurrent.ExecutorService tickExecutor; // SparklyPaper - parallel world ticking
+ 
+     // CraftBukkit start
+     public final LevelStorageSource.LevelStorageAccess convertable;
+@@ -703,7 +704,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          this.uuid = WorldUUID.getUUID(convertable_conversionsession.levelDirectory.path().toFile());
          // CraftBukkit end
          this.players = Lists.newArrayList();
@@ -859,7 +861,15 @@ index 3fe14f5f135249ea9004589a86ed372aeb4667f8..49109a1c59f6b069ee636d0031754446
          this.blockTicks = new LevelTicks<>(this::isPositionTickingWithEntitiesLoaded, this.getProfilerSupplier());
          this.fluidTicks = new LevelTicks<>(this::isPositionTickingWithEntitiesLoaded, this.getProfilerSupplier());
          this.navigatingMobs = new ObjectOpenHashSet();
-@@ -1329,7 +1329,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -774,6 +775,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+ 
+         this.chunkTaskScheduler = new io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler(this, io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler.workerThreads); // Paper - rewrite chunk system
+         this.entityLookup = new io.papermc.paper.chunk.system.entity.EntityLookup(this, new EntityCallbacks()); // Paper - rewrite chunk system
++        this.tickExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new net.sparklypower.sparklypaper.ServerLevelTickExecutorThreadFactory(getWorld().getName())); // SparklyPaper - parallel world ticking
+     }
+ 
+     // Paper start
+@@ -1329,7 +1331,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          if (fluid1.is(fluid)) {
              fluid1.tick(this, pos);
          }
@@ -868,7 +878,7 @@ index 3fe14f5f135249ea9004589a86ed372aeb4667f8..49109a1c59f6b069ee636d0031754446
  
      }
  
-@@ -1339,7 +1339,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -1339,7 +1341,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          if (iblockdata.is(block)) {
              iblockdata.tick(this, pos, this.random);
          }
@@ -877,7 +887,7 @@ index 3fe14f5f135249ea9004589a86ed372aeb4667f8..49109a1c59f6b069ee636d0031754446
  
      }
  
-@@ -1357,7 +1357,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -1357,7 +1359,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
  
      public void tickNonPassenger(Entity entity) {
          // Paper start - log detailed entity tick information
@@ -886,7 +896,7 @@ index 3fe14f5f135249ea9004589a86ed372aeb4667f8..49109a1c59f6b069ee636d0031754446
          try {
              if (currentlyTickingEntity.get() == null) {
                  currentlyTickingEntity.lazySet(entity);
-@@ -1645,6 +1645,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -1645,6 +1647,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
      }
  
      private void addPlayer(ServerPlayer player) {
@@ -894,7 +904,7 @@ index 3fe14f5f135249ea9004589a86ed372aeb4667f8..49109a1c59f6b069ee636d0031754446
          Entity entity = (Entity) this.getEntities().get(player.getUUID());
  
          if (entity != null) {
-@@ -1658,7 +1659,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -1658,7 +1661,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
  
      // CraftBukkit start
      private boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
@@ -903,6 +913,14 @@ index 3fe14f5f135249ea9004589a86ed372aeb4667f8..49109a1c59f6b069ee636d0031754446
          // Paper start
          if (entity.valid) {
              MinecraftServer.LOGGER.error("Attempted Double World add on " + entity, new Throwable());
+@@ -2632,6 +2635,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+     @Override
+     public void close() throws IOException {
+         super.close();
++        tickExecutor.shutdown(); // SparklyPaper - parallel world ticking
+         //this.entityManager.close(); // Paper - rewrite chunk system
+     }
+ 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 index f71a4a8307fb092d33545e12d253e0b80c884168..e44f7734e677226ff8715134c81edad9520b5694 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
@@ -2131,22 +2149,19 @@ index 5dc160b743534665c6b3efb10b10f7c36e2da5ab..8942bb585e1f4a0b747194ef2ad91acc
              }
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/ServerLevelTickExecutorThreadFactory.kt b/src/main/kotlin/net/sparklypower/sparklypaper/ServerLevelTickExecutorThreadFactory.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..7d8b995f8bb7ecf2e1c9a638dc7d7a630702243b
+index 0000000000000000000000000000000000000000..3d536f724ffdae462e3af39e85e4e39190696c37
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/ServerLevelTickExecutorThreadFactory.kt
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,21 @@
 +package net.sparklypower.sparklypaper
 +
 +import io.papermc.paper.util.TickThread
 +import java.util.concurrent.ThreadFactory
 +import java.util.concurrent.atomic.AtomicInteger
 +
-+class ServerLevelTickExecutorThreadFactory : ThreadFactory {
-+    private val threadNumber = AtomicInteger(1)
-+
++class ServerLevelTickExecutorThreadFactory(private val worldName: String) : ThreadFactory {
 +    override fun newThread(p0: Runnable): Thread {
-+        val threadCount = threadNumber.getAndAdd(1)
-+        val tickThread = TickThread.ServerLevelTickThread(p0, "serverlevel-tick-worker-$threadCount")
++        val tickThread = TickThread.ServerLevelTickThread(p0, "serverlevel-tick-worker [$worldName]")
 +
 +        if (tickThread.isDaemon) {
 +            tickThread.isDaemon = false
