@@ -12,6 +12,8 @@ While our fork is mostly cherry-picked patches from other forks, we do have some
 
 ## Features
 
+This does not include all patches included in SparklyPaper, only the patches exclusive to SparklyPaper! To see all patches, check out the ["patches" directory](patches).
+
 SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, placed on the root of your server.
 
 * Configurable Farm Land moisture tick rate when the block is already moisturised
