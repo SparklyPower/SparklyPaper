@@ -23,7 +23,7 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
 * Skip `MapItem#update()` if the map does not have the CraftMapRenderer present
   * By default, maps, even those with custom renderers, fetch the world data to update the map data. With this change, "image in map" maps can avoid these hefty updates, without requiring the map to be locked, which some old map plugins may not do.
   * This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, so if you readd the default renderer, the server will need to update the map data, but that's not a huuuge problem, after all, it is a very rare circumstance that you may need the map data to always be up-to-date when you have a custom renderer on the map.
-* SparklyPaper - fix concurrency issues when using `imageToBytes` in multiple threads
+* Fix concurrency issues when using `imageToBytes` in multiple threads
   * Useful if one of your plugins is parallelizng map creation on server startup
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
