@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 17 Nov 2023 19:08:08 -0300
+Subject: [PATCH] Fix concurrency issues when using "imageToBytes" in multiple
+ threads
+
+Useful if one of your plugins is parallelizng map creation on server startup
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java b/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java
+index 8149b9c51b78eb5c689b7218a2ca3aab60e73bcf..c983d8d7e79d55c9757add8ac1093a0a9d98e5b3 100644
+--- a/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java
++++ b/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java
+@@ -145,7 +145,7 @@ public class CraftMapColorCache implements MapPalette.MapColorCache {
+     }
+ 
+     @Override
+-    public boolean isCached() {
++    public synchronized boolean isCached() { // SparklyPaper - fix concurrency issues when using "imageToBytes" in multiple threads
+         return this.cached || (!this.running.get() && this.initCache().isDone());
+     }
+ 

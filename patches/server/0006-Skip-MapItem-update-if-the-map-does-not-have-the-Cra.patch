@@ -9,22 +9,15 @@ Optimizes "image in map" maps, without requiring the map to be locked, which som
 This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, but that's not a huuuge problem for us
 
 diff --git a/src/main/java/net/minecraft/world/item/MapItem.java b/src/main/java/net/minecraft/world/item/MapItem.java
-index c368b437597edf7e165326727ae778a69c3fcc83..c54498c662fef50ffb16441e1480f4e048ff99d6 100644
+index c368b437597edf7e165326727ae778a69c3fcc83..190716ea7857c7ad5427a527ad8d6b5a241a00b6 100644
 --- a/src/main/java/net/minecraft/world/item/MapItem.java
 +++ b/src/main/java/net/minecraft/world/item/MapItem.java
-@@ -333,7 +333,14 @@ public class MapItem extends ComplexItem {
+@@ -332,7 +332,7 @@ public class MapItem extends ComplexItem {
+                     worldmap.tickCarriedBy(entityhuman, stack);
                  }
  
-                 if (!worldmap.locked && (selected || entity instanceof Player && ((Player) entity).getOffhandItem() == stack)) {
--                    this.update(world, entity, worldmap);
-+                    // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
-+                    if (!world.sparklyPaperConfig.getSkipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer() || worldmap.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) {
-+                        this.update(world, entity, worldmap);
-+                    } else {
-+                        if (entity instanceof Player)
-+                            worldmap.getHoldingPlayer((Player) entity); // Required to add the player to the carriedBy list, which causes a map update
-+                    }
-+                    // SparklyPaper end
+-                if (!worldmap.locked && (selected || entity instanceof Player && ((Player) entity).getOffhandItem() == stack)) {
++                if (!worldmap.locked && (!world.sparklyPaperConfig.getSkipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer() || worldmap.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) && (selected || entity instanceof Player && ((Player) entity).getOffhandItem() == stack)) { // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
+                     this.update(world, entity, worldmap);
                  }
  
-             }
