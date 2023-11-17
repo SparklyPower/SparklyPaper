@@ -20,10 +20,10 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * The `isNearWater` check is costly, especially if you have a lot of farm lands. If the block is already moistured, we can change the tick rate of it to avoid these expensive `isNearWater` checks.
 * Skip `distanceToSqr` call in `ServerEntity#sendChanges` if the delta movement hasn't changed
   * The `distanceToSqr` call is a bit expensive, so avoiding it is pretty nice, around ~15% calls are skipped with this check. Currently, we only check if both Vec3 objects have the same identity, that means, if they are literally the same object. (that works because Minecraft's code reuses the Vec3 object when caching the current delta movement)
-* Skip `MapItem#update()` if the map does not have the CraftMapRenderer present
-  * By default, maps, even those with custom renderers, fetch the world data to update the map data. With this change, "image in map" maps can avoid these hefty updates, without requiring the map to be locked, which some old map plugins may not do.
+* Skip `MapItem#update()` if the map does not have the default `CraftMapRenderer` present
+  * By default, maps, even those with custom renderers, fetch the world data to update the map data. With this change, "image in map" maps that have removed the default `CraftMapRenderer` can avoid these hefty updates, without requiring the map to be locked, which some old map plugins may not do.
   * This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, so if you readd the default renderer, the server will need to update the map data, but that's not a huuuge problem, after all, it is a very rare circumstance that you may need the map data to always be up-to-date when you have a custom renderer on the map.
-  * If you made your own custom "image on map" plugin, you can get the same performance benefits if you change your code to set the locked state on the map with `mapView.isLocked = true`.
+  * But still, if you made your own custom "image on map" plugin, don't forget to `mapView.isLocked = true` to get the same performance benefits in vanilla Paper!
 * Fix concurrency issues when using `imageToBytes` in multiple threads
   * Useful if one of your plugins is parallelizng map creation on server startup
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
