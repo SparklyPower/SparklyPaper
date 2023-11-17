@@ -30,3 +30,10 @@ jobs:
         run: ./gradlew applyPatches
       - name: Build
         run: ./gradlew build
+      - name: Create reobf Paperclip JAR
+        run: ./gradlew createReobfPaperclipJar
+      - uses: actions/upload-artifact@v2
+        name: "Upload Paperclip JAR"
+        with:
+          name: SparklyPaper Paperclip
+          path: "build/libs/SparklyPaper-paperclip-*.jar"
