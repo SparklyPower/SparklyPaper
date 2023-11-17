@@ -225,10 +225,10 @@ index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c2
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..fbbb11c1a62a28a251c35261fb29e6267a08c1a3
+index 0000000000000000000000000000000000000000..4c736abcf64855e8fdfdeb2ba646288283ae278a
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -0,0 +1,49 @@
+@@ -0,0 +1,50 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import com.charleskorn.kaml.Yaml
@@ -255,6 +255,7 @@ index 0000000000000000000000000000000000000000..fbbb11c1a62a28a251c35261fb29e626
 +                        ),
 +                        mapOf(
 +                            "default" to SparklyPaperWorldConfig(
++                                skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer = true,
 +                                SparklyPaperWorldConfig.TickRates(
 +                                    farmWhenMoisturised = 1
 +                                )
@@ -281,10 +282,10 @@ index 0000000000000000000000000000000000000000..fbbb11c1a62a28a251c35261fb29e626
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..190954d4533e53247f9a4af878a08ce96eee2ebd
+index 0000000000000000000000000000000000000000..1b0851f6c66910773f99e9a6c6a99abc90164f51
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,18 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import kotlinx.serialization.SerialName
@@ -292,6 +293,8 @@ index 0000000000000000000000000000000000000000..190954d4533e53247f9a4af878a08ce9
 +
 +@Serializable
 +class SparklyPaperWorldConfig(
++    @SerialName("skip-map-item-data-updates-if-map-does-not-have-craftmaprenderer")
++    val skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer: Boolean,
 +    @SerialName("tick-rates")
 +    val tickRates: TickRates
 +) {
