@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 17 Nov 2023 14:22:41 -0300
+Subject: [PATCH] Skip "MapItem#update()" if the map does not have the
+ CraftMapRenderer present
+
+Optimizes "image in map" maps, without requiring the map to be locked, which some old map plugins may not do
+
+This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, but that's not a huuuge problem for us
+
+diff --git a/src/main/java/net/minecraft/world/item/MapItem.java b/src/main/java/net/minecraft/world/item/MapItem.java
+index c368b437597edf7e165326727ae778a69c3fcc83..3d812694c6ca2f211ff4f2bdd4d0c1336652b421 100644
+--- a/src/main/java/net/minecraft/world/item/MapItem.java
++++ b/src/main/java/net/minecraft/world/item/MapItem.java
+@@ -333,7 +333,14 @@ public class MapItem extends ComplexItem {
+                 }
+ 
+                 if (!worldmap.locked && (selected || entity instanceof Player && ((Player) entity).getOffhandItem() == stack)) {
+-                    this.update(world, entity, worldmap);
++                    // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
++                    if (worldmap.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) {
++                        this.update(world, entity, worldmap);
++                    } else {
++                        if (entity instanceof Player)
++                            worldmap.getHoldingPlayer((Player) entity); // Required to add the player to the carriedBy list, which causes a map update
++                    }
++                    // SparklyPaper end
+                 }
+ 
+             }

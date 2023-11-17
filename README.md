@@ -20,6 +20,9 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * The `isNearWater` check is costly, especially if you have a lot of farm lands. If the block is already moistured, we can change the tick rate of it to avoid these expensive `isNearWater` checks.
 * Skip `distanceToSqr` call in `ServerEntity#sendChanges` if the delta movement hasn't changed
   * The `distanceToSqr` call is a bit expensive, so avoiding it is pretty nice, around ~15% calls are skipped with this check. Currently, we only check if both Vec3 objects have the same identity, that means, if they are literally the same object. (that works because Minecraft's code reuses the Vec3 object when caching the current delta movement)
+* Skip `MapItem#update()` if the map does not have the CraftMapRenderer present
+  * By default, custom maps, even those with custom renderers, are still fetching world data to update the map data. With this change, "image in map" maps can avoid these hefty updates, without requiring the map to be locked, which some old map plugins may not do.
+  * This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, so if you readd the default renderer, the server will need to update the map data, but that's not a huuuge problem for us.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
