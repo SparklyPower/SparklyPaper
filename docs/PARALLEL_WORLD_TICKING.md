@@ -80,9 +80,11 @@ By default, Spark will profile the `Server thread` thread, which ain't good for 
 
 Spark has an undocumented configuration setting to configure what threads the background profiler will track.
 
-In Spark's `config.json`, add `"backgroundProfilerThreadDumper": "Server thread,serverlevel-tick-worker-1,serverlevel-tick-worker-2,serverlevel-tick-worker-3,serverlevel-tick-worker-4,serverlevel-tick-worker-5,serverlevel-tick-worker-6,serverlevel-tick-worker-7,serverlevel-tick-worker-8"` (the thread list may vary if you changed your thread count) to dump the Server thread and the ServerLevel ticking worker threads.
+In Spark's `config.json`, add `"backgroundProfilerThreadDumper": "all"` to dump all threads used in server.
 
-Because Spark queries the thread list on startup, we prestart all the threads in the thread pool with `Util.SERVERLEVEL_TICK_EXECUTOR.prestartAllCoreThreads()`.
+When looking at the profiler result, the server level tick threads are named `serverlevel-tick-worker [WorldNameHere]`.
+
+We use a single thread per world instead of a thread pool to be easier to track down what thing is lagging which world. However, parallel thread execution is limited by a semaphore based on the `parallel-world-ticking.threads` value.
 
 ## Can I disable this?
 
