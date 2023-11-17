@@ -72,7 +72,7 @@ But of course, that doesn't mean that SparklyPaper is perfect! If your server cr
 
 Off-main thread throws can be disabled with `-Dsparklypaper.disableHardThrow=true`, but THIS IS NOT RECOMMENDED because you SHOULD FIX THE ISSUES THEMSELVES instead of RISKING DATA CORRUPTION!!! The server will still log the stacktrace of where the exception happened.
 
-In fact, disabling throws is not an easy way out: Yes, you avoid some functions borking out. But, if the tick thread check has failed, your server is probably going to crash anyway. Example: If a plugin is attempting to teleport a player to world X while they are in a TickThread of world Y, the server will lock up because loading chunks outside of the world's tick thread or from an async thread is not allowed. In fact, if you had kept hard throws enabled, your server wouldn't have crashed because the request would've been denied! Fix the dang issues instead!!!
+In fact, disabling throws is not an easy way out: Yes, you avoid some functions borking out. But, if the tick thread check has failed, your server is probably going to crash anyway. Example: If a plugin is attempting to teleport a player to world X while they are in a TickThread of world Y, the server will lock up because loading chunks outside of the world's tick thread or from an async thread is not allowed but if you had kept hard throws enabled, your server wouldn't have crashed because the request would've been denied! Fix the dang issues instead!!!
 
 ## Profiling with Spark
 
