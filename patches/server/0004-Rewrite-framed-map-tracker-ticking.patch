@@ -11,10 +11,10 @@ now is just updating dirty map/decoration data.
 When no bukkit renderers are added to the map, we also re-use the same packet for all players who are tracking it which avoids a lot of work.
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 196280f54e397c69d32bd4d1f6ae666efdd93773..8ef1c11969310f64d06c8421969d171b6c399ab6 100644
+index 35674f92a67f93382103c2766df4b678ba5c862f..bfdd0ce9acfae75a403d3689b391dd8fff7416a0 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
-@@ -108,29 +108,42 @@ public class ServerEntity {
+@@ -111,29 +111,42 @@ public class ServerEntity {
  
          Entity entity = this.entity;
  
@@ -62,7 +62,7 @@ index 196280f54e397c69d32bd4d1f6ae666efdd93773..8ef1c11969310f64d06c8421969d171b
                      }
                  }
  
-@@ -373,6 +386,19 @@ public class ServerEntity {
+@@ -366,6 +379,19 @@ public class ServerEntity {
              }
          }
  
@@ -104,10 +104,10 @@ index 759ecd79534a7706f7d4a63eb9dacbefcfe54674..0780dd4abf035cdd4001fb9702494c54
                      if (!player.getAbilities().instabuild) {
                          itemstack.shrink(1);
 diff --git a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727c5d652ee 100644
+index e4c4948e076cd64686dfd16ae0568fafc1437140..0e7c7593eec47bc266f53ee8b2053917a84ae61e 100644
 --- a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
 +++ b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-@@ -66,6 +66,16 @@ public class MapItemSavedData extends SavedData {
+@@ -67,6 +67,16 @@ public class MapItemSavedData extends SavedData {
      private final Map<String, MapFrame> frameMarkers = Maps.newHashMap();
      private int trackedDecorationCount;
      private org.bukkit.craftbukkit.map.RenderData vanillaRender = new org.bukkit.craftbukkit.map.RenderData(); // Paper
@@ -124,7 +124,7 @@ index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727
  
      // CraftBukkit start
      public final CraftMapView mapView;
-@@ -325,6 +335,7 @@ public class MapItemSavedData extends SavedData {
+@@ -332,6 +342,7 @@ public class MapItemSavedData extends SavedData {
          }
  
          this.setDecorationsDirty();
@@ -132,7 +132,7 @@ index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727
      }
  
      public static void addTargetDecoration(ItemStack stack, BlockPos pos, String id, MapDecoration.Type type) {
-@@ -420,6 +431,7 @@ public class MapItemSavedData extends SavedData {
+@@ -427,6 +438,7 @@ public class MapItemSavedData extends SavedData {
              }
  
              this.setDecorationsDirty();
@@ -140,7 +140,7 @@ index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727
          }
  
      }
-@@ -433,6 +445,20 @@ public class MapItemSavedData extends SavedData {
+@@ -440,6 +452,20 @@ public class MapItemSavedData extends SavedData {
  
      public void setColorsDirty(int x, int z) {
          this.setDirty();
@@ -161,7 +161,7 @@ index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727
          Iterator iterator = this.carriedBy.iterator();
  
          while (iterator.hasNext()) {
-@@ -515,6 +541,7 @@ public class MapItemSavedData extends SavedData {
+@@ -522,6 +548,7 @@ public class MapItemSavedData extends SavedData {
      public void removedFromFrame(BlockPos pos, int id) {
          this.removeDecoration("frame-" + id);
          this.frameMarkers.remove(MapFrame.frameId(pos));
@@ -169,7 +169,7 @@ index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727
      }
  
      public boolean updateColor(int x, int z, byte color) {
-@@ -572,6 +599,93 @@ public class MapItemSavedData extends SavedData {
+@@ -579,6 +606,93 @@ public class MapItemSavedData extends SavedData {
          return this.trackedDecorationCount >= iconCount;
      }
  
@@ -264,7 +264,7 @@ index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727
  
          // Paper start
 diff --git a/src/main/java/org/bukkit/craftbukkit/map/CraftMapView.java b/src/main/java/org/bukkit/craftbukkit/map/CraftMapView.java
-index 115ac54d13a8ca189a69526b1b3baf48be8a64e9..f878bed0503b183e636c15a16b766e15844f4a3f 100644
+index c3266c43a073cb7d7eff10d1a1b15f0a2265b859..4d69e345117556bac2126edc5169ab01eed97377 100644
 --- a/src/main/java/org/bukkit/craftbukkit/map/CraftMapView.java
 +++ b/src/main/java/org/bukkit/craftbukkit/map/CraftMapView.java
 @@ -108,6 +108,10 @@ public final class CraftMapView implements MapView {

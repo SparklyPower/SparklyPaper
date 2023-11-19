@@ -11,16 +11,39 @@ To avoid the hefty ArrayDeque's size() call, we check if we *really* need to exe
 Most entities won't have any scheduled tasks, so this is a nice performance bonus. These optimizations, however, wouldn't work in a Folia environment, but because in SparklyPaper executeTick is always executed on the main thread, it ain't an issue for us (yay).
 
 diff --git a/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java b/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
-index 62484ebf4550b05182f693a3180bbac5d5fd906d..1ee31db28d3a4b9b841efeb37f7df7932dfad2dc 100644
+index 62484ebf4550b05182f693a3180bbac5d5fd906d..9e15a2a9e47a5b50c3c9e2afce2eb0f48ed0fdaf 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
-@@ -138,15 +138,27 @@ public final class EntityScheduler {
+@@ -45,6 +45,7 @@ public final class EntityScheduler {
+     private final Long2ObjectOpenHashMap<List<ScheduledTask>> oneTimeDelayed = new Long2ObjectOpenHashMap<>();
+ 
+     private final ArrayDeque<ScheduledTask> currentlyExecuting = new ArrayDeque<>();
++    private boolean hasScheduledAtLeastOneTask = false; // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
+ 
+     public EntityScheduler(final CraftEntity entity) {
+         this.entity = Validate.notNull(entity);
+@@ -124,6 +125,7 @@ public final class EntityScheduler {
+             if (this.tickCount == RETIRED_TICK_COUNT) {
+                 return false;
+             }
++            hasScheduledAtLeastOneTask = true; // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
+             this.oneTimeDelayed.computeIfAbsent(this.tickCount + Math.max(1L, delay), (final long keyInMap) -> {
+                 return new ArrayList<>();
+             }).add(task);
+@@ -138,15 +140,34 @@ public final class EntityScheduler {
       * @throws IllegalStateException If the scheduler is retired.
       */
      public void executeTick() {
-+        // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++        // SparklyPaper start - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
 +        // This wouldn't work on a multithreaded environment like Folia!!! But because the executeTick is always executed on the
 +        // main thread, we don't need to care about concurrency
++        // First, we use a simple boolean check here
++        // Yeah, this sounds dumb but, after benchmarking, it seems like a simple boolean check like this is actually more performant than calling both is empty checks
++        // So first we check if the EntityScheduler has been used at least ONCE
++        // If it wasn't, then we skip all checks entirely
++        // We don't even need to update the tick count because the tick count is actually relative to this scheduler, not bound to the global current tick, so it isn't a big deal if we don't update the tick count
++        if (!this.hasScheduledAtLeastOneTask)
++            return;
 +        if (this.tickCount == RETIRED_TICK_COUNT) {
 +            throw new IllegalStateException("Ticking retired scheduler");
 +        }
@@ -37,7 +60,7 @@ index 62484ebf4550b05182f693a3180bbac5d5fd906d..1ee31db28d3a4b9b841efeb37f7df793
 -                throw new IllegalStateException("Ticking retired scheduler");
 -            }
 -            ++this.tickCount;
-+            // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++            // SparklyPaper start - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
 +            // if (this.tickCount == RETIRED_TICK_COUNT) {
 +            //     throw new IllegalStateException("Ticking retired scheduler");
 +            // }
