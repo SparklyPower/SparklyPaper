@@ -30,7 +30,7 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * Instead of using Java's HashSet, we will use fastutil's `ObjectOpenHashSet`, which has better performance
   * While this seems stupid, awardStat was using around ~0.14% when adding to the `HashSet`, and that's not good
   * We also optimized the `getDirty` calls. I mean, the *only* `getDirty` call. Because the map was only retrieved once, we don't actually need to create a copy of the map just to iterate it, we can just access it directly and clear it manually after use.
-* ~~Avoid unnecessary `ItemFrame#getItem()` calls
+* ~~Avoid unnecessary `ItemFrame#getItem()` calls~~
   * ~~When ticking an item frame, on each tick, it checks if the item on the item frame is a map and, if it is, it adds the map to be carried by the entity player~~
   * ~~However, the `getItem()` call is a bit expensive, especially because this is only really used if the item in the item frame is a map~~
   * ~~We can avoid this call by checking if the `cachedMapId` is not null, if it is, then we get the item in the item frame, if not, then we ignore the `getItem()` call.~~
