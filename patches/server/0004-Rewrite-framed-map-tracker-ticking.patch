@@ -136,7 +136,7 @@ index 50713f03c783c63f93710d986d94af544be0615a..5a0978c2342647d6293cd370e489a727
              }
  
              this.setDecorationsDirty();
-+            if (type.isRenderedOnFrame() || (mapicon1 != null && mapicon.getType().isRenderedOnFrame())) this.dirtyFrameDecorations = true; // Paper
++            if (type.isRenderedOnFrame() || (mapicon1 != null && mapicon.type().isRenderedOnFrame())) this.dirtyFrameDecorations = true; // Paper
          }
  
      }
