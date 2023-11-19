@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sat, 18 Nov 2023 20:35:44 -0300
+Subject: [PATCH] Optimize ServerStatsCounter's dirty set
+
+Instead of using Java's HashSet, we will use fastutil's ObjectOpenHashSet, which has better performance
+
+While this seems stupid, awardStat was using around ~0.14% when adding to the HashSet, and that's not good
+
+We also optimized the getDirty calls, since the map was only retrieved once, so in that case, we don't actually need to create a copy of the map just to iterate it
+
+diff --git a/src/main/java/net/minecraft/stats/ServerStatsCounter.java b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
+index 9bb8d4d7be6a937980aa653db82be084d066a563..f2c1a0046075ea0f3a06fdbe40ea4b776203b37c 100644
+--- a/src/main/java/net/minecraft/stats/ServerStatsCounter.java
++++ b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
+@@ -43,7 +43,7 @@ public class ServerStatsCounter extends StatsCounter {
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final MinecraftServer server;
+     private final File file;
+-    private final Set<Stat<?>> dirty = Sets.newHashSet();
++    private final Set<Stat<?>> dirty = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet(); // SparklyPaper - optimize ServerStatsCounter's dirty set
+ 
+     public ServerStatsCounter(MinecraftServer server, File file) {
+         this.server = server;
+@@ -85,12 +85,15 @@ public class ServerStatsCounter extends StatsCounter {
+         this.dirty.add(stat);
+     }
+ 
++    // SparklyPaper - Optimize ServerStatsCounter's dirty set
++    /*
+     private Set<Stat<?>> getDirty() {
+-        Set<Stat<?>> set = Sets.newHashSet(this.dirty);
++        Set<Stat<?>> set = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>(this.dirty); // SparklyPaper - optimize ServerStatsCounter's dirty set
+ 
+         this.dirty.clear();
+         return set;
+     }
++    */
+ 
+     public void parseLocal(DataFixer dataFixer, String json) {
+         try {
+@@ -238,13 +241,14 @@ public class ServerStatsCounter extends StatsCounter {
+ 
+     public void sendStats(ServerPlayer player) {
+         Object2IntMap<Stat<?>> object2intmap = new Object2IntOpenHashMap();
+-        Iterator iterator = this.getDirty().iterator();
++        Iterator iterator = this.dirty.iterator(); // SparklyPaper - Optimize ServerStatsCounter's dirty set
+ 
+         while (iterator.hasNext()) {
+             Stat<?> statistic = (Stat) iterator.next();
+ 
+             object2intmap.put(statistic, this.getValue(statistic));
+         }
++        this.dirty.clear(); // SparklyPaper - Optimize ServerStatsCounter's dirty set
+ 
+         player.connection.send(new ClientboundAwardStatsPacket(object2intmap));
+     }

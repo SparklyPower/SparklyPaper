@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sat, 18 Nov 2023 21:04:53 -0300
+Subject: [PATCH] Avoid unnecessary ItemFrame#getItem() calls
+
+When ticking a item frame, on each tick, it checks if the item on the item frame is a map and, if it is, it adds the map to be carried by the entity player
+
+However, the "getItem()" call is a bit expensive, especially because this is only really used if the item in the item frame is a map
+
+We can avoid this call by checking if the "cachedMapId" is not null
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
+index aedf24ba0d64de855a59869052cbc2704e7dc134..f49585cfd485eed504e91887599ff25c3238c8fd 100644
+--- a/src/main/java/net/minecraft/server/level/ServerEntity.java
++++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
+@@ -115,13 +115,14 @@ public class ServerEntity {
+             ItemFrame entityitemframe = (ItemFrame) entity;
+ 
+             if (true || this.tickCount % 10 == 0) { // CraftBukkit - Moved below, should always enter this block
+-                ItemStack itemstack = entityitemframe.getItem();
+-
+-                if (this.level.paperConfig().maps.itemFrameCursorUpdateInterval > 0 && this.tickCount % this.level.paperConfig().maps.itemFrameCursorUpdateInterval == 0 && itemstack.getItem() instanceof MapItem) { // CraftBukkit - Moved this.tickCounter % 10 logic here so item frames do not enter the other blocks // Paper - Make item frame map cursor update interval configurable
++                if (this.level.paperConfig().maps.itemFrameCursorUpdateInterval > 0 && this.tickCount % this.level.paperConfig().maps.itemFrameCursorUpdateInterval == 0 && entityitemframe.cachedMapId != null) { // CraftBukkit - Moved this.tickCounter % 10 logic here so item frames do not enter the other blocks // Paper - Make item frame map cursor update interval configurable // SparklyPaper - avoid unnecessary ItemFrame#getItem() calls
+                     Integer integer = entityitemframe.cachedMapId; // Paper
+                     MapItemSavedData worldmap = MapItem.getSavedData(integer, this.level);
+ 
+                     if (worldmap != null) {
++                        // SparklyPaper start - avoid unnecessary ItemFrame#getItem() calls
++                        ItemStack itemstack = entityitemframe.getItem();
++                        if (itemstack.getItem() instanceof MapItem) { // fail-safe, what if the cached map ID is present but the item isn't a MapItem? (this should NEVER happen but, who knows)
+                         Iterator<ServerPlayerConnection> iterator = this.trackedPlayers.iterator(); // CraftBukkit
+ 
+                         while (iterator.hasNext()) {
+@@ -134,6 +135,7 @@ public class ServerEntity {
+                                 entityplayer.connection.send(packet);
+                             }
+                         }
++                        } // SparklyPaper end
+                     }
+                 }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
+index 759ecd79534a7706f7d4a63eb9dacbefcfe54674..07739c3d74074b2668466250f944dfbe22d4dc86 100644
+--- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
++++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
+@@ -50,7 +50,8 @@ public class ItemFrame extends HangingEntity {
+     public static final int NUM_ROTATIONS = 8;
+     public float dropChance;
+     public boolean fixed;
+-    public Integer cachedMapId; // Paper
++    @Nullable // SparklyPaper - avoid unnecessary ItemFrame#getItem() calls
++    public Integer cachedMapId = null; // Paper // SparklyPaper - avoid unnecessary ItemFrame#getItem() calls
+ 
+     public ItemFrame(EntityType<? extends ItemFrame> type, Level world) {
+         super(type, world);
