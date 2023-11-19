@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sun, 19 Nov 2023 12:35:16 -0300
+Subject: [PATCH] Skip EntityScheduler's executeTick checks if there isn't any
+ tasks to be run
+
+On each tick, Paper runs EntityScheduler's executeTick of each entity. This is a bit expensive, due to ArrayDeque's size() call because it ain't a simple "get the current queue size" function, and due to the thread checks.
+
+To avoid the hefty ArrayDeque's size() call, we check if we *really* need to execute the executeTick, by checking if currentlyExecuting is not empty or if oneTimeDelayed is not empty.
+
+Most entities won't have any scheduled tasks, so this is a nice performance bonus. These optimizations, however, wouldn't work in a Folia environment, but because in SparklyPaper executeTick is always executed on the main thread, it ain't an issue for us (yay).
+
+diff --git a/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java b/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
+index 62484ebf4550b05182f693a3180bbac5d5fd906d..1ee31db28d3a4b9b841efeb37f7df7932dfad2dc 100644
+--- a/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
++++ b/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
+@@ -138,15 +138,27 @@ public final class EntityScheduler {
+      * @throws IllegalStateException If the scheduler is retired.
+      */
+     public void executeTick() {
++        // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++        // This wouldn't work on a multithreaded environment like Folia!!! But because the executeTick is always executed on the
++        // main thread, we don't need to care about concurrency
++        if (this.tickCount == RETIRED_TICK_COUNT) {
++            throw new IllegalStateException("Ticking retired scheduler");
++        }
++        ++this.tickCount;
++        if (this.currentlyExecuting.isEmpty() && this.oneTimeDelayed.isEmpty()) // Check if we have any pending tasks and, if not, skip!
++            return;
++        // SparklyPaper end
+         final Entity thisEntity = this.entity.getHandleRaw();
+ 
+         TickThread.ensureTickThread(thisEntity, "May not tick entity scheduler asynchronously");
+         final List<ScheduledTask> toRun;
+         synchronized (this.stateLock) {
+-            if (this.tickCount == RETIRED_TICK_COUNT) {
+-                throw new IllegalStateException("Ticking retired scheduler");
+-            }
+-            ++this.tickCount;
++            // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++            // if (this.tickCount == RETIRED_TICK_COUNT) {
++            //     throw new IllegalStateException("Ticking retired scheduler");
++            // }
++            // ++this.tickCount;
++            // SparklyPaper end
+             if (this.oneTimeDelayed.isEmpty()) {
+                 toRun = null;
+             } else {

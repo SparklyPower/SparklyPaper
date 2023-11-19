@@ -34,6 +34,11 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * When ticking an item frame, on each tick, it checks if the item on the item frame is a map and, if it is, it adds the map to be carried by the entity player
   * However, the `getItem()` call is a bit expensive, especially because this is only really used if the item in the item frame is a map
   * We can avoid this call by checking if the `cachedMapId` is not null, if it is, then we get the item in the item frame, if not, then we ignore the `getItem()` call.
+* Optimize `EntityScheduler`'s `executeTick`
+  * On each tick, Paper runs `EntityScheduler`'s `executeTick` of each entity. This is a bit expensive, due to `ArrayDeque`'s `size()` call because it ain't a simple "get the current queue size" function, and due to the thread checks.
+  * To avoid the hefty `ArrayDeque`'s `size()` call, we check if we *really* need to execute the `executeTick`, by checking if `currentlyExecuting` is not empty or if `oneTimeDelayed` is not empty. This brings `executeTick`'s CPU % from 2.46% down to 1.14% in a server with ~13k entities.
+  * Most entities won't have any scheduled tasks, so this is a nice performance bonus. These optimizations, however, wouldn't work in a Folia environment, but because in SparklyPaper `executeTick` is always executed on the main thread, it ain't an issue for us (yay).
+  * Of course, this doesn't mean that `ArrayDeque#size()` is slow! It is mostly that because the `executeTick` function is called each tick for each entity, it would be better for us to avoid as many useless calls as possible.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
