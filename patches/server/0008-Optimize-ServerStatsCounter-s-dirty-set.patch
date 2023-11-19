@@ -10,7 +10,7 @@ While this seems stupid, awardStat was using around ~0.14% when adding to the Ha
 We also optimized the getDirty calls, since the map was only retrieved once, so in that case, we don't actually need to create a copy of the map just to iterate it
 
 diff --git a/src/main/java/net/minecraft/stats/ServerStatsCounter.java b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-index 9bb8d4d7be6a937980aa653db82be084d066a563..f2c1a0046075ea0f3a06fdbe40ea4b776203b37c 100644
+index 9bb8d4d7be6a937980aa653db82be084d066a563..142b42e906cd1c10c17bd82bfb19cf4d252fbd34 100644
 --- a/src/main/java/net/minecraft/stats/ServerStatsCounter.java
 +++ b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
 @@ -43,7 +43,7 @@ public class ServerStatsCounter extends StatsCounter {
@@ -29,8 +29,7 @@ index 9bb8d4d7be6a937980aa653db82be084d066a563..f2c1a0046075ea0f3a06fdbe40ea4b77
 +    // SparklyPaper - Optimize ServerStatsCounter's dirty set
 +    /*
      private Set<Stat<?>> getDirty() {
--        Set<Stat<?>> set = Sets.newHashSet(this.dirty);
-+        Set<Stat<?>> set = new it.unimi.dsi.fastutil.objects.ObjectOpenHashSet<>(this.dirty); // SparklyPaper - optimize ServerStatsCounter's dirty set
+         Set<Stat<?>> set = Sets.newHashSet(this.dirty);
  
          this.dirty.clear();
          return set;
