@@ -37,8 +37,10 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * Replaced by [Warriorrrr's "Rewrite framed map tracker ticking" patch (Paper #9605)](https://github.com/PaperMC/Paper/pull/9605)
 * Optimize `EntityScheduler`'s `executeTick`
   * On each tick, Paper runs `EntityScheduler`'s `executeTick` of each entity. This is a bit expensive, due to `ArrayDeque`'s `size()` call because it ain't a simple "get the current queue size" function, and due to the thread checks.
-  * To avoid the hefty `ArrayDeque`'s `size()` call, we check if we *really* need to execute the `executeTick`, by checking if `currentlyExecuting` is not empty or if `oneTimeDelayed` is not empty. This brings `executeTick`'s CPU % from 2.46% down to 1.14% in a server with ~13k entities.
-  * Most entities won't have any scheduled tasks, so this is a nice performance bonus. These optimizations, however, wouldn't work in a Folia environment, but because in SparklyPaper `executeTick` is always executed on the main thread, it ain't an issue for us (yay).
+  * To avoid those hefty calls, we check if we *really* need to execute the `executeTick`, by doing two changes:
+    * First, we check if the scheduler had a task scheduled to it at least once, if not, we bail out early and quickly. In this case, we don't even increase the scheduler's `tickCount`, nor do we check if the scheduler has been retired. This is not an issue, since `tickCount` is relative and not bound to the server's current tick, so it doesn't matter if we don't increase it.
+    * Then, we check if the scheduler has any pending tasks by checking if `currentlyExecuting` is not empty or if `oneTimeDelayed` is not empty. This avoids the thread checks and unnecessary `size()` calls.
+  * Most entities won't have any scheduled tasks, so this is a nice performance bonus. These optimizations, however, wouldn't work in a Folia environment, but because in SparklyPaper `executeTick` is always executed on the main thread, it ain't an issue for us (yay). With this change, the `executeTick` loop in `tickChildren` CPU % usage drops from 2.48% to 0.61% in a server with ~12k entities!
   * Of course, this doesn't mean that `ArrayDeque#size()` is slow! It is mostly that because the `executeTick` function is called each tick for each entity, it would be better for us to avoid as many useless calls as possible.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
