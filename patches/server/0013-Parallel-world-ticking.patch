@@ -3,7 +3,6 @@ From: MrPowerGamerBR <git@mrpowergamerbr.com>
 Date: Tue, 7 Nov 2023 01:34:14 -0300
 Subject: [PATCH] Parallel world ticking
 
-"mom can we have folia?" "we already have folia at home" folia at home:
 
 diff --git a/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java b/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
 index abd0217cf0bff183c8e262edc173a53403797c1a..1ef797d2c743077c40c7e1796d4afe324e162970 100644
@@ -2013,6 +2012,30 @@ index bec8e6b62dba2bd0e4e85a7d1fb51287384f1290..f650163cab8c54b97a7dac7c79320dae
          net.minecraft.world.level.block.state.BlockState blockData = this.getNMS();
          net.minecraft.server.level.ServerLevel level = this.world.getMinecraftWorld();
  
+diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
+index a8290624d8c5b19506f628d049984d2e59c4423c..4b0cb97a9355c77eedf17d36c4313189b23aca73 100644
+--- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
+@@ -18,7 +18,7 @@ public abstract class CraftBlockEntityState<T extends BlockEntity> extends Craft
+     private final T tileEntity;
+     private final T snapshot;
+     public boolean snapshotDisabled; // Paper
+-    public static boolean DISABLE_SNAPSHOT = false; // Paper
++    public static ThreadLocal<Boolean> DISABLE_SNAPSHOT = ThreadLocal.withInitial(() -> Boolean.FALSE); // SparklyPaper - parallel world ticking
+ 
+     public CraftBlockEntityState(World world, T tileEntity) {
+         super(world, tileEntity.getBlockPos(), tileEntity.getBlockState());
+@@ -27,8 +27,8 @@ public abstract class CraftBlockEntityState<T extends BlockEntity> extends Craft
+ 
+         try { // Paper - show location on failure
+         // Paper start
+-        this.snapshotDisabled = DISABLE_SNAPSHOT;
+-        if (DISABLE_SNAPSHOT) {
++        this.snapshotDisabled = DISABLE_SNAPSHOT.get(); // SparklyPaper - parallel world ticking
++        if (DISABLE_SNAPSHOT.get()) { // SparklyPaper - parallel world ticking
+             this.snapshot = this.tileEntity;
+         } else {
+             this.snapshot = this.createSnapshot(tileEntity);
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
 index 390e1b7fd2721b99cb3ce268c6bc1bf0a38e08a3..9255e51954bd9a43afc366d8c414dd8af7571525 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
@@ -2038,6 +2061,30 @@ index 390e1b7fd2721b99cb3ce268c6bc1bf0a38e08a3..9255e51954bd9a43afc366d8c414dd8a
          net.minecraft.world.item.ItemStack nms = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(item);
  
          // Modelled off EntityHuman#hasBlock
+diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
+index e3b07d623cd64de9645f2372f1e08757edc1a9ed..d00bffcb7f671ec261a58deacf90110978610898 100644
+--- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
+@@ -239,8 +239,8 @@ public final class CraftBlockStates {
+         net.minecraft.world.level.block.state.BlockState blockData = craftBlock.getNMS();
+         BlockEntity tileEntity = craftBlock.getHandle().getBlockEntity(blockPosition);
+         // Paper start - block state snapshots
+-        boolean prev = CraftBlockEntityState.DISABLE_SNAPSHOT;
+-        CraftBlockEntityState.DISABLE_SNAPSHOT = !useSnapshot;
++        boolean prev = CraftBlockEntityState.DISABLE_SNAPSHOT.get(); // SparklyPaper - parallel world ticking
++        CraftBlockEntityState.DISABLE_SNAPSHOT.set(useSnapshot); // SparklyPaper - parallel world ticking
+         try {
+         // Paper end
+         CraftBlockState blockState = CraftBlockStates.getBlockState(world, blockPosition, blockData, tileEntity);
+@@ -248,7 +248,7 @@ public final class CraftBlockStates {
+         return blockState;
+         // Paper start
+         } finally {
+-            CraftBlockEntityState.DISABLE_SNAPSHOT = prev;
++            CraftBlockEntityState.DISABLE_SNAPSHOT.set(prev); // SparklyPaper - parallel world ticking
+         }
+         // Paper end
+     }
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 index 5dc160b743534665c6b3efb10b10f7c36e2da5ab..8942bb585e1f4a0b747194ef2ad91acc5de82d8b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
