@@ -18,6 +18,7 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
 
 * Configurable Farm Land moisture tick rate when the block is already moisturised
   * The `isNearWater` check is costly, especially if you have a lot of farm lands. If the block is already moistured, we can change the tick rate of it to avoid these expensive `isNearWater` checks.
+  * (Incompatible with the Blazingly Simple Farm Checks feature)
 * Skip `distanceToSqr` call in `ServerEntity#sendChanges` if the delta movement hasn't changed
   * The `distanceToSqr` call is a bit expensive, so avoiding it is pretty nice, around ~15% calls are skipped with this check. Currently, we only check if both Vec3 objects have the same identity, that means, if they are literally the same object. (that works because Minecraft's code reuses the Vec3 object when caching the current delta movement)
 * Skip `MapItem#update()` if the map does not have the default `CraftMapRenderer` present
@@ -42,6 +43,11 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
     * Then, we check if the scheduler has any pending tasks by checking if `currentlyExecuting` is not empty or if `oneTimeDelayed` is not empty. This avoids the thread checks and unnecessary `size()` calls.
   * Most entities won't have any scheduled tasks, so this is a nice performance bonus. These optimizations, however, wouldn't work in a Folia environment, but because in SparklyPaper `executeTick` is always executed on the main thread, it ain't an issue for us (yay). With this change, the `executeTick` loop in `tickChildren` CPU % usage drops from 2.48% to 0.61% in a server with ~12k entities!
   * Of course, this doesn't mean that `ArrayDeque#size()` is slow! It is mostly that because the `executeTick` function is called each tick for each entity, it would be better for us to avoid as many useless calls as possible.
+* Blazingly Simple Farm Checks
+  * Changes Minecraft's farm checks for crops, stem blocks, and farm lands to be simpler and less resource intensive
+  * If a farm land is moisturised, the farm land won't check if there's water nearby to avoid intensive block checks. Now, instead of the farm land checking for moisture, the crops themselves will check when attempting to grow, this way, farms with fully grown crops won't cause lag.
+  * The growth speed of crops and stems are now fixed based on if the block below them is moist or not, instead of doing vanilla's behavior of "check all blocks nearby to see if at least one of them is moist" and "if the blocks nearby are of the same time, make them grow slower".
+    * In my opinion: Who cares about the vanilla behavior lol, most players only care about farm land + crop = crop go brrrr
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)

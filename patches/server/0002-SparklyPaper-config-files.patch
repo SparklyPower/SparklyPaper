@@ -5,7 +5,7 @@ Subject: [PATCH] SparklyPaper config files
 
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index cf605aa56adf7f80d3b409f60a92a5ca7ae8fd07..8c20221736419bcb9c3e570af624eef8e6fc3b09 100644
+index 1c9742ad81f04052d2c3bc18c7636f45b2fc5160..9a6915a87ae8aa4ffefea575d7a7d5199c800799 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -218,6 +218,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -225,10 +225,10 @@ index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c2
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..4c736abcf64855e8fdfdeb2ba646288283ae278a
+index 0000000000000000000000000000000000000000..250b19027db75b1ba44383621215fd2c3370c967
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -0,0 +1,50 @@
+@@ -0,0 +1,55 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import com.charleskorn.kaml.Yaml
@@ -256,6 +256,11 @@ index 0000000000000000000000000000000000000000..4c736abcf64855e8fdfdeb2ba6462882
 +                        mapOf(
 +                            "default" to SparklyPaperWorldConfig(
 +                                skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer = true,
++                                blazinglySimpleFarmChecks = SparklyPaperWorldConfig.BlazinglySimpleFarmChecks(
++                                    false,
++                                    1.0f,
++                                    5.0f,
++                                ),
 +                                SparklyPaperWorldConfig.TickRates(
 +                                    farmWhenMoisturised = 1
 +                                )
@@ -282,10 +287,10 @@ index 0000000000000000000000000000000000000000..4c736abcf64855e8fdfdeb2ba6462882
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..1b0851f6c66910773f99e9a6c6a99abc90164f51
+index 0000000000000000000000000000000000000000..41f2482097d7b835dcec85bb33ab0ce5f6f48eec
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,29 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import kotlinx.serialization.SerialName
@@ -295,9 +300,20 @@ index 0000000000000000000000000000000000000000..1b0851f6c66910773f99e9a6c6a99abc
 +class SparklyPaperWorldConfig(
 +    @SerialName("skip-map-item-data-updates-if-map-does-not-have-craftmaprenderer")
 +    val skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer: Boolean,
++    @SerialName("blazingly-simple-farm-checks")
++    val blazinglySimpleFarmChecks: BlazinglySimpleFarmChecks,
 +    @SerialName("tick-rates")
 +    val tickRates: TickRates
 +) {
++    @Serializable
++    data class BlazinglySimpleFarmChecks(
++        val enabled: Boolean,
++        @SerialName("default-growth-speed")
++        val defaultGrowthSpeed: Float,
++        @SerialName("moist-growth-speed")
++        val moistGrowthSpeed: Float
++    )
++
 +    @Serializable
 +    data class TickRates(
 +        @SerialName("farm-when-moisturised")

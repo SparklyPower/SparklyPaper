@@ -1,0 +1,174 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Mon, 20 Nov 2023 20:17:56 -0300
+Subject: [PATCH] Blazingly Simple Farm Checks
+
+
+diff --git a/src/main/java/net/minecraft/world/level/block/CropBlock.java b/src/main/java/net/minecraft/world/level/block/CropBlock.java
+index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..2e39555a9202bd1474dd2229ece4ebab3d35f898 100644
+--- a/src/main/java/net/minecraft/world/level/block/CropBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/CropBlock.java
+@@ -74,6 +74,49 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+             int i = this.getAge(state);
+ 
+             if (i < this.getMaxAge()) {
++                // SparklyPaper start - Blazingly simple farm checks
++                if (world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {
++                    // These checks are similar to getGrowthSpeed, but we have "inlined" them because we want to access stuff like the farm block data later on
++                    // Is the block below us moisturised?
++                    BlockPos farmlandBelowTheCurrentBlock = pos.below();
++                    BlockState farmlandBelowTheCurrentBlockData = world.getBlockState(farmlandBelowTheCurrentBlock);
++                    float f = world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getDefaultGrowthSpeed();
++                    boolean isCurrentFarmlandStateMoist = false;
++                    if (farmlandBelowTheCurrentBlockData.is(Blocks.FARMLAND)) {
++                        if ((Integer) farmlandBelowTheCurrentBlockData.getValue(FarmBlock.MOISTURE) > 0) {
++                            // If we are currently moist, increase the speed!
++                            f = world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getMoistGrowthSpeed();
++                            isCurrentFarmlandStateMoist = true;
++                        }
++                    }
++
++                    // Spigot start
++                    int modifier;
++                    if (this == Blocks.BEETROOTS) {
++                        modifier = world.spigotConfig.beetrootModifier;
++                    } else if (this == Blocks.CARROTS) {
++                        modifier = world.spigotConfig.carrotModifier;
++                    } else if (this == Blocks.POTATOES) {
++                        modifier = world.spigotConfig.potatoModifier;
++                        // Paper start
++                    } else if (this == Blocks.TORCHFLOWER_CROP) {
++                        modifier = world.spigotConfig.torchFlowerModifier;
++                        // Paper end
++                    } else {
++                        modifier = world.spigotConfig.wheatModifier;
++                    }
++
++                    if (random.nextFloat() < (modifier / (100.0f * (Math.floor((25.0F / f) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
++                        // Spigot end
++                        // Now that we know that the crop will grow... is the next stage the crop's max age? If yes, we are going to check if the farm land is moist!
++                        if (i + 1 == getMaxAge() && isCurrentFarmlandStateMoist && !FarmBlock.isNearWater(world, farmlandBelowTheCurrentBlock)) {
++                            // Whoops, farm land ain't moist!
++                            // From FarmBlock, set the moisture to 0
++                            org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(world, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmBlock.MOISTURE, 0), 2); // CraftBukkit
++                        }
++                        CraftEventFactory.handleBlockGrowEvent(world, pos, this.getStateForAge(i + 1), 2); // CraftBukkit
++                    }
++                } else {
+                 float f = CropBlock.getGrowthSpeed(this, world, pos);
+ 
+                 // Spigot start
+@@ -96,6 +139,8 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+                     // Spigot end
+                     CraftEventFactory.handleBlockGrowEvent(world, pos, this.getStateForAge(i + 1), 2); // CraftBukkit
+                 }
++                }
++                // SparklyPaper end
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/block/FarmBlock.java b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
+index 590a573a9b5099d3062031dc54978993cdd912ad..544131216aff2b2b54b8690d4321a194deab1589 100644
+--- a/src/main/java/net/minecraft/world/level/block/FarmBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
+@@ -1,6 +1,5 @@
+ package net.minecraft.world.level.block;
+ 
+-import java.util.Iterator;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+@@ -85,6 +84,19 @@ public class FarmBlock extends Block {
+     @Override
+     public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+         int i = (Integer) state.getValue(FarmBlock.MOISTURE);
++        // SparklyPaper start - Blazingly simple farm checks
++        if (world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {
++            if (i == 0) { // We only care about non-moisturised farm blocks
++                if (FarmBlock.isNearWater(world, pos)) {
++                    // Make it MOIST!
++                    org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(world, pos, (BlockState) state.setValue(FarmBlock.MOISTURE, 7), 2); // CraftBukkit
++                } else if (!FarmBlock.shouldMaintainFarmland(world, pos)) {
++                    FarmBlock.turnToDirt((Entity) null, state, world, pos);
++                }
++            }
++            return;
++        }
++        // SparklyPaper end
+         if (i > 0 && world.sparklyPaperConfig.getTickRates().getFarmWhenMoisturised() != 1 && (world.sparklyPaperConfig.getTickRates().getFarmWhenMoisturised() < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % world.sparklyPaperConfig.getTickRates().getFarmWhenMoisturised() != 0)) { return; } // SparklyPaper
+ 
+         if (!FarmBlock.isNearWater(world, pos) && !world.isRainingAt(pos.above())) {
+@@ -142,7 +154,7 @@ public class FarmBlock extends Block {
+         return world.getBlockState(pos.above()).is(BlockTags.MAINTAINS_FARMLAND);
+     }
+ 
+-    private static boolean isNearWater(LevelReader world, BlockPos pos) {
++    public static boolean isNearWater(LevelReader world, BlockPos pos) { // SparklyPaper - make public for the Blazingly simple farm checks
+         // Paper start - remove abstract block iteration
+         int xOff = pos.getX();
+         int yOff = pos.getY();
+diff --git a/src/main/java/net/minecraft/world/level/block/StemBlock.java b/src/main/java/net/minecraft/world/level/block/StemBlock.java
+index 0d9be3b28ba4957c3f4da5455283fca903836c91..d20af373521636a0fb42712effd09619b9c78960 100644
+--- a/src/main/java/net/minecraft/world/level/block/StemBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/StemBlock.java
+@@ -51,6 +51,50 @@ public class StemBlock extends BushBlock implements BonemealableBlock {
+     @Override
+     public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+         if (world.getRawBrightness(pos, 0) >= 9) {
++            // SparklyPaper start - Blazingly simple farm checks
++            if (world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {
++                // These checks are similar to getGrowthSpeed, but we have "inlined" them because we want to access stuff like the farm block data later on
++                // Is the block below us moisturised?
++                BlockPos farmlandBelowTheCurrentBlock = pos.below();
++                BlockState farmlandBelowTheCurrentBlockData = world.getBlockState(farmlandBelowTheCurrentBlock);
++                float f = world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getDefaultGrowthSpeed();
++                boolean isCurrentFarmlandStateMoist = false;
++                if (farmlandBelowTheCurrentBlockData.is(Blocks.FARMLAND)) {
++                    if ((Integer) farmlandBelowTheCurrentBlockData.getValue(FarmBlock.MOISTURE) > 0) {
++                        // If we are currently moist, increase the speed!
++                        f = world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getMoistGrowthSpeed();
++                        isCurrentFarmlandStateMoist = true;
++                    }
++                }
++
++                if (random.nextFloat() < ((this == Blocks.PUMPKIN_STEM ? world.spigotConfig.pumpkinModifier : world.spigotConfig.melonModifier) / (100.0f * (Math.floor((25.0F / f) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
++                    int i = (Integer) state.getValue(StemBlock.AGE);
++
++                    if (i < 7) {
++                        state = (BlockState) state.setValue(StemBlock.AGE, i + 1);
++                        CraftEventFactory.handleBlockGrowEvent(world, pos, state, 2); // CraftBukkit
++                    } else {
++                        Direction enumdirection = Direction.Plane.HORIZONTAL.getRandomDirection(random);
++                        BlockPos blockposition1 = pos.relative(enumdirection);
++                        BlockState iblockdata1 = world.getBlockState(blockposition1.below());
++
++                        if (world.getBlockState(blockposition1).isAir() && (iblockdata1.is(Blocks.FARMLAND) || iblockdata1.is(BlockTags.DIRT))) {
++                            // CraftBukkit start
++                            if (!CraftEventFactory.handleBlockGrowEvent(world, blockposition1, this.fruit.defaultBlockState())) {
++                                return;
++                            }
++                            // CraftBukkit end
++                            // Now that we know that the crop will grow... is the next stage the crop's max age? If yes, we are going to check if the farm land is moist!
++                            if (isCurrentFarmlandStateMoist && !FarmBlock.isNearWater(world, farmlandBelowTheCurrentBlock)) {
++                                // Whoops, farm land ain't moist!
++                                // From FarmBlock, set the moisture to 0
++                                org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(world, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmBlock.MOISTURE, 0), 2); // CraftBukkit
++                            }
++                            world.setBlockAndUpdate(pos, (BlockState) this.fruit.getAttachedStem().defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, enumdirection));
++                        }
++                    }
++                }
++            } else {
+             float f = CropBlock.getGrowthSpeed(this, world, pos);
+ 
+             if (random.nextFloat() < ((this == Blocks.PUMPKIN_STEM ? world.spigotConfig.pumpkinModifier : world.spigotConfig.melonModifier) / (100.0f * (Math.floor((25.0F / f) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
+@@ -74,7 +118,8 @@ public class StemBlock extends BushBlock implements BonemealableBlock {
+                     }
+                 }
+             }
+-
++            }
++            // SparklyPaper end
+         }
+     }
+ 
