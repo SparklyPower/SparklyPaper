@@ -48,6 +48,9 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * If a farm land is moisturised, the farm land won't check if there's water nearby to avoid intensive block checks. Now, instead of the farm land checking for moisture, the crops themselves will check when attempting to grow, this way, farms with fully grown crops won't cause lag.
   * The growth speed of crops and stems are now fixed based on if the block below them is moist or not, instead of doing vanilla's behavior of "check all blocks nearby to see if at least one of them is moist" and "if the blocks nearby are of the same time, make them grow slower".
     * In my opinion: Who cares about the vanilla behavior lol, most players only care about farm land + crop = crop go brrrr
+* Lazily create `LootContext` for criterions
+  * For each player on each tick, enter block triggers are invoked, and these create loot contexts that are promptly thrown away since the trigger doesn't pass the predicate.
+  * To avoid this, we now lazily create the LootContext if the criterion passes the predicate AND if any of the listener triggers require a loot context instance.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
