@@ -133,3 +133,7 @@ If a player mounted on a Warden teleports to another world, the server crashes.
 This is caused by https://github.com/MyPetORG/MyPet/issues/1647 and can even cause issues in vanilla Paper. In vanilla Paper, instead of crashing the server, the player is teleported back to the Warden's location.
 
 Fork that removes the affecting code: https://github.com/SparklyPower/MyPet
+
+## Citizens
+
+If a NPC with a sleeping trait is teleported to another world, the server crashes because Citizens attempts to query the NPC's "bed" when ticking the entity, and because the entity is in a whole different world... things explode.
