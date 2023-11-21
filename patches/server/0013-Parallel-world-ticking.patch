@@ -754,7 +754,7 @@ index a308b52c26c2bb1bfee9f50e03480676b53e602f..e48cb1a99f6876393eaaa98eeca41c0a
  
          this.profiler.popPush("connection");
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 8c20221736419bcb9c3e570af624eef8e6fc3b09..52f7b6cc6f410e353ec8a5836d23d47c5c934675 100644
+index 9a6915a87ae8aa4ffefea575d7a7d5199c800799..774d62b7166452157d237b703fbaf32c66829974 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -17,6 +17,7 @@ import java.util.Collections;
@@ -841,7 +841,7 @@ index 8c33a12ca879c46893150d6adfb8aa4d397c6b4c..7088c8e8a7eba566fa91f5fa2995cd72
                  }
              }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 3fe14f5f135249ea9004589a86ed372aeb4667f8..3e3f92cb5b740badf78133b0a942794860ddd1bb 100644
+index 3721a45fbc38d6fc92cc8ba5080c7bd18b8d006c..add727490a4513342914e94a57e4674310777b5a 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -216,6 +216,7 @@ public class ServerLevel extends Level implements WorldGenLevel {

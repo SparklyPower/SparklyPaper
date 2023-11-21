@@ -5,10 +5,10 @@ Subject: [PATCH] Blazingly Simple Farm Checks
 
 
 diff --git a/src/main/java/net/minecraft/world/level/block/CropBlock.java b/src/main/java/net/minecraft/world/level/block/CropBlock.java
-index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..2e39555a9202bd1474dd2229ece4ebab3d35f898 100644
+index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..0c210c7788a45c672abed20175dfc05bfea89d34 100644
 --- a/src/main/java/net/minecraft/world/level/block/CropBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/CropBlock.java
-@@ -74,6 +74,49 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+@@ -74,6 +74,52 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
              int i = this.getAge(state);
  
              if (i < this.getMaxAge()) {
@@ -46,19 +46,22 @@ index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..2e39555a9202bd1474dd2229ece4ebab
 +
 +                    if (random.nextFloat() < (modifier / (100.0f * (Math.floor((25.0F / f) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
 +                        // Spigot end
++                        if (!CraftEventFactory.handleBlockGrowEvent(world, pos, this.getStateForAge(i + 1), 2)) {
++                            return;
++                        }
++
 +                        // Now that we know that the crop will grow... is the next stage the crop's max age? If yes, we are going to check if the farm land is moist!
 +                        if (i + 1 == getMaxAge() && isCurrentFarmlandStateMoist && !FarmBlock.isNearWater(world, farmlandBelowTheCurrentBlock)) {
 +                            // Whoops, farm land ain't moist!
 +                            // From FarmBlock, set the moisture to 0
 +                            org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(world, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmBlock.MOISTURE, 0), 2); // CraftBukkit
 +                        }
-+                        CraftEventFactory.handleBlockGrowEvent(world, pos, this.getStateForAge(i + 1), 2); // CraftBukkit
 +                    }
 +                } else {
                  float f = CropBlock.getGrowthSpeed(this, world, pos);
  
                  // Spigot start
-@@ -96,6 +139,8 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+@@ -96,6 +142,8 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
                      // Spigot end
                      CraftEventFactory.handleBlockGrowEvent(world, pos, this.getStateForAge(i + 1), 2); // CraftBukkit
                  }

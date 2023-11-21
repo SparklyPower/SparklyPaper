@@ -77,7 +77,7 @@ index 25367df06a8a6e8b0b3a56652a5fb1c70a15632d..a308b52c26c2bb1bfee9f50e03480676
                  for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
                      regionManager.recalculateRegions();
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 584a768f2ce1c98a1de7749060c47f21721f9055..3fe14f5f135249ea9004589a86ed372aeb4667f8 100644
+index c88d5b9125f6ee43bf2be60fd1745d836f271b78..3721a45fbc38d6fc92cc8ba5080c7bd18b8d006c 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -685,6 +685,12 @@ public class ServerLevel extends Level implements WorldGenLevel {
