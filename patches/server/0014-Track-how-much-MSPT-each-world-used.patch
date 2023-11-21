@@ -56,10 +56,10 @@ index 8b5293b0c696ef21d0101493ffa41b60bf0bc86b..601198a33adb29316b0617d5390d1620
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 25367df06a8a6e8b0b3a56652a5fb1c70a15632d..a308b52c26c2bb1bfee9f50e03480676b53e602f 100644
+index a154182d4bab167086a644dc3907e0893af5adb6..4bdd8e58c7ad86b8ed839a5293e0b7442c05ad05 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1545,7 +1545,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1546,7 +1546,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  worldserver.timings.doTick.startTiming(); // Spigot

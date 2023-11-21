@@ -557,7 +557,7 @@ index 6f2adf2334e35e8a617a4ced0c1af2abf32bbd8d..a5ea9df0a021ed820c0c1ccb612caebd
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index a308b52c26c2bb1bfee9f50e03480676b53e602f..e48cb1a99f6876393eaaa98eeca41c0a5eb6b52c 100644
+index 4bdd8e58c7ad86b8ed839a5293e0b7442c05ad05..1755fa872726ddb35ba9eb3d9da51a2b0260619b 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -160,6 +160,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
@@ -568,17 +568,17 @@ index a308b52c26c2bb1bfee9f50e03480676b53e602f..e48cb1a99f6876393eaaa98eeca41c0a
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -308,6 +309,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-     // Paper start - lag compensation
+@@ -309,6 +310,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public static final long SERVER_INIT = System.nanoTime();
      // Paper end - lag compensation
+     public net.sparklypower.sparklypaper.HalloweenManager halloweenManager = new net.sparklypower.sparklypaper.HalloweenManager(); // SparklyPaper - Spooky month optimizations
 +    // SparklyPaper - parallel world ticking
 +    public java.util.concurrent.Semaphore serverLevelTickingSemaphore = null;
 +    // SparklyPaper end
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-@@ -1523,63 +1527,124 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1524,63 +1528,124 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.isIteratingOverLevels = true; // Paper
          Iterator iterator = this.getAllLevels().iterator(); // Paper - move down
@@ -754,7 +754,7 @@ index a308b52c26c2bb1bfee9f50e03480676b53e602f..e48cb1a99f6876393eaaa98eeca41c0a
  
          this.profiler.popPush("connection");
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 9a6915a87ae8aa4ffefea575d7a7d5199c800799..774d62b7166452157d237b703fbaf32c66829974 100644
+index 7f90783254d4178e02baf6b5b0a60508a4ce2806..42d20588534dc4c864e5d9b659f5e329cebb175e 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -17,6 +17,7 @@ import java.util.Collections;
@@ -780,8 +780,8 @@ index 9a6915a87ae8aa4ffefea575d7a7d5199c800799..774d62b7166452157d237b703fbaf32c
 +        serverLevelTickingSemaphore = new java.util.concurrent.Semaphore(net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getConfig().getParallelWorldTicking().getThreads()); // SparklyPaper - parallel world ticking
 +        DedicatedServer.LOGGER.info("Using " + serverLevelTickingSemaphore.availablePermits() + " permits for parallel world ticking"); // SparklyPaper - parallel world ticking
          // SparklyPaper end
-         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // load version history now
-         io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // init PaperBrigadierProvider
+         // SparklyPaper start - Spooky month optimizations
+         halloweenManager.startHalloweenEpochTask();
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 index 8c33a12ca879c46893150d6adfb8aa4d397c6b4c..7088c8e8a7eba566fa91f5fa2995cd724705b8c4 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
