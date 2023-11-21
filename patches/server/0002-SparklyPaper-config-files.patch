@@ -225,10 +225,10 @@ index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c2
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..250b19027db75b1ba44383621215fd2c3370c967
+index 0000000000000000000000000000000000000000..155ef71c119ebeb95fdfae9e681520b91874ba8e
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -0,0 +1,55 @@
+@@ -0,0 +1,56 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import com.charleskorn.kaml.Yaml
@@ -257,9 +257,10 @@ index 0000000000000000000000000000000000000000..250b19027db75b1ba44383621215fd2c
 +                            "default" to SparklyPaperWorldConfig(
 +                                skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer = true,
 +                                blazinglySimpleFarmChecks = SparklyPaperWorldConfig.BlazinglySimpleFarmChecks(
-+                                    false,
-+                                    1.0f,
-+                                    5.0f,
++                                    enabled = false,
++                                    defaultGrowthSpeed = 1.0f,
++                                    moistGrowthSpeed = 5.0f,
++                                    skipMiddleAgingStagesForCrops = true
 +                                ),
 +                                SparklyPaperWorldConfig.TickRates(
 +                                    farmWhenMoisturised = 1
@@ -287,10 +288,10 @@ index 0000000000000000000000000000000000000000..250b19027db75b1ba44383621215fd2c
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..41f2482097d7b835dcec85bb33ab0ce5f6f48eec
+index 0000000000000000000000000000000000000000..d2c53262581710d2ca4b588331fe54458015bfe8
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,31 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import kotlinx.serialization.SerialName
@@ -311,7 +312,9 @@ index 0000000000000000000000000000000000000000..41f2482097d7b835dcec85bb33ab0ce5
 +        @SerialName("default-growth-speed")
 +        val defaultGrowthSpeed: Float,
 +        @SerialName("moist-growth-speed")
-+        val moistGrowthSpeed: Float
++        val moistGrowthSpeed: Float,
++        @SerialName("skip-middle-aging-stages-for-crops")
++        val skipMiddleAgingStagesForCrops: Boolean
 +    )
 +
 +    @Serializable

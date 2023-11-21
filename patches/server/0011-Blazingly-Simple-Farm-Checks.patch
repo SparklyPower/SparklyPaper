@@ -5,10 +5,10 @@ Subject: [PATCH] Blazingly Simple Farm Checks
 
 
 diff --git a/src/main/java/net/minecraft/world/level/block/CropBlock.java b/src/main/java/net/minecraft/world/level/block/CropBlock.java
-index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..0c210c7788a45c672abed20175dfc05bfea89d34 100644
+index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..41a0a22bf28eec79bc6dd96622789a2fd2ec646d 100644
 --- a/src/main/java/net/minecraft/world/level/block/CropBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/CropBlock.java
-@@ -74,6 +74,52 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+@@ -74,6 +74,57 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
              int i = this.getAge(state);
  
              if (i < this.getMaxAge()) {
@@ -27,7 +27,12 @@ index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..0c210c7788a45c672abed20175dfc05b
 +                            isCurrentFarmlandStateMoist = true;
 +                        }
 +                    }
-+
++                    // If we are skipping the middle aging stages, we need to change the growth speed and the next stage accordingly
++                    if (world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getSkipMiddleAgingStagesForCrops()) {
++                        f = f / getMaxAge();
++                        i = getMaxAge() - 1;
++                    }
++                    
 +                    // Spigot start
 +                    int modifier;
 +                    if (this == Blocks.BEETROOTS) {
@@ -61,7 +66,7 @@ index 6365ddea0c23bc5d4009d98915f2b39aed2a0328..0c210c7788a45c672abed20175dfc05b
                  float f = CropBlock.getGrowthSpeed(this, world, pos);
  
                  // Spigot start
-@@ -96,6 +142,8 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+@@ -96,6 +147,8 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
                      // Spigot end
                      CraftEventFactory.handleBlockGrowEvent(world, pos, this.getStateForAge(i + 1), 2); // CraftBukkit
                  }
