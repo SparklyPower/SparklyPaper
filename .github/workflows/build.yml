@@ -39,12 +39,14 @@ jobs:
           path: "build/libs/SparklyPaper-paperclip-*.jar"
       - name: Delete Parallel world ticking patch
         run: rm patches/server/*-Parallel-world-ticking.patch
-      - name: Apply Patches
+      - name: Apply Patches (without Parallel World Ticking)
         run: ./gradlew applyPatches
-      - name: Build
+      - name: Build (without Parallel World Ticking)
         run: ./gradlew build
-      - name: Create reobf Paperclip JAR
+      - name: Create reobf Paperclip JAR (without Parallel World Ticking)
         run: ./gradlew -PsparklypaperImplementationVersionSuffix=without-pwt createReobfPaperclipJar
+      - uses: actions/upload-artifact@v2
+        name: "Upload Paperclip JAR (without Parallel World Ticking)"
         with:
           name: SparklyPaper (without Parallel World Ticking) Paperclip
           path: "build/libs/SparklyPaper-paperclip-*.jar"
