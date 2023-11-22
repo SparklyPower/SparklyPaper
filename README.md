@@ -55,6 +55,9 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * The quintessential patch that other performance forks also have for... some reason??? I thought that this optimization was too funny to not do it in SparklyPaper.
   * Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies halloween starts and ends. The epoch is updated every 90 days. If your server is running for 90+ days straight without restarts, congratulations!
   * Avoids unnecessary date checks, even tho that this shouldn't really improve performance that much... unless you have a lot of bats/zombies/skeletons spawning.
+* Cache tracking range type enum ordinal
+  * Yes, I was shocked, flabbergasted even, when I found out that "Enum.ordinal()" was lagging here.
+  * But I guess it makes sense: It is a function that is called every tick for each entity, and it is a bit wasteful converting from enum to ordinal every time.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)

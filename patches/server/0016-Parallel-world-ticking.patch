@@ -1083,10 +1083,10 @@ index 33abcf12b4426572b74ca4c813e4392c823494bc..07198f2f8f7cb082c9e575a5c1e56c14
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index e544081e8214802facb77defc1e9aa765834be2a..f979d22f5bf83492133a87119686a4e136923bc0 100644
+index 6d9aa481cf0a3c31505977b98ca5f2a6b812a757..90efb34aeb8ab4718f34fd68cb9db3c006dc912f 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -934,11 +934,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -937,11 +937,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
                  // This will be called every single tick the entity is in lava, so don't throw an event
                  this.setSecondsOnFire(15, false);
              }
@@ -1100,7 +1100,7 @@ index e544081e8214802facb77defc1e9aa765834be2a..f979d22f5bf83492133a87119686a4e1
              // CraftBukkit end - we also don't throw an event unless the object in lava is living, to save on some event calls
  
          }
-@@ -3390,9 +3390,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3393,9 +3393,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          if (this.fireImmune()) {
              return;
          }
@@ -1112,7 +1112,7 @@ index e544081e8214802facb77defc1e9aa765834be2a..f979d22f5bf83492133a87119686a4e1
              return;
          }
          // CraftBukkit end
-@@ -3903,6 +3903,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -3906,6 +3906,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
              this.teleportPassengers();
              this.setYHeadRot(yaw);
          } else {
