@@ -42,8 +42,8 @@ index 79beac737c17412913983614bd478d33e3c6ed58..5812c7056d11be2cc966728de6b07cd9
 -        val implementationVersion = System.getenv("BUILD_NUMBER") ?: "\"$gitHash\""
 +        // SparklyPaper start
 +        var implementationVersion = System.getenv("BUILD_NUMBER") ?: "\"$gitHash\""
-+        if (hasProperty("sparklypaperImplementationVersionSuffix")) {
-+            implementationVersion += "/${property("sparklypaperImplementationVersionSuffix")}"
++        if (project.hasProperty("sparklypaperImplementationVersionSuffix")) {
++            implementationVersion += "/${project.property("sparklypaperImplementationVersionSuffix")}"
 +        }
 +        // SparklyPaper end
          val date = git("show", "-s", "--format=%ci", gitHash).getText().trim() // Paper
