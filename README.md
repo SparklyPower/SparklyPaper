@@ -80,7 +80,7 @@ If you only care about some of the patches included in SparklyPaper, it is bette
 
 There are two kinds of builds: One with the Parallel World Ticking feature, and another without it. If you don't want to risk using a very experimental feature that may lead to server crashes and corruption, or if you aren't a developer that can't fix plugin issues related to the feature, then use the version without Parallel World Ticking! (We do run Parallel World Ticking in production @ SparklyPower tho, we live on the edge :3)
 
-** SparklyPaper:** https://github.com/SparklyPower/SparklyPaper/actions/workflows/build.yml
-** SparklyPaper (without Parallel World Ticking):** https://github.com/SparklyPower/SparklyPaper/actions/workflows/build-without-pwt.yml
+* **SparklyPaper:** https://github.com/SparklyPower/SparklyPaper/actions/workflows/build.yml
+* **SparklyPaper (without Parallel World Ticking):** https://github.com/SparklyPower/SparklyPaper/actions/workflows/build-without-pwt.yml
 
 Click on a workflow run, scroll down to the Artifacts, and download!
