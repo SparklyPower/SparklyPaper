@@ -783,7 +783,7 @@ index 7f90783254d4178e02baf6b5b0a60508a4ce2806..42d20588534dc4c864e5d9b659f5e329
          // SparklyPaper start - Spooky month optimizations
          halloweenManager.startHalloweenEpochTask();
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 8c33a12ca879c46893150d6adfb8aa4d397c6b4c..7088c8e8a7eba566fa91f5fa2995cd724705b8c4 100644
+index 66d9358c30b827a1299e9d9b0d3793a0eb62d67b..33504d860c8ac8397863cee401b2718c13f99640 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -238,7 +238,7 @@ public class ServerChunkCache extends ChunkSource {
@@ -1083,7 +1083,7 @@ index 33abcf12b4426572b74ca4c813e4392c823494bc..07198f2f8f7cb082c9e575a5c1e56c14
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 6d9aa481cf0a3c31505977b98ca5f2a6b812a757..90efb34aeb8ab4718f34fd68cb9db3c006dc912f 100644
+index 136ba5d75cadb3ed3e3b70048d3509d57d050651..052c26a0bb9181407c33204d1fd80d80c3df59fe 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -937,11 +937,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
@@ -2063,7 +2063,7 @@ index 390e1b7fd2721b99cb3ce268c6bc1bf0a38e08a3..9255e51954bd9a43afc366d8c414dd8a
  
          // Modelled off EntityHuman#hasBlock
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
-index e3b07d623cd64de9645f2372f1e08757edc1a9ed..d00bffcb7f671ec261a58deacf90110978610898 100644
+index e3b07d623cd64de9645f2372f1e08757edc1a9ed..72e72d4c1e77d2940d65bc65253b3a84c47c38a7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
 @@ -239,8 +239,8 @@ public final class CraftBlockStates {
@@ -2073,7 +2073,7 @@ index e3b07d623cd64de9645f2372f1e08757edc1a9ed..d00bffcb7f671ec261a58deacf901109
 -        boolean prev = CraftBlockEntityState.DISABLE_SNAPSHOT;
 -        CraftBlockEntityState.DISABLE_SNAPSHOT = !useSnapshot;
 +        boolean prev = CraftBlockEntityState.DISABLE_SNAPSHOT.get(); // SparklyPaper - parallel world ticking
-+        CraftBlockEntityState.DISABLE_SNAPSHOT.set(useSnapshot); // SparklyPaper - parallel world ticking
++        CraftBlockEntityState.DISABLE_SNAPSHOT.set(!useSnapshot); // SparklyPaper - parallel world ticking
          try {
          // Paper end
          CraftBlockState blockState = CraftBlockStates.getBlockState(world, blockPosition, blockData, tileEntity);
