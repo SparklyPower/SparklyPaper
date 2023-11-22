@@ -58,6 +58,10 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
 * Cache tracking range type enum ordinal
   * Yes, I was shocked, flabbergasted even, when I found out that `Enum.ordinal()` was lagging when calling `Entity.getPlayersInTrackRange()`.
   * But I guess it makes sense: It is a function that is called every tick for each entity, and it is a bit wasteful "converting" (in quotes, because it is actually accessing `int ordinal`) from enum to ordinal every time.
+* Cache coordinate key used for nearby players when ticking chunks
+  * The `getChunkKey(...)` call is a bit expensive, using 0.24% of CPU time with 19k chunks loaded.
+  * So instead of paying the price on each tick, we pay the price when the chunk is loaded.
+  * Which, if you think about it, is actually better, since we tick chunks more than we load chunks.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
