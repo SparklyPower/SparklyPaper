@@ -6,13 +6,13 @@
 <h1 align="center">✨ SparklyPaper ✨</h1>
 </p>
 
-SparklyPower's Paper fork, with a mix of weird & crazy patches from other forks!
+SparklyPower's Paper fork, with blazing high-performance improvements for large servers!
 
-While our fork is mostly cherry-picked patches from other forks, we do have some handmade patches too to add and optimize some of the things that we have in our server!
+Our fork has handmade patches to add and optimize some of the things that we have in our server, with some cherry-picked patches from other forks.
 
 ## Features
 
-This does not include all patches included in SparklyPaper, only the patches exclusive to SparklyPaper! To see all patches, check out the ["patches" directory](patches).
+This does not include all patches included in SparklyPaper, only the patches handmade for SparklyPaper! To see all patches, check out the ["patches" directory](patches).
 
 SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, placed on the root of your server.
 
@@ -68,7 +68,7 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
 * Parallel World Ticking
   * "mom can we have folia?" "we already have folia at home" folia at home: [Parallel World Ticking](docs/PARALLEL_WORLD_TICKING.md)
 
-We don't cherry-pick *everything* from other forks, only patches that I can see and think "yeah, I can see how this would improve performance" or patches that target specific performance/feature pain points in our server are cherry-picked! In fact, some patches that are used in other forks [may be actually borked](docs/BORKED_PATCHES.md)...
+While we could cherry-pick *everything* from other forks, only patches that I can see and think "yeah, I can see how this would improve performance" or patches that target specific performance/feature pain points in our server are cherry-picked! In fact, some patches that are used in other forks [may be actually borked](docs/BORKED_PATCHES.md)...
 
 ## Support
 
