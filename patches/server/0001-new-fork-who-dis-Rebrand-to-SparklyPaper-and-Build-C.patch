@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 79beac737c17412913983614bd478d33e3c6ed58..8adfd75d66cbd3e3afafc0ea167d1e6568c4adbe 100644
+index 79beac737c17412913983614bd478d33e3c6ed58..5812c7056d11be2cc966728de6b07cd903e8d320 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import io.papermc.paperweight.util.*
@@ -35,16 +35,28 @@ index 79beac737c17412913983614bd478d33e3c6ed58..8adfd75d66cbd3e3afafc0ea167d1e65
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -70,7 +79,7 @@ tasks.jar {
+@@ -64,13 +73,18 @@ tasks.jar {
+     manifest {
+         val git = Git(rootProject.layout.projectDirectory.path)
+         val gitHash = git("rev-parse", "--short=7", "HEAD").getText().trim()
+-        val implementationVersion = System.getenv("BUILD_NUMBER") ?: "\"$gitHash\""
++        // SparklyPaper start
++        var implementationVersion = System.getenv("BUILD_NUMBER") ?: "\"$gitHash\""
++        if (hasProperty("sparklypaperImplementationVersionSuffix")) {
++            implementationVersion += "/${property("sparklypaperImplementationVersionSuffix")}"
++        }
++        // SparklyPaper end
+         val date = git("show", "-s", "--format=%ci", gitHash).getText().trim() // Paper
+         val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
 -            "Implementation-Version" to "git-Paper-$implementationVersion",
-+            "Implementation-Version" to "git-SparklyPaper-$implementationVersion", // ForkTest
++            "Implementation-Version" to "git-SparklyPaper-$implementationVersion", // SparklyPaper
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-@@ -154,7 +163,7 @@ fun TaskContainer.registerRunTask(
+@@ -154,7 +168,7 @@ fun TaskContainer.registerRunTask(
      name: String,
      block: JavaExec.() -> Unit
  ): TaskProvider<JavaExec> = register<JavaExec>(name) {

@@ -30,10 +30,10 @@ index 17ba07cbd4792f63d88ce29d00da280f30c4abff..8e8aad958c96fa1df3d906ec120a89ad
          final TrackedChunk chunk = this.byChunk.get(CoordinateUtils.getChunkKey(chunkX, chunkZ));
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 7088c8e8a7eba566fa91f5fa2995cd724705b8c4..33504d860c8ac8397863cee401b2718c13f99640 100644
+index 8c33a12ca879c46893150d6adfb8aa4d397c6b4c..66d9358c30b827a1299e9d9b0d3793a0eb62d67b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -630,7 +630,7 @@ public class ServerChunkCache extends ChunkSource {
+@@ -621,7 +621,7 @@ public class ServerChunkCache extends ChunkSource {
  
                  // Paper start - optimise chunk tick iteration
                  com.destroystokyo.paper.util.maplist.ReferenceList<ServerPlayer> playersNearby

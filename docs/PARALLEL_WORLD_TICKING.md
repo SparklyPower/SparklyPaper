@@ -92,7 +92,7 @@ SparklyPaper was tailor-made for SparklyPower with features that we need, so... 
 
 I'm not even sure why this question is even here considering that the only real SparklyPaper user is myself. :3
 
-*Theorically* if you really want to, you can set `parallel-world-ticking.threads` to 1, and it would work just like the good old days. None of the additional checks are removed, however.
+But you can build, or download SparklyPaper builds, without the parallel world ticking added!
 
 ## Plugin Incompatibilities
 
