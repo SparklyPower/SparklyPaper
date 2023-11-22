@@ -29,9 +29,9 @@ jobs:
       - name: Delete Parallel world ticking patch
         run: rm patches/server/*-Parallel-world-ticking.patch
       - name: Apply Patches
-        run: ./gradlew applyPatches
+        run: ./gradlew -PsparklypaperImplementationVersionSuffix=without-pwt applyPatches
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew -PsparklypaperImplementationVersionSuffix=without-pwt build
       - name: Create reobf Paperclip JAR
         run: ./gradlew -PsparklypaperImplementationVersionSuffix=without-pwt createReobfPaperclipJar
       - uses: actions/upload-artifact@v2
