@@ -1,4 +1,4 @@
-name: Patch and Build
+name: Patch and Build (without Parallel World Ticking)
 
 on:
   push:
