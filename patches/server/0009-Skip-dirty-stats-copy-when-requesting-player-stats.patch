@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Wed, 22 Nov 2023 14:40:36 -0300
+Subject: [PATCH] Skip dirty stats copy when requesting player stats
+
+There's literally only one getDirty call. Because the map was only retrieved once, we don't actually need to create a copy of the map just to iterate it, we can just access it directly and clear it manually after use.
+
+diff --git a/src/main/java/net/minecraft/stats/ServerStatsCounter.java b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
+index 9bb8d4d7be6a937980aa653db82be084d066a563..e93722fd8b7a97037914beddbace9a0de5dca8b4 100644
+--- a/src/main/java/net/minecraft/stats/ServerStatsCounter.java
++++ b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
+@@ -85,12 +85,16 @@ public class ServerStatsCounter extends StatsCounter {
+         this.dirty.add(stat);
+     }
+ 
++    // SparklyPaper start - Skip dirty stats copy when requesting player stats
++    /*
+     private Set<Stat<?>> getDirty() {
+         Set<Stat<?>> set = Sets.newHashSet(this.dirty);
+ 
+         this.dirty.clear();
+         return set;
+     }
++    */
++    // SparklyPaper end
+ 
+     public void parseLocal(DataFixer dataFixer, String json) {
+         try {
+@@ -238,7 +242,7 @@ public class ServerStatsCounter extends StatsCounter {
+ 
+     public void sendStats(ServerPlayer player) {
+         Object2IntMap<Stat<?>> object2intmap = new Object2IntOpenHashMap();
+-        Iterator iterator = this.getDirty().iterator();
++        Iterator iterator = this.dirty.iterator(); // SparklyPaper - Skip dirty stats copy when requesting player stats
+ 
+         while (iterator.hasNext()) {
+             Stat<?> statistic = (Stat) iterator.next();
+@@ -246,6 +250,8 @@ public class ServerStatsCounter extends StatsCounter {
+             object2intmap.put(statistic, this.getValue(statistic));
+         }
+ 
++        this.dirty.clear(); // SparklyPaper - Skip dirty stats copy when requesting player stats
++
+         player.connection.send(new ClientboundAwardStatsPacket(object2intmap));
+     }
+ }
