@@ -64,7 +64,7 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * The `canSee(...)` checks is in a hot path (`ChunkMap#updatePlayers()`), invoked by each entity for each player on the server if they are in tracking range, so optimizing it is pretty nice.
   * First, we change the original `HashMap` to fastutil's `Object2ObjectOpenHashMap`, because fastutil's `containsKey` throughput is better.
   * Then, we add a `isEmpty()` check before attempting to check if the map contains something. This seems stupid, but it does seem that it improves the performance a bit, and it makes sense, `containsKey(...)` does not attempt to check the map size before attempting to check if the map contains the key.
-  * We also create a `canSee` method tailored for `ChunkMap#updatePlayer()`, a method without the equals check (the `updatePlayer()` already checks if the entity is the same entity) and we cache the `isVisibleByDefault()` result between runs (this also seems a bit overkill because `isVisibleByDefault()` is just a method that returns a boolean, but because this is a hot path, we need all optimizations that we can get!Draem).
+  * We also create a `canSee` method tailored for `ChunkMap#updatePlayer()`, a method without the equals check (the `updatePlayer()` already checks if the entity is the same entity) and we cache the `isVisibleByDefault()` result between runs (this also seems a bit overkill because `isVisibleByDefault()` is just a method that returns a boolean, but because this is a hot path, we need all optimizations that we can get!).
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
