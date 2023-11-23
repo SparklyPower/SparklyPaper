@@ -1322,7 +1322,7 @@ index 45243249a561440512ef2a620c60b02e159c80e2..849b9b4336d2ac99324dacf6ad8a2e34
                              continue;
                          }
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 95bc1fab201f5869bb811e25e51ad9c94e955e6e..09ab461affbc20f0748dadd1c80552642201e9cf 100644
+index 14936213cf2a9f0d7f4d0fbf7387e6d97c6cf717..ef0776b6429f1e82c7bd29b19b0328722b426a18 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -15,6 +15,8 @@ import java.util.function.Consumer;
@@ -1695,10 +1695,10 @@ index a743f36f2682a6b72ffa6644782fc081d1479eb7..85e7da9884f48989a62a789306b701a3
      // CraftBukkit end
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index fa170cc1ce7011d201295b89718292d696c7fc24..59045493537533f60bb5e3b80633c71bafb25dc0 100644
+index c6f62c56da6e74fbaa57300f8cc2718675d1681e..0af3100fdb59028dd43bcfba50c36fca45778fd5 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -412,6 +412,7 @@ public class LevelChunk extends ChunkAccess {
+@@ -419,6 +419,7 @@ public class LevelChunk extends ChunkAccess {
  
      @Nullable
      public BlockState setBlockState(BlockPos blockposition, BlockState iblockdata, boolean flag, boolean doPlace) {

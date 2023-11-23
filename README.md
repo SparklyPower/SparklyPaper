@@ -71,6 +71,7 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * We could use a map for caching, but here's why this is way better than using a map: The block entity ticking list is sorted by chunks! Well, sort of... It is sorted by chunk when the chunk has been loaded *because* all loaded block entities are appended to the list, however, this also means that newly placed blocks will be appended to the end of the list until the chunk unloads and loads again.
   * But here's the thing: We don't care if this is bad, the small performance hit of when a player placed new block entities is so small ('tis just a long comparsion after all), that the huge performance boost from already placed block entities is way bigger.
   * Most block entities are things that players placed to be there for a long time anyway (like hoppers, etc), and the block entities will be automatically sorted after the chunk is unloaded and loaded again, so it ain't that bad.
+  * We also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
