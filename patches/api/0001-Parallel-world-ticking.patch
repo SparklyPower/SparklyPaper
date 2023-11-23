@@ -64,3 +64,16 @@ index 9812d668ad945aba486fbf6d5bf83c4292cb5d03..c82b9188c79a0671ca9d09d7cd31e63d
      /**
       * <p>Sets whether or not the Timings should monitor at Verbose level.</p>
       *
+diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
+index ac9a28922f8a556944a4c3649d74c32c622f0cb0..374fa246b0f72e588d9e8082759876d2a8ca5695 100644
+--- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
++++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
+@@ -34,7 +34,7 @@ public class SimpleCommandMap implements CommandMap {
+         register("bukkit", new VersionCommand("version"));
+         register("bukkit", new ReloadCommand("reload"));
+         //register("bukkit", new PluginsCommand("plugins")); // Paper
+-        register("bukkit", new co.aikar.timings.TimingsCommand("timings")); // Paper
++        // register("bukkit", new co.aikar.timings.TimingsCommand("timings")); // Paper // SparklyPaper - parallel world ticking
+     }
+ 
+     public void setFallbackCommands() {
