@@ -17,7 +17,7 @@ Most block entities are things that players placed to be there for a long time a
 We also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index b9e0822638a3979bd43392efdb595153e6f34675..14936213cf2a9f0d7f4d0fbf7387e6d97c6cf717 100644
+index b9e0822638a3979bd43392efdb595153e6f34675..b008bbc1bfef5d2ea53ed2fbffa505a398b9f26c 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -1272,6 +1272,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -40,7 +40,7 @@ index b9e0822638a3979bd43392efdb595153e6f34675..14936213cf2a9f0d7f4d0fbf7387e6d9
 +            } else {
 +                long chunkPos = tickingblockentity.getChunkCoordinateKey();
 +                boolean shouldTick;
-+                if (shouldTickBlocksAtLastResult != -1 && shouldTickBlocksAtChunkPos == chunkPos) {
++                if (shouldTickBlocksAtChunkPos == chunkPos && shouldTickBlocksAtLastResult != -1) {
 +                    shouldTick = shouldTickBlocksAtLastResult == 1;
 +                } else {
 +                    shouldTick = this.shouldTickBlocksAt(chunkPos);
