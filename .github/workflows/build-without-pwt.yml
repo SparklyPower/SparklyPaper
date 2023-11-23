@@ -27,7 +27,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Delete Parallel world ticking patch
-        run: rm patches/server/*-Parallel-world-ticking.patch
+        run: rm patches/server/*-Parallel-world-ticking.patch patches/api/*-Parallel-world-ticking.patch
       - name: Apply Patches
         run: ./gradlew -PsparklypaperImplementationVersionSuffix=without-pwt applyPatches
       - name: Build
