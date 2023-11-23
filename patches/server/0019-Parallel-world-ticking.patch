@@ -1322,7 +1322,7 @@ index 45243249a561440512ef2a620c60b02e159c80e2..849b9b4336d2ac99324dacf6ad8a2e34
                              continue;
                          }
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index b9e0822638a3979bd43392efdb595153e6f34675..28caabc36e7af64d3f546fc0e3c9c06bc5c8b78d 100644
+index 95bc1fab201f5869bb811e25e51ad9c94e955e6e..09ab461affbc20f0748dadd1c80552642201e9cf 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -15,6 +15,8 @@ import java.util.function.Consumer;
@@ -1351,7 +1351,7 @@ index b9e0822638a3979bd43392efdb595153e6f34675..28caabc36e7af64d3f546fc0e3c9c06b
          // CraftBukkit start - tree generation
          if (this.captureTreeGeneration) {
              // Paper start
-@@ -1292,7 +1295,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1307,7 +1310,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  tickingblockentity.tick();
                  // Paper start - execute chunk tasks during tick
                  if ((this.tileTickPosition & 7) == 0) {
@@ -1359,8 +1359,8 @@ index b9e0822638a3979bd43392efdb595153e6f34675..28caabc36e7af64d3f546fc0e3c9c06b
 +                    // MinecraftServer.getServer().executeMidTickTasks(); // SparklyPaper - parallel world ticking (only run mid-tick at the end of each tick / fixes concurrency bugs related to executeMidTickTasks)
                  }
                  // Paper end - execute chunk tasks during tick
-             }
-@@ -1309,7 +1312,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+                 } // SparklyPaper end
+@@ -1325,7 +1328,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      public <T extends Entity> void guardEntityTick(Consumer<T> tickConsumer, T entity) {
          try {
              tickConsumer.accept(entity);
@@ -1369,7 +1369,7 @@ index b9e0822638a3979bd43392efdb595153e6f34675..28caabc36e7af64d3f546fc0e3c9c06b
          } catch (Throwable throwable) {
              if (throwable instanceof ThreadDeath) throw throwable; // Paper
              // Paper start - Prevent tile entity and entity crashes
-@@ -1409,6 +1412,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1425,6 +1428,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      @Nullable
      public BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
@@ -1377,7 +1377,7 @@ index b9e0822638a3979bd43392efdb595153e6f34675..28caabc36e7af64d3f546fc0e3c9c06b
          // Paper start - Optimize capturedTileEntities lookup
          net.minecraft.world.level.block.entity.BlockEntity blockEntity;
          if (!this.capturedTileEntities.isEmpty() && (blockEntity = this.capturedTileEntities.get(blockposition)) != null) {
-@@ -1416,10 +1420,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1432,10 +1436,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          }
          // Paper end
          // CraftBukkit end
@@ -1390,7 +1390,7 @@ index b9e0822638a3979bd43392efdb595153e6f34675..28caabc36e7af64d3f546fc0e3c9c06b
          BlockPos blockposition = blockEntity.getBlockPos();
  
          if (!this.isOutsideBuildHeight(blockposition)) {
-@@ -1505,6 +1510,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1521,6 +1526,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      @Override
      public List<Entity> getEntities(@Nullable Entity except, AABB box, Predicate<? super Entity> predicate) {
@@ -1398,7 +1398,7 @@ index b9e0822638a3979bd43392efdb595153e6f34675..28caabc36e7af64d3f546fc0e3c9c06b
          this.getProfiler().incrementCounter("getEntities");
          List<Entity> list = Lists.newArrayList();
          ((ServerLevel)this).getEntityLookup().getEntities(except, box, list, predicate); // Paper - optimise this call
-@@ -1769,8 +1775,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1785,8 +1791,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      }
      public final BlockPos.MutableBlockPos getRandomBlockPosition(int x, int y, int z, int l, BlockPos.MutableBlockPos out) {
          // Paper end

@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Thu, 23 Nov 2023 18:05:00 -0300
+Subject: [PATCH] Cache last shouldTickBlocksAt result when ticking block
+ entities
+
+The "shouldTickBlocksAt" call is expensive, it requires pulling chunk holder info from an map for each block entity (even if the block entities are on the same chunk!) every single time
+
+So here's a quick and dirty optimization: We cache the last "shouldTickBlocksAt" result and, if the last chunk position is the same as our cached value, we use the last cached "shouldTickBlocksAt" result!
+
+We could use a map for caching, but here's why this is way better than using a map: The block entity ticking list is sorted by chunks! Well, sort of... It is sorted by chunk when the chunk has been loaded, newly placed blocks will be appended to the end of the list until the chunk unloads and loads again
+
+But here's the thing: We don't care if this is bad, the small performance hit of when a player placed new block entities is so small ('tis just a integer comparsion after all), that the huge performance boost from already placed block entities is way bigger
+
+Most block entities are things that players placed to be there for a long time anyway (like hoppers, etc)
+
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index b9e0822638a3979bd43392efdb595153e6f34675..95bc1fab201f5869bb811e25e51ad9c94e955e6e 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -1272,6 +1272,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         int tilesThisCycle = 0;
+         var toRemove = new it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet<TickingBlockEntity>(net.minecraft.Util.identityStrategy()); // Paper - use removeAll
+         toRemove.add(null);
++        // SparklyPaper start - cache last shouldTickBlocksAt result when ticking block entities
++        var shouldTickBlocksAtLastResult = -1; // -1 = undefined
++        var shouldTickBlocksAtChunkPos = 0L;
++        // SparklyPaper end
+         for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
+             this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
+             TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
+@@ -1288,13 +1292,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+                 tilesThisCycle--;
+                 toRemove.add(tickingblockentity); // Paper - use removeAll
+                 // Spigot end
+-            } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) {
++            // } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper - cache last shouldTickBlocksAt result when ticking block entities
++            } else {
++                long chunkPos = ChunkPos.asLong(tickingblockentity.getPos());
++                boolean shouldTick;
++                if (shouldTickBlocksAtLastResult != -1 && shouldTickBlocksAtChunkPos == chunkPos) {
++                    shouldTick = shouldTickBlocksAtLastResult == 1;
++                } else {
++                    shouldTick = this.shouldTickBlocksAt(chunkPos);
++                    shouldTickBlocksAtLastResult = shouldTick ? 1 : 0;
++                    shouldTickBlocksAtChunkPos = chunkPos;
++                }
++                if (shouldTick) {
+                 tickingblockentity.tick();
+                 // Paper start - execute chunk tasks during tick
+                 if ((this.tileTickPosition & 7) == 0) {
+                     MinecraftServer.getServer().executeMidTickTasks();
+                 }
+                 // Paper end - execute chunk tasks during tick
++                } // SparklyPaper end
+             }
+         }
+         this.blockEntityTickers.removeAll(toRemove);
