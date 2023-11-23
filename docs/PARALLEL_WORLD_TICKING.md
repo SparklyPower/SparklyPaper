@@ -74,6 +74,10 @@ Off-main thread throws can be disabled with `-Dsparklypaper.disableHardThrow=tru
 
 In fact, disabling throws is not an easy way out: Yes, you avoid some functions borking out. But, if the tick thread check has failed, your server is probably going to crash anyway. Example: If a plugin is attempting to teleport a player to world X while they are in a TickThread of world Y, the server will lock up because loading chunks outside of the world's tick thread or from an async thread is not allowed but if you had kept hard throws enabled, your server wouldn't have crashed because the request would've been denied! Fix the dang issues instead!!!
 
+## Timings
+
+Parallel World Ticking does not work with Aikar's Timings because Timings wasn't really meant for asynchronous stuff, so the Timings stack becomes corrupted when the worlds are ticked and the server crashes, please use Spark instead!
+
 ## Profiling with Spark
 
 By default, Spark will profile the `Server thread` thread, which ain't good for us if we want to profile what is being used in our worlds.
