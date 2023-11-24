@@ -1,0 +1,269 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Thu, 23 Nov 2023 18:05:00 -0300
+Subject: [PATCH] Optimize tickBlockEntities
+
+We replaced the "blockEntityTickers" list with a custom list based on fastutil's "ObjectArrayList" with a small yet huge change for us: A method that allows us to remove a list of indexes from the list.
+
+This is WAY FASTER than using "removeAll" with a list of entries to be removed, because we don't need to calculate the identity of each block entity to be removed, and we can jump directly to where the search should begin, giving a performance boost for small removals (because we don't need to loop thru the entire list to find what element should be removed) and a performance boost for big removals (no need to calculate the identity of each block entity).
+
+We also now cache the last "shouldTickBlocksAt" result, because the "shouldTickBlocksAt" is expensive because it requires pulling chunk holder info from an map for each block entity (even if the block entities are on the same chunk!) every single time. So, if the last chunk position is the same as our cached value, we use the last cached "shouldTickBlocksAt" result!
+
+We could use a map for caching, but here's why this is way better than using a map: The block entity ticking list is sorted by chunks! Well, sort of... It is sorted by chunk when the chunk has been loaded, newly placed blocks will be appended to the end of the list until the chunk unloads and loads again.  Most block entities are things that players placed to be there for a long time anyway (like hoppers, etc)
+
+But here's the thing: We don't care if we have a small performance penalty if the players have placed new block entities, the small performance hit of when a player placed new block entities is so small ('tis just a long comparsion after all), that the performance boost from already placed block entities is bigger, this helps a lot if your server has a lot of chunks with multiple block entities, and the block entities will be automatically sorted after the chunk is unloaded and loaded again, so it ain't that bad.
+
+And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
+
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index b9e0822638a3979bd43392efdb595153e6f34675..5a35b9f1fd9c8d4c96b3d29ae3dcd13919a5bc0f 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -117,7 +117,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+     public static final int TICKS_PER_DAY = 24000;
+     public static final int MAX_ENTITY_SPAWN_Y = 20000000;
+     public static final int MIN_ENTITY_SPAWN_Y = -20000000;
+-    protected final List<TickingBlockEntity> blockEntityTickers = Lists.newArrayList(); public final int getTotalTileEntityTickers() { return this.blockEntityTickers.size(); } // Paper
++    protected final net.sparklypower.sparklypaper.BlockEntityTickersList blockEntityTickers = new net.sparklypower.sparklypaper.BlockEntityTickersList(); /* Lists.newArrayList(); */ public final int getTotalTileEntityTickers() { return this.blockEntityTickers.size(); } // Paper // SparklyPaper - optimize tickBlockEntities
+     protected final NeighborUpdater neighborUpdater;
+     private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
+     private boolean tickingBlockEntities;
+@@ -1270,15 +1270,26 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         // Spigot start
+         // Iterator iterator = this.blockEntityTickers.iterator();
+         int tilesThisCycle = 0;
+-        var toRemove = new it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet<TickingBlockEntity>(net.minecraft.Util.identityStrategy()); // Paper - use removeAll
+-        toRemove.add(null);
++        // SparklyPaper start - optimize tickBlockEntities
++        // var toRemove = new it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet<TickingBlockEntity>(net.minecraft.Util.identityStrategy()); // Paper - use removeAll
++        // toRemove.add(null);
++        var toRemove = new java.util.HashSet<Integer>(); // For some reason, Java's HashSet seems to be faster than fastutil's only if we are removing HUGE amounts of tile entities, idk why
++        var startSearchFromIndex = -1;
++        var shouldTickBlocksAtLastResult = -1; // -1 = undefined
++        var shouldTickBlocksAtChunkPos = 0L;
++        // SparklyPaper end
+         for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
+             this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
+-            TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
++            TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.getWithoutBoundsChecks(this.tileTickPosition);
+             // Spigot start
+             if (tickingblockentity == null) {
+                 this.getCraftServer().getLogger().severe("Spigot has detected a null entity and has removed it, preventing a crash");
+                 tilesThisCycle--;
++                // SparklyPaper start - optimize tickBlockEntities
++                toRemove.add(tileTickPosition);
++                if (startSearchFromIndex == -1)
++                    startSearchFromIndex = tileTickPosition;
++                // SparklyPaper end
+                 continue;
+             }
+             // Spigot end
+@@ -1286,19 +1297,38 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+             if (tickingblockentity.isRemoved()) {
+                 // Spigot start
+                 tilesThisCycle--;
+-                toRemove.add(tickingblockentity); // Paper - use removeAll
++                // SparklyPaper start - optimize tickBlockEntities
++                // toRemove.add(tickingblockentity); // Paper - use removeAll
++                toRemove.add(tileTickPosition);
++                if (startSearchFromIndex == -1)
++                    startSearchFromIndex = tileTickPosition;
++                // SparklyPaper end
+                 // Spigot end
+-            } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) {
++            // } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper start - optimize tickBlockEntities
++            } else {
++                long chunkPos = tickingblockentity.getChunkCoordinateKey();
++                boolean shouldTick;
++                if (shouldTickBlocksAtChunkPos == chunkPos && shouldTickBlocksAtLastResult != -1) {
++                    shouldTick = shouldTickBlocksAtLastResult == 1;
++                } else {
++                    shouldTick = this.shouldTickBlocksAt(chunkPos);
++                    shouldTickBlocksAtLastResult = shouldTick ? 1 : 0;
++                    shouldTickBlocksAtChunkPos = chunkPos;
++                }
++                if (shouldTick) {
+                 tickingblockentity.tick();
+                 // Paper start - execute chunk tasks during tick
+                 if ((this.tileTickPosition & 7) == 0) {
+                     MinecraftServer.getServer().executeMidTickTasks();
+                 }
+                 // Paper end - execute chunk tasks during tick
++                } // SparklyPaper end
+             }
+         }
+-        this.blockEntityTickers.removeAll(toRemove);
+-
++        // SparklyPaper start - optimize tickBlockEntities
++        // this.blockEntityTickers.removeAll(toRemove);
++        this.blockEntityTickers.removeAllByIndex(startSearchFromIndex, toRemove); // We don't need to care about if the startSearchFromIndex can be -1 here, since if it is -1, then the toRemove list is empty and the call will fast fail
++        // SparklyPaper end
+         this.timings.tileEntityTick.stopTiming(); // Spigot
+         this.tickingBlockEntities = false;
+         co.aikar.timings.TimingHistory.tileEntityTicks += this.blockEntityTickers.size(); // Paper
+@@ -1306,6 +1336,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         this.spigotConfig.currentPrimedTnt = 0; // Spigot
+     }
+ 
++    // SparklyPaper start
++    private final record BlockEntityRemovalSection(int startsAt, int endsAt) {}
++    // SparklyPaper end
++
+     public <T extends Entity> void guardEntityTick(Consumer<T> tickConsumer, T entity) {
+         try {
+             tickConsumer.accept(entity);
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
+index 28e3b73507b988f7234cbf29c4024c88180d0aef..68d96dd3e288346d8df49b52fa035e8154057065 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
+@@ -10,4 +10,6 @@ public interface TickingBlockEntity {
+     BlockPos getPos();
+ 
+     String getType();
++
++    long getChunkCoordinateKey(); // SparklyPaper - cache last shouldTickBlocksAt result when ticking block entities
+ }
+diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+index fa170cc1ce7011d201295b89718292d696c7fc24..c6f62c56da6e74fbaa57300f8cc2718675d1681e 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -73,6 +73,13 @@ public class LevelChunk extends ChunkAccess {
+         public String getType() {
+             return "<null>";
+         }
++
++        // SparklyPaper start - cache last shouldTickBlocksAt result when ticking block entities
++        @Override
++        public long getChunkCoordinateKey() {
++            return 0;
++        }
++        // SparklyPaper end
+     };
+     private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
+     public boolean loaded;
+@@ -1090,7 +1097,7 @@ public class LevelChunk extends ChunkAccess {
+     }
+ 
+     private <T extends BlockEntity> TickingBlockEntity createTicker(T blockEntity, BlockEntityTicker<T> blockEntityTicker) {
+-        return new LevelChunk.BoundTickingBlockEntity<>(blockEntity, blockEntityTicker);
++        return new LevelChunk.BoundTickingBlockEntity<>(blockEntity, blockEntityTicker, coordinateKey); // SparklyPaper - cache last shouldTickBlocksAt result when ticking block entities
+     }
+ 
+     @FunctionalInterface
+@@ -1141,6 +1148,13 @@ public class LevelChunk extends ChunkAccess {
+         public String toString() {
+             return this.ticker + " <wrapped>";
+         }
++
++        // SparklyPaper start - cache last shouldTickBlocksAt result when ticking block entities
++        @Override
++        public long getChunkCoordinateKey() {
++            return this.ticker.getChunkCoordinateKey();
++        }
++        // SparklyPaper end
+     }
+ 
+     private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
+@@ -1148,10 +1162,12 @@ public class LevelChunk extends ChunkAccess {
+         private final T blockEntity;
+         private final BlockEntityTicker<T> ticker;
+         private boolean loggedInvalidBlockState;
++        private final long chunkCoordinateKey; // SparklyPaper - cache last shouldTickBlocksAt result when ticking block entities
+ 
+-        BoundTickingBlockEntity(BlockEntity tileentity, BlockEntityTicker blockentityticker) {
++        BoundTickingBlockEntity(BlockEntity tileentity, BlockEntityTicker blockentityticker, long chunkCoordinateKey) { // SparklyPaper - cache last shouldTickBlocksAt result when ticking block entities
+             this.blockEntity = (T) tileentity; // CraftBukkit - decompile error
+             this.ticker = blockentityticker;
++            this.chunkCoordinateKey = chunkCoordinateKey; // SparklyPaper - cache last shouldTickBlocksAt result when ticking block entities
+         }
+ 
+         @Override
+@@ -1214,5 +1230,12 @@ public class LevelChunk extends ChunkAccess {
+ 
+             return "Level ticker for " + s + "@" + this.getPos();
+         }
++
++        // SparklyPaper start - cache last shouldTickBlocksAt result when ticking block entities
++        @Override
++        public long getChunkCoordinateKey() {
++            return this.chunkCoordinateKey;
++        }
++        // SparklyPaper end
+     }
+ }
+diff --git a/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e21abc7f612805d78aba2064e9b9e0eccc2f112d
+--- /dev/null
++++ b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
+@@ -0,0 +1,70 @@
++package net.sparklypower.sparklypaper;
++
++import it.unimi.dsi.fastutil.objects.ObjectArrayList;
++import net.minecraft.world.level.block.entity.TickingBlockEntity;
++
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.Set;
++
++/**
++ * A list for ServerLevel's blockEntityTickers
++ *
++ * This list is behaves identically to ObjectArrayList, but it has an additional method, `removeAllByIndex`, that allows a list of integers to be passed indicating what
++ * indexes should be deleted from the list
++ *
++ * This is faster than using removeAll, since we don't need to compare the identity of each block entity, and faster than looping thru each index manually and deleting with remove,
++ * since we don't need to resize the array every single remove.
++ */
++public class BlockEntityTickersList extends ObjectArrayList<TickingBlockEntity> {
++    /** Creates a new array list with {@link #DEFAULT_INITIAL_CAPACITY} capacity. */
++    public BlockEntityTickersList() {
++        super();
++    }
++
++    /**
++     * Creates a new array list and fills it with a given collection.
++     *
++     * @param c a collection that will be used to fill the array list.
++     */
++    public BlockEntityTickersList(final Collection<? extends TickingBlockEntity> c) {
++        super(c);
++    }
++
++    /**
++     * Gets an element by their index, without checking for array bounds.
++     */
++    public TickingBlockEntity getWithoutBoundsChecks(final int index) {
++        return a[index];
++    }
++
++    /**
++     * Removes elements by their index.
++     */
++    public boolean removeAllByIndex(final int startSearchFromIndex, final Set<Integer> c) {
++        final int requiredMatches = c.size();
++        if (requiredMatches == 0)
++            return false; // exit early, we don't need to do anything
++
++        final Object[] a = this.a;
++        int j = startSearchFromIndex;
++        int matches = 0;
++        for (int i = startSearchFromIndex; i < size; i++) { // If the user knows the first index to be removed, we can skip a lot of unnecessary comparsions
++            if (!c.contains(i)) {
++                a[j++] = a[i];
++                matches++;
++            }
++
++            if (matches == requiredMatches) { // exit the loop if we already removed everything, we don't need to check anything else
++                // We need to update the final size here, because we know that we already found everything!
++                // Because we know that the size must be currentSize - requiredMatches (because we have matched everything), let's update the value
++                j = size - requiredMatches;
++                break;
++            }
++        }
++        Arrays.fill(a, j, size, null);
++        final boolean modified = size != j;
++        size = j;
++        return modified;
++    }
++}
