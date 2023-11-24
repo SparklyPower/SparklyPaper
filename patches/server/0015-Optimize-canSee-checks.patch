@@ -11,7 +11,7 @@ Then, we add a "isEmpty()" check before attempting to check if the map contains 
 
 This seems stupid, but it does seem that it improves the performance a bit, and it makes sense, "containsKey(...)" does not attempt to check the map size before attempting to check if the map contains the key
 
-We also create a "canSee" method tailored for "ChunkMap#updatePlayer()", a method without the equals check (the "updatePlayer()" already checks if the entity is the same entity) and we cache the "isVisibleByDefault()" result between runs (this also seems a bit overkill because "isVisibleByDefault()" is just a method that returns a boolean, but because this is a hotpath, we need all optimizations that we can get
+We also create a "canSee" method tailored for "ChunkMap#updatePlayer()", a method without the equals check (the "updatePlayer()" already checks if the entity is the same entity) because the CraftPlayer's `equals()` check is a *bit* expensive compared to only checking the object's identity, and because the identity has already been check, we don't need to check it twice.
 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
 index caa73632aee15583c6b6ed12a668c8f49b794708..fa4c8a52a57775ef8f23e48e57b76ff7abc370c0 100644
