@@ -101,17 +101,6 @@ index b9e0822638a3979bd43392efdb595153e6f34675..5a35b9f1fd9c8d4c96b3d29ae3dcd139
          this.timings.tileEntityTick.stopTiming(); // Spigot
          this.tickingBlockEntities = false;
          co.aikar.timings.TimingHistory.tileEntityTicks += this.blockEntityTickers.size(); // Paper
-@@ -1306,6 +1336,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
-         this.spigotConfig.currentPrimedTnt = 0; // Spigot
-     }
- 
-+    // SparklyPaper start
-+    private final record BlockEntityRemovalSection(int startsAt, int endsAt) {}
-+    // SparklyPaper end
-+
-     public <T extends Entity> void guardEntityTick(Consumer<T> tickConsumer, T entity) {
-         try {
-             tickConsumer.accept(entity);
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
 index 28e3b73507b988f7234cbf29c4024c88180d0aef..68d96dd3e288346d8df49b52fa035e8154057065 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
