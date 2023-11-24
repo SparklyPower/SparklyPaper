@@ -14,36 +14,20 @@ This seems stupid, but it does seem that it improves the performance a bit, and 
 We also create a "canSee" method tailored for "ChunkMap#updatePlayer()", a method without the equals check (the "updatePlayer()" already checks if the entity is the same entity) and we cache the "isVisibleByDefault()" result between runs (this also seems a bit overkill because "isVisibleByDefault()" is just a method that returns a boolean, but because this is a hotpath, we need all optimizations that we can get
 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index caa73632aee15583c6b6ed12a668c8f49b794708..6fff96c1c0fc1442803718fa36ac30a35b6ae2d7 100644
+index caa73632aee15583c6b6ed12a668c8f49b794708..fa4c8a52a57775ef8f23e48e57b76ff7abc370c0 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1326,6 +1326,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
-         private final int range;
-         SectionPos lastSectionPos;
-         public final Set<ServerPlayerConnection> seenBy = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<>(); // Paper - optimise map impl
-+        boolean visibleByDefault; // SparklyPaper - optimize canSee checks
- 
-         public TrackedEntity(Entity entity, int i, int j, boolean flag) {
-             this.serverEntity = new ServerEntity(ChunkMap.this.level, entity, j, flag, this::broadcast, this.seenBy); // CraftBukkit
-@@ -1340,6 +1341,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
-         final void updatePlayers(com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<ServerPlayer> newTrackerCandidates) {
-             com.destroystokyo.paper.util.misc.PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<ServerPlayer> oldTrackerCandidates = this.lastTrackerCandidates;
-             this.lastTrackerCandidates = newTrackerCandidates;
-+            this.visibleByDefault = entity.visibleByDefault; // SparklyPaper - optimize canSee checks
- 
-             if (newTrackerCandidates != null) {
-                 Object[] rawData = newTrackerCandidates.getBackingSet();
-@@ -1436,7 +1438,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1436,7 +1436,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                  // Paper end - check Y
  
                  // CraftBukkit start - respect vanish API
 -                if (flag && !player.getBukkitEntity().canSee(this.entity.getBukkitEntity())) { // Paper - only consider hits
-+                if (flag && !player.getBukkitEntity().canSeeChunkMapUpdatePlayer(this.entity.getBukkitEntity(), visibleByDefault)) { // Paper - only consider hits // SparklyPaper - optimize canSee checks
++                if (flag && !player.getBukkitEntity().canSeeChunkMapUpdatePlayer(this.entity.getBukkitEntity())) { // Paper - only consider hits // SparklyPaper - optimize canSee checks
                      flag = false;
                  }
                  // CraftBukkit end
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 83aaf3e6e377d731ce02f779f80b7bf5db46f89f..3a02f92b57563b42680f4b867d681d2232c748cc 100644
+index 83aaf3e6e377d731ce02f779f80b7bf5db46f89f..1424783f9ebf44d260721fb36c6ae90adee82e1d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -183,7 +183,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
@@ -65,8 +49,8 @@ index 83aaf3e6e377d731ce02f779f80b7bf5db46f89f..3a02f92b57563b42680f4b867d681d22
  
 +    // SparklyPaper - optimize canSee checks
 +    // The check in ChunkMap#updatePlayer already rejects if it is the same entity, so we don't need to check it twice, especially because CraftPlayer's equals check is a bit expensive
-+    public boolean canSeeChunkMapUpdatePlayer(org.bukkit.entity.Entity entity, boolean visibleByDefault) {
-+        return visibleByDefault ^ (!invertedVisibilityEntities.isEmpty() && this.invertedVisibilityEntities.containsKey(entity.getUniqueId())); // SPIGOT-7312: Can always see self // SparklyPaper - optimize canSee checks
++    public boolean canSeeChunkMapUpdatePlayer(org.bukkit.entity.Entity entity) {
++        return entity.isVisibleByDefault() ^ (!invertedVisibilityEntities.isEmpty() && this.invertedVisibilityEntities.containsKey(entity.getUniqueId())); // SPIGOT-7312: Can always see self // SparklyPaper - optimize canSee checks
 +    }
 +    // SparklyPaper end
 +
