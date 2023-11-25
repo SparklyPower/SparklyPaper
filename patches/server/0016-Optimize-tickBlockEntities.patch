@@ -242,7 +242,7 @@ index 0000000000000000000000000000000000000000..713b98c7306a8495461fa228f9f35695
 +                // However, we need to copy the rest of the stuff over
 +                if (i != (size - 1)) { // If it isn't the last index...
 +                    // i + 1 because we want to copy the *next* element over
-+                    // and the size - i - 1 is because we want to get the current size, minus the current index (which is i), and then - 1 because... uh... I don't know...? (i forgor the reason but there's a reason)
++                    // and the size - i - 1 is because we want to get the current size, minus the current index (which is i), and then - 1 because we want to copy -1 ahead (remember, we are adding +1 to copy the *next* element)
 +                    System.arraycopy(a, i + 1, a, j, size - i - 1);
 +                }
 +                j = size - requiredMatches;
