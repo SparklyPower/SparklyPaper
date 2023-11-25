@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 24 Nov 2023 23:37:24 -0300
+Subject: [PATCH] BlockEntityTickersList optimization tests
+
+
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index 94eac6837c06e6fd192c108632f1e365a008d6ad..3588657da9969b4207bbeb8109bc101384c03398 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -1274,8 +1274,8 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         // Iterator iterator = this.blockEntityTickers.iterator();
+         int tilesThisCycle = 0;
+         // SparklyPaper start - optimize tickBlockEntities
+-        // var toRemove = new it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet<TickingBlockEntity>(net.minecraft.Util.identityStrategy()); // Paper - use removeAll
+-        // toRemove.add(null);
++        var toRemoveOld = new it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet<TickingBlockEntity>(net.minecraft.Util.identityStrategy()); // Paper - use removeAll
++        toRemoveOld.add(null);
+         var toRemove = new java.util.HashSet<Integer>(); // For some reason, Java's HashSet seems to be faster than fastutil's only if we are removing HUGE amounts of tile entities, idk why
+         var startSearchFromIndex = -1;
+         var shouldTickBlocksAtLastResult = -1; // -1 = undefined
+@@ -1301,13 +1301,13 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+                 // Spigot start
+                 tilesThisCycle--;
+                 // SparklyPaper start - optimize tickBlockEntities
+-                // toRemove.add(tickingblockentity); // Paper - use removeAll
++                toRemoveOld.add(tickingblockentity); // Paper - use removeAll
+                 toRemove.add(tileTickPosition);
+                 if (startSearchFromIndex == -1)
+                     startSearchFromIndex = tileTickPosition;
+                 // SparklyPaper end
+                 // Spigot end
+-            // } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper start - optimize tickBlockEntities
++                // } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper start - optimize tickBlockEntities
+             } else {
+                 long chunkPos = tickingblockentity.getChunkCoordinateKey();
+                 boolean shouldTick;
+@@ -1319,18 +1319,47 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+                     shouldTickBlocksAtChunkPos = chunkPos;
+                 }
+                 if (shouldTick) {
+-                tickingblockentity.tick();
+-                // Paper start - execute chunk tasks during tick
+-                if ((this.tileTickPosition & 7) == 0) {
+-                    // MinecraftServer.getServer().executeMidTickTasks(); // SparklyPaper - parallel world ticking (only run mid-tick at the end of each tick / fixes concurrency bugs related to executeMidTickTasks)
+-                }
+-                // Paper end - execute chunk tasks during tick
++                    tickingblockentity.tick();
++                    // Paper start - execute chunk tasks during tick
++                    if ((this.tileTickPosition & 7) == 0) {
++                        // MinecraftServer.getServer().executeMidTickTasks(); // SparklyPaper - parallel world ticking (only run mid-tick at the end of each tick / fixes concurrency bugs related to executeMidTickTasks)
++                    }
++                    // Paper end - execute chunk tasks during tick
+                 } // SparklyPaper end
+             }
+         }
+         // SparklyPaper start - optimize tickBlockEntities
+-        // this.blockEntityTickers.removeAll(toRemove);
+-        this.blockEntityTickers.removeAllByIndex(startSearchFromIndex, toRemove); // We don't need to care about if the startSearchFromIndex can be -1 here, since if it is -1, then the toRemove list is empty and the call will fast fail
++        java.util.ArrayList<TickingBlockEntity> oldList = new java.util.ArrayList<>(this.blockEntityTickers);
++        long diffOld = 0;
++        long diffNew = 0;
++        if (toRemoveOld.size() != 1) { // the old one always have null as the first element
++            var startOld = System.nanoTime();
++            oldList.removeAll(toRemoveOld);
++            var endOld = System.nanoTime();
++            diffOld = endOld - startOld;
++            System.out.println("Old version deleted " + toRemoveOld.size() + " elements, took " + diffOld + "ns");
++        }
++        if (startSearchFromIndex != -1) {
++            var start = System.nanoTime();
++            this.blockEntityTickers.removeAllByIndex(startSearchFromIndex, toRemove); // We don't need to care about if the startSearchFromIndex can be -1 here, since if it is -1, then the toRemove list is empty and the call will fast fail
++            var end = System.nanoTime();
++            System.out.println("(current tick: " + this.getServer().getTickCount() + ") startSearchFromIndex: " + startSearchFromIndex + " - toRemove: " + toRemove);
++            diffNew = end - start;
++            System.out.println("New version deleted " + toRemove.size() + " elements, took " + diffNew + "ns");
++        }
++        if (toRemove.size() != 0) {
++            System.out.println("Equals? " + oldList.equals(this.blockEntityTickers));
++            String winner = "Unknown";
++            long perfIncrease = 0;
++            if (diffOld > diffNew) {
++                winner = "New Version";
++                perfIncrease = diffOld - diffNew;
++            } else {
++                winner = "Old Version";
++                perfIncrease = diffNew - diffOld;
++            }
++            System.out.println("Who won? " + winner + ", by " + perfIncrease + "ns");
++        }
+         // SparklyPaper end
+         this.timings.tileEntityTick.stopTiming(); // Spigot
+         this.tickingBlockEntities = false;

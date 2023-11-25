@@ -16,7 +16,7 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index b9e0822638a3979bd43392efdb595153e6f34675..df9de7f1907efd4e30eb9ab3a683761ccb4b2204 100644
+index b9e0822638a3979bd43392efdb595153e6f34675..868e4b69e7ffa502a1ea188053d6f6ae125a554a 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -117,7 +117,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -28,7 +28,7 @@ index b9e0822638a3979bd43392efdb595153e6f34675..df9de7f1907efd4e30eb9ab3a683761c
      protected final NeighborUpdater neighborUpdater;
      private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
      private boolean tickingBlockEntities;
-@@ -1270,15 +1270,26 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1270,8 +1270,14 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          // Spigot start
          // Iterator iterator = this.blockEntityTickers.iterator();
          int tilesThisCycle = 0;
@@ -44,9 +44,8 @@ index b9e0822638a3979bd43392efdb595153e6f34675..df9de7f1907efd4e30eb9ab3a683761c
 +        // SparklyPaper end
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
--            TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-+            TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.getWithoutBoundsChecks(this.tileTickPosition);
-             // Spigot start
+             TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
+@@ -1279,6 +1285,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              if (tickingblockentity == null) {
                  this.getCraftServer().getLogger().severe("Spigot has detected a null entity and has removed it, preventing a crash");
                  tilesThisCycle--;
@@ -182,10 +181,10 @@ index fa170cc1ce7011d201295b89718292d696c7fc24..c6f62c56da6e74fbaa57300f8cc27186
  }
 diff --git a/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..804c9fd8eedcbf701bde9b8ac0213d94fa8f70c0
+index 0000000000000000000000000000000000000000..713b98c7306a8495461fa228f9f3569515bf8166
 --- /dev/null
 +++ b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,70 @@
 +package net.sparklypower.sparklypaper;
 +
 +import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -217,13 +216,6 @@ index 0000000000000000000000000000000000000000..804c9fd8eedcbf701bde9b8ac0213d94
 +     */
 +    public BlockEntityTickersList(final Collection<? extends TickingBlockEntity> c) {
 +        super(c);
-+    }
-+
-+    /**
-+     * Gets an element by their index, without checking for array bounds.
-+     */
-+    public TickingBlockEntity getWithoutBoundsChecks(final int index) {
-+        return a[index];
 +    }
 +
 +    /**
