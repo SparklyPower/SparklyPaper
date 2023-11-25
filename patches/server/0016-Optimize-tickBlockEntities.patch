@@ -16,7 +16,7 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index b9e0822638a3979bd43392efdb595153e6f34675..5a35b9f1fd9c8d4c96b3d29ae3dcd13919a5bc0f 100644
+index b9e0822638a3979bd43392efdb595153e6f34675..df9de7f1907efd4e30eb9ab3a683761ccb4b2204 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -117,7 +117,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -182,10 +182,10 @@ index fa170cc1ce7011d201295b89718292d696c7fc24..c6f62c56da6e74fbaa57300f8cc27186
  }
 diff --git a/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e21abc7f612805d78aba2064e9b9e0eccc2f112d
+index 0000000000000000000000000000000000000000..804c9fd8eedcbf701bde9b8ac0213d94fa8f70c0
 --- /dev/null
 +++ b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
-@@ -0,0 +1,70 @@
+@@ -0,0 +1,77 @@
 +package net.sparklypower.sparklypaper;
 +
 +import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -240,12 +240,19 @@ index 0000000000000000000000000000000000000000..e21abc7f612805d78aba2064e9b9e0ec
 +        for (int i = startSearchFromIndex; i < size; i++) { // If the user knows the first index to be removed, we can skip a lot of unnecessary comparsions
 +            if (!c.contains(i)) {
 +                a[j++] = a[i];
++            } else {
 +                matches++;
 +            }
 +
-+            if (matches == requiredMatches) { // exit the loop if we already removed everything, we don't need to check anything else
++            if (matches == requiredMatches) { // Exit the loop if we already removed everything, we don't need to check anything else
 +                // We need to update the final size here, because we know that we already found everything!
 +                // Because we know that the size must be currentSize - requiredMatches (because we have matched everything), let's update the value
++                // However, we need to copy the rest of the stuff over
++                if (i != (size - 1)) { // If it isn't the last index...
++                    // i + 1 because we want to copy the *next* element over
++                    // and the size - i - 1 is because we want to get the current size, minus the current index (which is i), and then - 1 because... uh... I don't know...? (i forgor the reason but there's a reason)
++                    System.arraycopy(a, i + 1, a, j, size - i - 1);
++                }
 +                j = size - requiredMatches;
 +                break;
 +            }
