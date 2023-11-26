@@ -1,0 +1,123 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sun, 26 Nov 2023 13:11:10 -0300
+Subject: [PATCH] Optimize tickBlockEntities
+
+We cache the last `shouldTickBlocksAt` result, because the `shouldTickBlocksAt` is expensive because it requires pulling chunk holder info from an map for each block entity (even if the block entities are on the same chunk!) every single time. So, if the last chunk position is the same as our cached value, we use the last cached `shouldTickBlocksAt` result!
+
+We could use a map for caching, but here's why this is way better than using a map: The block entity ticking list is sorted by chunks! Well, sort of... It is sorted by chunk when the chunk has been loaded, newly placed blocks will be appended to the end of the list until the chunk unloads and loads again.  Most block entities are things that players placed to be there for a long time anyway (like hoppers, etc)
+
+But here's the thing: We don't care if we have a small performance penalty if the players have placed new block entities, the small performance hit of when a player placed new block entities is so small ('tis just a long comparsion after all), that the performance boost from already placed block entities is bigger, this helps a lot if your server has a lot of chunks with multiple block entities, and the block entities will be automatically sorted after the chunk is unloaded and loaded again, so it ain't that bad.
+
+And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
+
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index 36c1cc48e6c2541d1218db0560ed7b315ce8067d..a6b47d5d0b9b844e76eae9f083569288e6716563 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -1270,6 +1270,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         // Spigot start
+         // Iterator iterator = this.blockEntityTickers.iterator();
+         int tilesThisCycle = 0;
++        // SparklyPaper start - optimize tickBlockEntities
++        int shouldTickBlocksAtLastResult = -1; // -1 = undefined
++        long shouldTickBlocksAtChunkPos = 0L;
++        // SparklyPaper end
+         for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
+             this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
+             TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
+@@ -1287,13 +1291,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+                 tilesThisCycle--;
+                 blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
+                 // Spigot end
+-            } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) {
++            // } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper start - optimize tickBlockEntities
++            } else {
++                long chunkPos = tickingblockentity.getChunkCoordinateKey();
++                boolean shouldTick;
++                if (shouldTickBlocksAtChunkPos == chunkPos && shouldTickBlocksAtLastResult != -1) {
++                    shouldTick = shouldTickBlocksAtLastResult == 1;
++                } else {
++                    shouldTick = this.shouldTickBlocksAt(chunkPos);
++                    shouldTickBlocksAtLastResult = shouldTick ? 1 : 0;
++                    shouldTickBlocksAtChunkPos = chunkPos;
++                }
++                if (shouldTick) {
+                 tickingblockentity.tick();
+                 // Paper start - execute chunk tasks during tick
+                 if ((this.tileTickPosition & 7) == 0) {
+                     MinecraftServer.getServer().executeMidTickTasks();
+                 }
+                 // Paper end - execute chunk tasks during tick
++                } // SparklyPaper end
+             }
+         }
+         blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
+diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+index fa170cc1ce7011d201295b89718292d696c7fc24..1338f91a85f5db6ce78705a0c48bec8a449a6220 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -73,6 +73,13 @@ public class LevelChunk extends ChunkAccess {
+         public String getType() {
+             return "<null>";
+         }
++
++        // SparklyPaper start - optimize tickBlockEntities
++        @Override
++        public long getChunkCoordinateKey() {
++            return 0;
++        }
++        // SparklyPaper end
+     };
+     private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
+     public boolean loaded;
+@@ -1090,7 +1097,7 @@ public class LevelChunk extends ChunkAccess {
+     }
+ 
+     private <T extends BlockEntity> TickingBlockEntity createTicker(T blockEntity, BlockEntityTicker<T> blockEntityTicker) {
+-        return new LevelChunk.BoundTickingBlockEntity<>(blockEntity, blockEntityTicker);
++        return new LevelChunk.BoundTickingBlockEntity<>(blockEntity, blockEntityTicker, this.coordinateKey); // SparklyPaper - optimize tickBlockEntities
+     }
+ 
+     @FunctionalInterface
+@@ -1141,6 +1148,13 @@ public class LevelChunk extends ChunkAccess {
+         public String toString() {
+             return this.ticker + " <wrapped>";
+         }
++
++        // SparklyPaper start - optimize tickBlockEntities
++        @Override
++        public long getChunkCoordinateKey() {
++            return this.ticker.getChunkCoordinateKey();
++        }
++        // SparklyPaper end
+     }
+ 
+     private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
+@@ -1148,10 +1162,12 @@ public class LevelChunk extends ChunkAccess {
+         private final T blockEntity;
+         private final BlockEntityTicker<T> ticker;
+         private boolean loggedInvalidBlockState;
++        private final long chunkCoordinateKey; // SparklyPaper - optimize tickBlockEntities
+ 
+-        BoundTickingBlockEntity(BlockEntity tileentity, BlockEntityTicker blockentityticker) {
++        BoundTickingBlockEntity(BlockEntity tileentity, BlockEntityTicker blockentityticker, long chunkCoordinateKey) { // SparklyPaper - optimize tickBlockEntities
+             this.blockEntity = (T) tileentity; // CraftBukkit - decompile error
+             this.ticker = blockentityticker;
++            this.chunkCoordinateKey = chunkCoordinateKey; // SparklyPaper - optimize tickBlockEntities
+         }
+ 
+         @Override
+@@ -1214,5 +1230,12 @@ public class LevelChunk extends ChunkAccess {
+ 
+             return "Level ticker for " + s + "@" + this.getPos();
+         }
++
++        // SparklyPaper start - optimize tickBlockEntities
++        @Override
++        public long getChunkCoordinateKey() {
++            return this.chunkCoordinateKey;
++        }
++        // SparklyPaper end
+     }
+ }

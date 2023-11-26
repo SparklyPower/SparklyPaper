@@ -1322,7 +1322,7 @@ index 45243249a561440512ef2a620c60b02e159c80e2..849b9b4336d2ac99324dacf6ad8a2e34
                              continue;
                          }
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 868e4b69e7ffa502a1ea188053d6f6ae125a554a..94eac6837c06e6fd192c108632f1e365a008d6ad 100644
+index a6b47d5d0b9b844e76eae9f083569288e6716563..d82fb6b2f0bab36a913ea5e224fb39e6d8eccda2 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -15,6 +15,8 @@ import java.util.function.Consumer;
@@ -1351,7 +1351,7 @@ index 868e4b69e7ffa502a1ea188053d6f6ae125a554a..94eac6837c06e6fd192c108632f1e365
          // CraftBukkit start - tree generation
          if (this.captureTreeGeneration) {
              // Paper start
-@@ -1319,7 +1322,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1306,7 +1309,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  tickingblockentity.tick();
                  // Paper start - execute chunk tasks during tick
                  if ((this.tileTickPosition & 7) == 0) {
@@ -1360,7 +1360,7 @@ index 868e4b69e7ffa502a1ea188053d6f6ae125a554a..94eac6837c06e6fd192c108632f1e365
                  }
                  // Paper end - execute chunk tasks during tick
                  } // SparklyPaper end
-@@ -1339,7 +1342,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1323,7 +1326,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      public <T extends Entity> void guardEntityTick(Consumer<T> tickConsumer, T entity) {
          try {
              tickConsumer.accept(entity);
@@ -1369,7 +1369,7 @@ index 868e4b69e7ffa502a1ea188053d6f6ae125a554a..94eac6837c06e6fd192c108632f1e365
          } catch (Throwable throwable) {
              if (throwable instanceof ThreadDeath) throw throwable; // Paper
              // Paper start - Prevent tile entity and entity crashes
-@@ -1439,6 +1442,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1423,6 +1426,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      @Nullable
      public BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
@@ -1377,7 +1377,7 @@ index 868e4b69e7ffa502a1ea188053d6f6ae125a554a..94eac6837c06e6fd192c108632f1e365
          // Paper start - Optimize capturedTileEntities lookup
          net.minecraft.world.level.block.entity.BlockEntity blockEntity;
          if (!this.capturedTileEntities.isEmpty() && (blockEntity = this.capturedTileEntities.get(blockposition)) != null) {
-@@ -1446,10 +1450,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1430,10 +1434,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          }
          // Paper end
          // CraftBukkit end
@@ -1390,7 +1390,7 @@ index 868e4b69e7ffa502a1ea188053d6f6ae125a554a..94eac6837c06e6fd192c108632f1e365
          BlockPos blockposition = blockEntity.getBlockPos();
  
          if (!this.isOutsideBuildHeight(blockposition)) {
-@@ -1535,6 +1540,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1519,6 +1524,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      @Override
      public List<Entity> getEntities(@Nullable Entity except, AABB box, Predicate<? super Entity> predicate) {
@@ -1398,7 +1398,7 @@ index 868e4b69e7ffa502a1ea188053d6f6ae125a554a..94eac6837c06e6fd192c108632f1e365
          this.getProfiler().incrementCounter("getEntities");
          List<Entity> list = Lists.newArrayList();
          ((ServerLevel)this).getEntityLookup().getEntities(except, box, list, predicate); // Paper - optimise this call
-@@ -1799,8 +1805,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1783,8 +1789,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      }
      public final BlockPos.MutableBlockPos getRandomBlockPosition(int x, int y, int z, int l, BlockPos.MutableBlockPos out) {
          // Paper end
@@ -1695,7 +1695,7 @@ index a743f36f2682a6b72ffa6644782fc081d1479eb7..85e7da9884f48989a62a789306b701a3
      // CraftBukkit end
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index c6f62c56da6e74fbaa57300f8cc2718675d1681e..0af3100fdb59028dd43bcfba50c36fca45778fd5 100644
+index 1338f91a85f5db6ce78705a0c48bec8a449a6220..00af4b8db53a55d252a43a29c4939fea111d3f13 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 @@ -419,6 +419,7 @@ public class LevelChunk extends ChunkAccess {
