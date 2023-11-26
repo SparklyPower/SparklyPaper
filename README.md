@@ -46,9 +46,6 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * The growth speed of crops and stems are now fixed based on if the block below them is moist or not, instead of doing vanilla's behavior of "check all blocks nearby to see if at least one of them is moist" and "if the blocks nearby are of the same time, make them grow slower".
     * In my opinion: Who cares about the vanilla behavior lol, most players only care about farm land + crop = crop go brrrr
   * Another optimization is that crop behavior can be changed to skip from age zero to the last age directly, while still keeping the original growth duration of the crop. This way, useless block updates due to crop growth can be avoided!
-* Lazily create `LootContext` for criterions
-  * For each player on each tick, enter block triggers are invoked, and these create loot contexts that are promptly thrown away since the trigger doesn't pass the predicate.
-  * To avoid this, we now lazily create the LootContext if the criterion passes the predicate AND if any of the listener triggers require a loot context instance.
 * Spooky month optimizations
   * The quintessential patch that other performance forks also have for... some reason??? I thought that this optimization was too funny to not do it in SparklyPaper.
   * Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies halloween starts and ends. The epoch is updated every 90 days. If your server is running for 90+ days straight without restarts, congratulations!
@@ -75,6 +72,14 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * "mom can we have folia?" "we already have folia at home" folia at home: [Parallel World Ticking](docs/PARALLEL_WORLD_TICKING.md)
 
 While we could cherry-pick *everything* from other forks, only patches that I can see and think "yeah, I can see how this would improve performance" or patches that target specific performance/feature pain points in our server are cherry-picked! In fact, some patches that are used in other forks [may be actually borked](docs/BORKED_PATCHES.md)...
+
+## Upstreamed Features
+
+These features were originally in SparklyPaper, but now they are in Paper, yay! Thanks Paper team :3
+
+* Lazily create `LootContext` for criterions (Merged in [Paper #9969](https://github.com/PaperMC/Paper/pull/9969))
+  * For each player on each tick, enter block triggers are invoked, and these create loot contexts that are promptly thrown away since the trigger doesn't pass the predicate.
+  * To avoid this, we now lazily create the LootContext if the criterion passes the predicate AND if any of the listener triggers require a loot context instance.
 
 ## Support
 

@@ -67,6 +67,16 @@ paperweight {
             serverPatchDir.set(layout.projectDirectory.dir("patches/server"))
             serverOutputDir.set(layout.projectDirectory.dir("sparklypaper-server"))
         }
+
+        // Paper API requires this
+        patchTasks {
+            register("PaperApiGenerator") {
+                isBareDirectory.set(true)
+                upstreamDirPath.set("paper-api-generator")
+                patchDir.set(layout.projectDirectory.dir("patches/paper-api-generator"))
+                outputDir.set(layout.projectDirectory.dir("sparklypaper-api-generator"))
+            }
+        }
     }
 }
 

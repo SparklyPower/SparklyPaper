@@ -11,4 +11,4 @@ plugins {
 
 rootProject.name = "SparklyPaper"
 
-include("sparklypaper-api", "sparklypaper-server")
+include("sparklypaper-api-generator", "sparklypaper-api", "sparklypaper-server")
