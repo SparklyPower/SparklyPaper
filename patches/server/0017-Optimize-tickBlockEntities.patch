@@ -12,7 +12,7 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 36c1cc48e6c2541d1218db0560ed7b315ce8067d..9c2ce199d486ac143843c5a1492da14f8bdcdfce 100644
+index f50a66841fd8c798cd881612be302c292afcfa65..6048e9ed03b633eb545a82a506e5033c61d8176f 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -1270,6 +1270,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -28,7 +28,7 @@ index 36c1cc48e6c2541d1218db0560ed7b315ce8067d..9c2ce199d486ac143843c5a1492da14f
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
 @@ -1287,13 +1291,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  tilesThisCycle--;
-                 blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
+                 this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  // Spigot end
 -            } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) {
 +            // } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper start - optimize tickBlockEntities
@@ -52,7 +52,7 @@ index 36c1cc48e6c2541d1218db0560ed7b315ce8067d..9c2ce199d486ac143843c5a1492da14f
 +                } // SparklyPaper end
              }
          }
-         blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
+         this.blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
 index 28e3b73507b988f7234cbf29c4024c88180d0aef..427cf73383155c52bca8fb4b32f43029ff619833 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java

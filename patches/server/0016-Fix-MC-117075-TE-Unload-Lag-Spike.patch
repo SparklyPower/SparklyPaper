@@ -8,7 +8,7 @@ We replaced the `blockEntityTickers` list with a custom list based on fastutil's
 This is WAY FASTER than using `removeAll` with a list of entries to be removed, because we don't need to calculate the identity of each block entity to be removed, and we can jump directly to where the search should begin, giving a performance boost for small removals (because we don't need to loop thru the entire list to find what element should be removed) and a performance boost for big removals (no need to calculate the identity of each block entity).
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index ddb618fce875b1a337b139c9c47433453654017b..36c1cc48e6c2541d1218db0560ed7b315ce8067d 100644
+index ddb618fce875b1a337b139c9c47433453654017b..f50a66841fd8c798cd881612be302c292afcfa65 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -117,7 +117,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -25,7 +25,7 @@ index ddb618fce875b1a337b139c9c47433453654017b..36c1cc48e6c2541d1218db0560ed7b31
                  this.getCraftServer().getLogger().severe("Spigot has detected a null entity and has removed it, preventing a crash");
                  tilesThisCycle--;
 -                this.blockEntityTickers.remove(this.tileTickPosition--);
-+                blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
++                this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  continue;
              }
              // Spigot end
@@ -34,7 +34,7 @@ index ddb618fce875b1a337b139c9c47433453654017b..36c1cc48e6c2541d1218db0560ed7b31
                  // Spigot start
                  tilesThisCycle--;
 -                this.blockEntityTickers.remove(this.tileTickPosition--);
-+                blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
++                this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  // Spigot end
              } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) {
                  tickingblockentity.tick();
@@ -43,7 +43,7 @@ index ddb618fce875b1a337b139c9c47433453654017b..36c1cc48e6c2541d1218db0560ed7b31
              }
          }
 -
-+        blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
++        this.blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
          this.timings.tileEntityTick.stopTiming(); // Spigot
          this.tickingBlockEntities = false;
          co.aikar.timings.TimingHistory.tileEntityTicks += this.blockEntityTickers.size(); // Paper
