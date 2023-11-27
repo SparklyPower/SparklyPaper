@@ -6,7 +6,7 @@
 <h1 align="center">✨ SparklyPaper ✨</h1>
 </p>
 
-SparklyPower's Paper fork, with blazing high-performance improvements for large servers!
+SparklyPower's Paper fork, making large servers snappier with high-performance optimizations and improvements!
 
 Our fork has handmade patches to add and optimize some of the things that we have in our server, with some cherry-picked patches from other forks.
 
