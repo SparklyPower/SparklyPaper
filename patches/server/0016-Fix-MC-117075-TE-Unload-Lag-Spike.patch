@@ -49,7 +49,7 @@ index ddb618fce875b1a337b139c9c47433453654017b..f50a66841fd8c798cd881612be302c29
          co.aikar.timings.TimingHistory.tileEntityTicks += this.blockEntityTickers.size(); // Paper
 diff --git a/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ebefc70ea5841526f4a4d5111b906d2075967e62
+index 0000000000000000000000000000000000000000..7affec7e343c39a83390ae13ce23f3bfa0db1eb6
 --- /dev/null
 +++ b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
 @@ -0,0 +1,100 @@
@@ -65,15 +65,15 @@ index 0000000000000000000000000000000000000000..ebefc70ea5841526f4a4d5111b906d20
 +import java.util.Set;
 +
 +/**
-+ + * A list for ServerLevel's blockEntityTickers
-+ + *
-+ + * This list is behaves identically to ObjectArrayList, but it has an additional method, `removeAllByIndex`, that allows a list of integers to be passed indicating what
-+ + * indexes should be deleted from the list
-+ + *
-+ + * This is faster than using removeAll, since we don't need to compare the identity of each block entity, and faster than looping thru each index manually and deleting with remove,
-+ + * since we don't need to resize the array every single remove.
-+ + */
-+public class BlockEntityTickersList extends ObjectArrayList<TickingBlockEntity> {
++ * A list for ServerLevel's blockEntityTickers
++ *
++ * This list is behaves identically to ObjectArrayList, but it has an additional method, `removeAllByIndex`, that allows a list of integers to be passed indicating what
++ * indexes should be deleted from the list
++ *
++ * This is faster than using removeAll, since we don't need to compare the identity of each block entity, and faster than looping thru each index manually and deleting with remove,
++ * since we don't need to resize the array every single remove.
++ */
++public final class BlockEntityTickersList extends ObjectArrayList<TickingBlockEntity> {
 +    private final IntOpenHashSet toRemove = new IntOpenHashSet();
 +    private int startSearchFromIndex = -1;
 +
