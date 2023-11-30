@@ -922,7 +922,7 @@ index 3721a45fbc38d6fc92cc8ba5080c7bd18b8d006c..add727490a4513342914e94a57e46743
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 08980763020a13ab49dc7d637625a4fba56da8c9..69dd7ef091f0f73fcd0c98fa5e4b610d8f4155dc 100644
+index 08980763020a13ab49dc7d637625a4fba56da8c9..8a0cae8acd552c8d8ab7dea9da08b8c5d855bb62 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -18,6 +18,7 @@ import java.util.Optional;
@@ -1011,11 +1011,15 @@ index 08980763020a13ab49dc7d637625a4fba56da8c9..69dd7ef091f0f73fcd0c98fa5e4b610d
                  this.containerMenu = container;
                  if (!this.isImmobile()) this.connection.send(new ClientboundOpenScreenPacket(container.containerId, container.getType(), Objects.requireNonNullElseGet(title, container::getTitle))); // Paper
                  // CraftBukkit end
-@@ -1655,6 +1664,7 @@ public class ServerPlayer extends Player {
+@@ -1655,6 +1664,11 @@ public class ServerPlayer extends Player {
      }
      @Override
      public void closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason reason) {
-+        MinecraftServer.LOGGER.warn("Closing " + this.getBukkitEntity().getName() + " inventory that was created at", this.containerMenu.containerCreationStacktrace);
++        // SparklyPaper start - parallel world ticking (debugging)
++        if (net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getLogContainerCreationStacktraces()) {
++            MinecraftServer.LOGGER.warn("Closing " + this.getBukkitEntity().getName() + " inventory that was created at", this.containerMenu.containerCreationStacktrace);
++        }
++        // SparklyPaper end
          CraftEventFactory.handleInventoryCloseEvent(this, reason); // CraftBukkit
          // Paper end
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
@@ -1247,17 +1251,24 @@ index f5db60cbecbe69941873e064315931089fe0e48a..6c4a1de4f2606439348dbdb620a1aff6
                      // CraftBukkit end
                  }
 diff --git a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
-index 82f18790b9dc55b039ae03600a80a46d56a87521..ed96fa9659c50da57e460846eda26090ec13085e 100644
+index 82f18790b9dc55b039ae03600a80a46d56a87521..4d9e1085c3218cf8b8f84f607983a5fc6b1a2cec 100644
 --- a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
-@@ -102,6 +102,7 @@ public abstract class AbstractContainerMenu {
+@@ -102,8 +102,14 @@ public abstract class AbstractContainerMenu {
          this.title = title;
      }
      // CraftBukkit end
-+    public Throwable containerCreationStacktrace = new Throwable(); // SparklyPaper - parallel world ticking (debugging)
++    public Throwable containerCreationStacktrace; // SparklyPaper - parallel world ticking (debugging)
  
      protected AbstractContainerMenu(@Nullable MenuType<?> type, int syncId) {
++        // SparklyPaper - parallel world ticking (debugging)
++        if (net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getLogContainerCreationStacktraces()) {
++            this.containerCreationStacktrace = new Throwable();
++        }
++        // SparklyPaper end
          this.carried = ItemStack.EMPTY;
+         this.remoteSlots = NonNullList.create();
+         this.remoteDataSlots = new IntArrayList();
 diff --git a/src/main/java/net/minecraft/world/item/ArmorItem.java b/src/main/java/net/minecraft/world/item/ArmorItem.java
 index 42d87800a328f71c5127ce5599ca4c71cc9bb1cd..466526dfe8f81379bccf640f2c3a70640c353540 100644
 --- a/src/main/java/net/minecraft/world/item/ArmorItem.java
@@ -1322,7 +1333,7 @@ index 45243249a561440512ef2a620c60b02e159c80e2..849b9b4336d2ac99324dacf6ad8a2e34
                              continue;
                          }
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index a6b47d5d0b9b844e76eae9f083569288e6716563..d82fb6b2f0bab36a913ea5e224fb39e6d8eccda2 100644
+index 6048e9ed03b633eb545a82a506e5033c61d8176f..114e6cc9d2245f7362aa0c63dba890f38a0722ca 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -15,6 +15,8 @@ import java.util.function.Consumer;
@@ -2223,3 +2234,15 @@ index 0000000000000000000000000000000000000000..3d536f724ffdae462e3af39e85e4e391
 +    }
 +}
 \ No newline at end of file
+diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
+index 155ef71c119ebeb95fdfae9e681520b91874ba8e..e1f898bd806f6bcdde477eb9af18cc4b2ff6446e 100644
+--- a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
++++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
+@@ -12,6 +12,7 @@ import java.util.logging.Level
+ object SparklyPaperConfigUtils {
+     val yaml = Yaml()
+     lateinit var config: SparklyPaperConfig
++    val logContainerCreationStacktraces = java.lang.Boolean.getBoolean("sparklypaper.logContainerCreationStacktraces")
+ 
+     fun init(configFile: File) {
+         // Write default config if the file doesn't exist
