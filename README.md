@@ -6,7 +6,7 @@
 <h1 align="center">✨ SparklyPaper ✨</h1>
 </p>
 
-SparklyPower's Paper fork, making large servers snappier with high-performance optimizations and improvements!
+SparklyPower's Paper fork, making large servers snappier with high-performance optimizations and improvements! Focused on performance improvements for Survival servers with high player counts.
 
 Our fork has handmade patches to add and optimize some of the things that we have in our server, with some cherry-picked patches from other forks.
 
@@ -73,9 +73,6 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * To avoid this, we can just... not check for the item's durability! Don't worry, the durability of the item is checked when it checks if both item metas are equal.
   * This is a leftover from when checking for the item's durability was "free" because the durability was stored in the `ItemStack` itself, this [was changed in Minecraft 1.13](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/f8b2086d60942eb2cd7ac25a2a1408cb790c222c#src/main/java/org/bukkit/inventory/ItemStack.java).
   * (The reason I found out that this had a performance impact was because the `getDurability()` was using 0.08ms each tick according to spark... yeah, sadly it ain't a super big crazy optimization, the performance impact would be bigger if you have more plugins using `isSimilar(...)` tho)
-* Remove Minecraft leftovers
-  * This patch does NOT remove ALL unused variables and functions, only the functions that are being called BUT doesn't have any reason being on the server, especially if they are being called a lot.
-  * The variables and methods themselves are commented out to cause a diff (or at the very least a compilation error) if some day the server starts using these values.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
@@ -91,6 +88,8 @@ These features were originally in SparklyPaper, but now they are in Paper, yay! 
 * Lazily create `LootContext` for criterions (Merged in [Paper #9969](https://github.com/PaperMC/Paper/pull/9969))
   * For each player on each tick, enter block triggers are invoked, and these create loot contexts that are promptly thrown away since the trigger doesn't pass the predicate.
   * To avoid this, we now lazily create the LootContext if the criterion passes the predicate AND if any of the listener triggers require a loot context instance.
+
+We attempt to upstream everything that we know helps performance and makes the server go zoom, and not stuff that we only *hope* that it improves performance. I'm still learning after all. :)
 
 ## Support
 
