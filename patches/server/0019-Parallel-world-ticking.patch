@@ -557,7 +557,7 @@ index 6f2adf2334e35e8a617a4ced0c1af2abf32bbd8d..a5ea9df0a021ed820c0c1ccb612caebd
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 52b86e899f0c897fb4deca36936073ade3db8265..dfc975c45abbc016e2212eb37883a798cbb4a515 100644
+index 53284b2b0d0a2546e8c045a960a1db9b8d06e3f7..a29af1d5005ce1a52693ce9acc6686e0a537fd7d 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -160,6 +160,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
@@ -570,7 +570,7 @@ index 52b86e899f0c897fb4deca36936073ade3db8265..dfc975c45abbc016e2212eb37883a798
  // CraftBukkit start
 @@ -310,6 +311,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      // Paper end - lag compensation
-     public final Set<org.bukkit.craftbukkit.entity.CraftEntity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
+     public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
      public net.sparklypower.sparklypaper.HalloweenManager halloweenManager = new net.sparklypower.sparklypaper.HalloweenManager(); // SparklyPaper - Spooky month optimizations
 +    // SparklyPaper - parallel world ticking
 +    public java.util.concurrent.Semaphore serverLevelTickingSemaphore = null;
@@ -578,7 +578,7 @@ index 52b86e899f0c897fb4deca36936073ade3db8265..dfc975c45abbc016e2212eb37883a798
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-@@ -1536,63 +1540,124 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1539,63 +1543,124 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.isIteratingOverLevels = true; // Paper
          Iterator iterator = this.getAllLevels().iterator(); // Paper - move down

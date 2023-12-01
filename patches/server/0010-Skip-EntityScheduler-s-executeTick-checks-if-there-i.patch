@@ -11,7 +11,7 @@ To avoid the hefty ArrayDeque's size() call, we check if we *really* need to exe
 Most entities won't have any scheduled tasks, so this is a nice performance bonus. These optimizations, however, wouldn't work in a Folia environment, but because in SparklyPaper executeTick is always executed on the main thread, it ain't an issue for us (yay).
 
 diff --git a/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java b/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
-index 62484ebf4550b05182f693a3180bbac5d5fd906d..4c7aa86bd115c0a6dd6fc8fe20be5c7c48215ca2 100644
+index 62484ebf4550b05182f693a3180bbac5d5fd906d..67800e426445060a8343e27a7452b8d7ed27ac5f 100644
 --- a/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
 +++ b/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
 @@ -36,6 +36,7 @@ public final class EntityScheduler {
@@ -32,30 +32,40 @@ index 62484ebf4550b05182f693a3180bbac5d5fd906d..4c7aa86bd115c0a6dd6fc8fe20be5c7c
          this.entity = Validate.notNull(entity);
      }
  
-@@ -66,6 +68,7 @@ public final class EntityScheduler {
+@@ -61,14 +63,16 @@ public final class EntityScheduler {
+      * @throws IllegalStateException If the scheduler is already retired.
+      */
+     public void retire() {
++        final Entity thisEntity = this.entity.getHandleRaw(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
+         synchronized (this.stateLock) {
+             if (this.tickCount == RETIRED_TICK_COUNT) {
                  throw new IllegalStateException("Already retired");
              }
              this.tickCount = RETIRED_TICK_COUNT;
-+            this.server.entitiesWithScheduledTasks.remove(entity); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++            this.server.entitiesWithScheduledTasks.remove(thisEntity); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
          }
  
-         final Entity thisEntity = this.entity.getHandleRaw();
-@@ -124,6 +127,7 @@ public final class EntityScheduler {
+-        final Entity thisEntity = this.entity.getHandleRaw();
++        // final Entity thisEntity = this.entity.getHandleRaw(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (moved up)
+ 
+         // correctly handle and order retiring while running executeTick
+         for (int i = 0, len = this.currentlyExecuting.size(); i < len; ++i) {
+@@ -124,6 +128,7 @@ public final class EntityScheduler {
              if (this.tickCount == RETIRED_TICK_COUNT) {
                  return false;
              }
-+            this.server.entitiesWithScheduledTasks.add(entity); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++            this.server.entitiesWithScheduledTasks.add(this.entity.getHandleRaw()); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
              this.oneTimeDelayed.computeIfAbsent(this.tickCount + Math.max(1L, delay), (final long keyInMap) -> {
                  return new ArrayList<>();
              }).add(task);
-@@ -143,6 +147,13 @@ public final class EntityScheduler {
+@@ -143,6 +148,13 @@ public final class EntityScheduler {
          TickThread.ensureTickThread(thisEntity, "May not tick entity scheduler asynchronously");
          final List<ScheduledTask> toRun;
          synchronized (this.stateLock) {
 +            // SparklyPaper start - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
 +            // Do we *really* have scheduled tasks tho?
 +            if (this.currentlyExecuting.isEmpty() && this.oneTimeDelayed.isEmpty()) { // Check if we have any pending tasks and, if not, skip!
-+                this.server.entitiesWithScheduledTasks.remove(entity); // We don't! Bye bye!!
++                this.server.entitiesWithScheduledTasks.remove(thisEntity); // We don't! Bye bye!!
 +                return;
 +            }
 +            // SparklyPaper end
@@ -63,34 +73,37 @@ index 62484ebf4550b05182f693a3180bbac5d5fd906d..4c7aa86bd115c0a6dd6fc8fe20be5c7c
                  throw new IllegalStateException("Ticking retired scheduler");
              }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 25367df06a8a6e8b0b3a56652a5fb1c70a15632d..e01297d1269e55f4a4f6c43273d194972529645c 100644
+index 25367df06a8a6e8b0b3a56652a5fb1c70a15632d..d83b2f3c03c2e22a3e7c97dc4e4b156d1b321738 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -308,6 +308,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      // Paper start - lag compensation
      public static final long SERVER_INIT = System.nanoTime();
      // Paper end - lag compensation
-+    public final Set<org.bukkit.craftbukkit.entity.CraftEntity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
++    public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-@@ -1471,6 +1472,15 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1471,6 +1472,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          MinecraftTimings.bukkitSchedulerTimer.stopTiming(); // Spigot // Paper
          // Paper start - Folia scheduler API
          ((io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler) Bukkit.getGlobalRegionScheduler()).tick();
 +        // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
-+        for (final org.bukkit.craftbukkit.entity.CraftEntity craftEntity : entitiesWithScheduledTasks) {
-+            Entity entity = craftEntity.getHandleRaw();
++        for (final Entity entity : entitiesWithScheduledTasks) {
 +            if (entity.isRemoved()) {
 +                continue;
 +            }
-+            craftEntity.taskScheduler.executeTick();
++
++            final org.bukkit.craftbukkit.entity.CraftEntity bukkit = entity.getBukkitEntityRaw();
++            if (bukkit != null) {
++                bukkit.taskScheduler.executeTick();
++            }
 +        }
 +        /*
          getAllLevels().forEach(level -> {
              for (final Entity entity : level.getEntityLookup().getAllCopy()) {
                  if (entity.isRemoved()) {
-@@ -1482,6 +1492,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1482,6 +1495,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  }
              }
          });
