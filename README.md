@@ -73,6 +73,9 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * To avoid this, we can just... not check for the item's durability! Don't worry, the durability of the item is checked when it checks if both item metas are equal.
   * This is a leftover from when checking for the item's durability was "free" because the durability was stored in the `ItemStack` itself, this [was changed in Minecraft 1.13](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/f8b2086d60942eb2cd7ac25a2a1408cb790c222c#src/main/java/org/bukkit/inventory/ItemStack.java).
   * (The reason I found out that this had a performance impact was because the `getDurability()` was using 0.08ms each tick according to spark... yeah, sadly it ain't a super big crazy optimization, the performance impact would be bigger if you have more plugins using `isSimilar(...)` tho)
+* Remove Minecraft leftovers
+  * This patch does NOT remove ALL unused variables and functions, only the functions that are being called BUT doesn't have any reason being on the server, especially if they are being called a lot.
+  * The variables and methods themselves are commented out to cause a diff (or at the very least a compilation error) if some day the server starts using these values.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
