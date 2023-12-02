@@ -67,12 +67,6 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
     * We could use a map for caching, but here's why this is way better than using a map: The block entity ticking list is sorted by chunks! Well, sort of... It is sorted by chunk when the chunk has been loaded, newly placed blocks will be appended to the end of the list until the chunk unloads and loads again.  Most block entities are things that players placed to be there for a long time anyway (like hoppers, etc)
     * But here's the thing: We don't care if we have a small performance penalty if the players have placed new block entities, the small performance hit of when a player placed new block entities is so small ('tis just a long comparsion after all), that the performance boost from already placed block entities is bigger, this helps a lot if your server has a lot of chunks with multiple block entities, and the block entities will be automatically sorted after the chunk is unloaded and loaded again, so it ain't that bad.
   * And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
-* Remove unnecessary durability check in `ItemStack#isSimilar(...)`
-  * I know that this looks like a stupid optimization that doesn't do anything, but hear me out: `getDurability()` ain't free, when you call `getDurability()`, it calls `getItemMeta()`, which then allocates a new `ItemMeta` or clones the current item's item meta.
-  * However, this means that we are unnecessarily allocating useless `ItemMeta` objects if we are comparing two items, or one of the two items, that don't have any durability, and this impact can be noticed if one of your plugins has a `canHoldItem` function that checks if a inventory can hold an item.
-  * To avoid this, we can just... not check for the item's durability! Don't worry, the durability of the item is checked when it checks if both item metas are equal.
-  * This is a leftover from when checking for the item's durability was "free" because the durability was stored in the `ItemStack` itself, this [was changed in Minecraft 1.13](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/f8b2086d60942eb2cd7ac25a2a1408cb790c222c#src/main/java/org/bukkit/inventory/ItemStack.java).
-  * (The reason I found out that this had a performance impact was because the `getDurability()` was using 0.08ms each tick according to spark... yeah, sadly it ain't a super big crazy optimization, the performance impact would be bigger if you have more plugins using `isSimilar(...)` tho)
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
@@ -88,6 +82,12 @@ These features were originally in SparklyPaper, but now they are in Paper, yay! 
 * Lazily create `LootContext` for criterions (Merged in [Paper #9969](https://github.com/PaperMC/Paper/pull/9969))
   * For each player on each tick, enter block triggers are invoked, and these create loot contexts that are promptly thrown away since the trigger doesn't pass the predicate.
   * To avoid this, we now lazily create the LootContext if the criterion passes the predicate AND if any of the listener triggers require a loot context instance.
+* Remove unnecessary durability check in `ItemStack#isSimilar(...)` (Merged in [Paper #9979](https://github.com/PaperMC/Paper/pull/9979))
+  * I know that this looks like a stupid optimization that doesn't do anything, but hear me out: `getDurability()` ain't free, when you call `getDurability()`, it calls `getItemMeta()`, which then allocates a new `ItemMeta` or clones the current item's item meta.
+  * However, this means that we are unnecessarily allocating useless `ItemMeta` objects if we are comparing two items, or one of the two items, that don't have any durability, and this impact can be noticed if one of your plugins has a `canHoldItem` function that checks if a inventory can hold an item.
+  * To avoid this, we can just... not check for the item's durability! Don't worry, the durability of the item is checked when it checks if both item metas are equal.
+  * This is a leftover from when checking for the item's durability was "free" because the durability was stored in the `ItemStack` itself, this [was changed in Minecraft 1.13](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/f8b2086d60942eb2cd7ac25a2a1408cb790c222c#src/main/java/org/bukkit/inventory/ItemStack.java).
+  * (The reason I found out that this had a performance impact was because the `getDurability()` was using 0.08ms each tick according to spark... yeah, sadly it ain't a super big crazy optimization, the performance impact would be bigger if you have more plugins using `isSimilar(...)` tho)
 
 We attempt to upstream everything that we know helps performance and makes the server go zoom, and not stuff that we only *hope* that it improves performance. I'm still learning after all. :)
 
