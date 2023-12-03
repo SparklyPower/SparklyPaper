@@ -73,9 +73,9 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
 
 While we could cherry-pick *everything* from other forks, only patches that I can see and think "yeah, I can see how this would improve performance" or patches that target specific performance/feature pain points in our server are cherry-picked! In fact, some patches that are used in other forks [may be actually borked](docs/BORKED_PATCHES.md)...
 
-## Upstreamed Features
+## Upstreamed Optimizations & Features
 
-These features were originally in SparklyPaper, but now they are in Paper, yay! Thanks Paper team :3
+These optimizations and features were originally in SparklyPaper, but now they are in Paper, yay! Thanks Paper team :3
 
 * Lazily create `LootContext` for criterions (Merged in [Paper #9969](https://github.com/PaperMC/Paper/pull/9969))
   * For each player on each tick, enter block triggers are invoked, and these create loot contexts that are promptly thrown away since the trigger doesn't pass the predicate.
@@ -90,7 +90,7 @@ These features were originally in SparklyPaper, but now they are in Paper, yay! 
   * The `isNearWater` check is costly, especially if you have a lot of farm lands. If the block is already moistured, we can change the tick rate of it to avoid these expensive `isNearWater` checks.
   * (Incompatible with the Blazingly Simple Farm Checks feature)
   
-We attempt to upstream everything that we know helps performance and makes the server go zoom, and not stuff that we only *hope* that it improves performance. I'm still learning after all. :)
+We attempt to upstream everything that we know helps performance and makes the server go zoom, and not stuff that we only *hope* that it improves performance. I'm still learning after all, so some of my patches may be worthless and not good enough. :)
 
 ## Support
 
