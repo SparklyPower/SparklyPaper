@@ -2235,12 +2235,12 @@ index 0000000000000000000000000000000000000000..3d536f724ffdae462e3af39e85e4e391
 +}
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-index 155ef71c119ebeb95fdfae9e681520b91874ba8e..e1f898bd806f6bcdde477eb9af18cc4b2ff6446e 100644
+index 8b78f0e8b1de1a6a2506e686be9d71ced72352dd..ce608ca9640cdea0fe690ef61021355822284cf6 100644
 --- a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -12,6 +12,7 @@ import java.util.logging.Level
- object SparklyPaperConfigUtils {
-     val yaml = Yaml()
+@@ -17,6 +17,7 @@ object SparklyPaperConfigUtils {
+         )
+     )
      lateinit var config: SparklyPaperConfig
 +    val logContainerCreationStacktraces = java.lang.Boolean.getBoolean("sparklypaper.logContainerCreationStacktraces")
  

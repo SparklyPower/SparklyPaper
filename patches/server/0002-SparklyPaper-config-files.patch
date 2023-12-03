@@ -225,13 +225,14 @@ index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c2
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..155ef71c119ebeb95fdfae9e681520b91874ba8e
+index 0000000000000000000000000000000000000000..8b78f0e8b1de1a6a2506e686be9d71ced72352dd
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -0,0 +1,56 @@
+@@ -0,0 +1,61 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import com.charleskorn.kaml.Yaml
++import com.charleskorn.kaml.YamlConfiguration
 +import com.google.common.base.Throwables
 +import kotlinx.serialization.SerializationException
 +import kotlinx.serialization.decodeFromString
@@ -241,7 +242,11 @@ index 0000000000000000000000000000000000000000..155ef71c119ebeb95fdfae9e681520b9
 +import java.util.logging.Level
 +
 +object SparklyPaperConfigUtils {
-+    val yaml = Yaml()
++    val yaml = Yaml(
++        configuration = YamlConfiguration(
++            strictMode = false
++        )
++    )
 +    lateinit var config: SparklyPaperConfig
 +
 +    fun init(configFile: File) {
@@ -261,9 +266,6 @@ index 0000000000000000000000000000000000000000..155ef71c119ebeb95fdfae9e681520b9
 +                                    defaultGrowthSpeed = 1.0f,
 +                                    moistGrowthSpeed = 5.0f,
 +                                    skipMiddleAgingStagesForCrops = true
-+                                ),
-+                                SparklyPaperWorldConfig.TickRates(
-+                                    farmWhenMoisturised = 1
 +                                )
 +                            )
 +                        )
@@ -278,6 +280,9 @@ index 0000000000000000000000000000000000000000..155ef71c119ebeb95fdfae9e681520b9
 +            Bukkit.getLogger().log(Level.SEVERE, "Could not load sparklypaper.yml, please correct your syntax errors", e)
 +            throw Throwables.propagate(e)
 +        }
++        // Rewrite the config file to remove old fields and stuff
++        // TODO: Maybe handle this in another way? This feels kinda bad
++        configFile.writeText(yaml.encodeToString(loadedConfig))
 +        config = loadedConfig
 +    }
 +
@@ -288,10 +293,10 @@ index 0000000000000000000000000000000000000000..155ef71c119ebeb95fdfae9e681520b9
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..d2c53262581710d2ca4b588331fe54458015bfe8
+index 0000000000000000000000000000000000000000..0909362629aa4f6cdfd4052b4b1dc847cbdb57d8
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,23 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import kotlinx.serialization.SerialName
@@ -303,8 +308,6 @@ index 0000000000000000000000000000000000000000..d2c53262581710d2ca4b588331fe5445
 +    val skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer: Boolean,
 +    @SerialName("blazingly-simple-farm-checks")
 +    val blazinglySimpleFarmChecks: BlazinglySimpleFarmChecks,
-+    @SerialName("tick-rates")
-+    val tickRates: TickRates
 +) {
 +    @Serializable
 +    data class BlazinglySimpleFarmChecks(
@@ -315,12 +318,6 @@ index 0000000000000000000000000000000000000000..d2c53262581710d2ca4b588331fe5445
 +        val moistGrowthSpeed: Float,
 +        @SerialName("skip-middle-aging-stages-for-crops")
 +        val skipMiddleAgingStagesForCrops: Boolean
-+    )
-+
-+    @Serializable
-+    data class TickRates(
-+        @SerialName("farm-when-moisturised")
-+        val farmWhenMoisturised: Int
 +    )
 +}
 \ No newline at end of file

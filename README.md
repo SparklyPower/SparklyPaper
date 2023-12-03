@@ -16,9 +16,6 @@ This does not include all patches included in SparklyPaper, only the patches han
 
 SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, placed on the root of your server.
 
-* Configurable Farm Land moisture tick rate when the block is already moisturised
-  * The `isNearWater` check is costly, especially if you have a lot of farm lands. If the block is already moistured, we can change the tick rate of it to avoid these expensive `isNearWater` checks.
-  * (Incompatible with the Blazingly Simple Farm Checks feature)
 * Skip `distanceToSqr` call in `ServerEntity#sendChanges` if the delta movement hasn't changed
   * The `distanceToSqr` call is a bit expensive, so avoiding it is pretty nice, around ~15% calls are skipped with this check. Currently, we only check if both Vec3 objects have the same identity, that means, if they are literally the same object. (that works because Minecraft's code reuses the Vec3 object when caching the current delta movement)
 * Skip `MapItem#update()` if the map does not have the default `CraftMapRenderer` present
@@ -46,6 +43,7 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
   * The growth speed of crops and stems are now fixed based on if the block below them is moist or not, instead of doing vanilla's behavior of "check all blocks nearby to see if at least one of them is moist" and "if the blocks nearby are of the same time, make them grow slower".
     * In my opinion: Who cares about the vanilla behavior lol, most players only care about farm land + crop = crop go brrrr
   * Another optimization is that crop behavior can be changed to skip from age zero to the last age directly, while still keeping the original growth duration of the crop. This way, useless block updates due to crop growth can be avoided!
+  * (Incompatible with Paper's Dry and Wet Farmland custom tick rates)
 * Spooky month optimizations
   * The quintessential patch that other performance forks also have for... some reason??? I thought that this optimization was too funny to not do it in SparklyPaper.
   * Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies halloween starts and ends. The epoch is updated every 90 days. If your server is running for 90+ days straight without restarts, congratulations!
@@ -88,7 +86,10 @@ These features were originally in SparklyPaper, but now they are in Paper, yay! 
   * To avoid this, we can just... not check for the item's durability! Don't worry, the durability of the item is checked when it checks if both item metas are equal.
   * This is a leftover from when checking for the item's durability was "free" because the durability was stored in the `ItemStack` itself, this [was changed in Minecraft 1.13](https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/f8b2086d60942eb2cd7ac25a2a1408cb790c222c#src/main/java/org/bukkit/inventory/ItemStack.java).
   * (The reason I found out that this had a performance impact was because the `getDurability()` was using 0.08ms each tick according to spark... yeah, sadly it ain't a super big crazy optimization, the performance impact would be bigger if you have more plugins using `isSimilar(...)` tho)
-
+* Configurable Farm Land moisture tick rate when the block is already moisturised (Merged in [Paper #9968](https://github.com/PaperMC/Paper/pull/9968))
+  * The `isNearWater` check is costly, especially if you have a lot of farm lands. If the block is already moistured, we can change the tick rate of it to avoid these expensive `isNearWater` checks.
+  * (Incompatible with the Blazingly Simple Farm Checks feature)
+  
 We attempt to upstream everything that we know helps performance and makes the server go zoom, and not stuff that we only *hope* that it improves performance. I'm still learning after all. :)
 
 ## Support
