@@ -12,12 +12,12 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index f50a66841fd8c798cd881612be302c292afcfa65..6048e9ed03b633eb545a82a506e5033c61d8176f 100644
+index d9acec6352adf9e7d774cf3ea9486e57fc02ff83..4c0aa4b4c79562d43df9fc07a56731056f6a2348 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1270,6 +1270,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
-         // Spigot start
-         // Iterator iterator = this.blockEntityTickers.iterator();
+@@ -1281,6 +1281,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         boolean flag = this.tickRateManager().runsNormally();
+ 
          int tilesThisCycle = 0;
 +        // SparklyPaper start - optimize tickBlockEntities
 +        int shouldTickBlocksAtLastResult = -1; // -1 = undefined
@@ -26,13 +26,13 @@ index f50a66841fd8c798cd881612be302c292afcfa65..6048e9ed03b633eb545a82a506e5033c
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -1287,13 +1291,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1298,13 +1302,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  tilesThisCycle--;
                  this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  // Spigot end
--            } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) {
-+            // } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper start - optimize tickBlockEntities
-+            } else {
+-            } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) {
++                // } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) { // SparklyPaper start - optimize tickBlockEntities
++            } else if (flag) {
 +                long chunkPos = tickingblockentity.getChunkCoordinateKey();
 +                boolean shouldTick;
 +                if (shouldTickBlocksAtChunkPos == chunkPos && shouldTickBlocksAtLastResult != -1) {

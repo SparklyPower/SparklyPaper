@@ -83,10 +83,10 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..bfdd0ce9acfae75a403d3689b391dd8f
  
      private void sendDirtyEntityData() {
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index 759ecd79534a7706f7d4a63eb9dacbefcfe54674..0780dd4abf035cdd4001fb9702494c54be83361a 100644
+index 69912c5b300b67394dce3876d2d96872033cf156..bde22dcbc67211a62c2280b0c6cf5b85aa3b96eb 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-@@ -488,6 +488,16 @@ public class ItemFrame extends HangingEntity {
+@@ -483,6 +483,16 @@ public class ItemFrame extends HangingEntity {
                      }
                      this.setItem(ItemStack.fromBukkitCopy(event.getItemStack()));
                      // Paper end
@@ -104,7 +104,7 @@ index 759ecd79534a7706f7d4a63eb9dacbefcfe54674..0780dd4abf035cdd4001fb9702494c54
                      if (!player.getAbilities().instabuild) {
                          itemstack.shrink(1);
 diff --git a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-index e4c4948e076cd64686dfd16ae0568fafc1437140..0e7c7593eec47bc266f53ee8b2053917a84ae61e 100644
+index e4c4948e076cd64686dfd16ae0568fafc1437140..fec7d474df8cfc8c36f5a69faac7ad03ad648d45 100644
 --- a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
 +++ b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
 @@ -67,6 +67,16 @@ public class MapItemSavedData extends SavedData {

@@ -30,18 +30,18 @@ index 17ba07cbd4792f63d88ce29d00da280f30c4abff..8e8aad958c96fa1df3d906ec120a89ad
          final TrackedChunk chunk = this.byChunk.get(CoordinateUtils.getChunkKey(chunkX, chunkZ));
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 8c33a12ca879c46893150d6adfb8aa4d397c6b4c..66d9358c30b827a1299e9d9b0d3793a0eb62d67b 100644
+index 6e212f672579a3e08dc362c287be59ca5170d717..a9763733a0026f7785349dcdd845a01f50a022b1 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -621,7 +621,7 @@ public class ServerChunkCache extends ChunkSource {
+@@ -647,7 +647,7 @@ public class ServerChunkCache extends ChunkSource {
  
-                 // Paper start - optimise chunk tick iteration
-                 com.destroystokyo.paper.util.maplist.ReferenceList<ServerPlayer> playersNearby
--                    = nearbyPlayers.getPlayers(chunkcoordintpair, io.papermc.paper.util.player.NearbyPlayers.NearbyMapType.SPAWN_RANGE);
+                     // Paper start - optimise chunk tick iteration
+                     com.destroystokyo.paper.util.maplist.ReferenceList<ServerPlayer> playersNearby
+-                        = nearbyPlayers.getPlayers(chunkcoordintpair, io.papermc.paper.util.player.NearbyPlayers.NearbyMapType.SPAWN_RANGE);
 +                    = nearbyPlayers.getPlayers(chunk1.nearbyPlayersCoordinateKey, io.papermc.paper.util.player.NearbyPlayers.NearbyMapType.SPAWN_RANGE); // nearbyPlayers.getPlayers(chunkcoordintpair, io.papermc.paper.util.player.NearbyPlayers.NearbyMapType.SPAWN_RANGE); // SparklyPaper - cache coordinate key used for nearby players
-                 if (playersNearby == null) {
-                     continue;
-                 }
+                     if (playersNearby == null) {
+                         continue;
+                     }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 index f7e5e016a7028a9196e689e950805b0d5b31fe38..d0285843920f78e05ce07b1b0b2d8ce97ec8041e 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java

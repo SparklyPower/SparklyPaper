@@ -9,10 +9,10 @@ Optimizes "image in map" maps, without requiring the map to be locked, which som
 This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, but that's not a huuuge problem for us
 
 diff --git a/src/main/java/net/minecraft/world/item/MapItem.java b/src/main/java/net/minecraft/world/item/MapItem.java
-index c368b437597edf7e165326727ae778a69c3fcc83..190716ea7857c7ad5427a527ad8d6b5a241a00b6 100644
+index 797415866a7f182d804f6b8e57ceb07a6ac2a20a..fc824f471e5d814cb3eee48516731c2b001fb54e 100644
 --- a/src/main/java/net/minecraft/world/item/MapItem.java
 +++ b/src/main/java/net/minecraft/world/item/MapItem.java
-@@ -332,7 +332,7 @@ public class MapItem extends ComplexItem {
+@@ -324,7 +324,7 @@ public class MapItem extends ComplexItem {
                      worldmap.tickCarriedBy(entityhuman, stack);
                  }
  

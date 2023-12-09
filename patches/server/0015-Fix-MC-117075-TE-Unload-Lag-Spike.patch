@@ -8,10 +8,10 @@ We replaced the `blockEntityTickers` list with a custom list based on fastutil's
 This is WAY FASTER than using `removeAll` with a list of entries to be removed, because we don't need to calculate the identity of each block entity to be removed, and we can jump directly to where the search should begin, giving a performance boost for small removals (because we don't need to loop thru the entire list to find what element should be removed) and a performance boost for big removals (no need to calculate the identity of each block entity).
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index ddb618fce875b1a337b139c9c47433453654017b..f50a66841fd8c798cd881612be302c292afcfa65 100644
+index 0740a7e90c8b7947448990cd9e76328d7d4a7e95..d9acec6352adf9e7d774cf3ea9486e57fc02ff83 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -117,7 +117,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -120,7 +120,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      public static final int TICKS_PER_DAY = 24000;
      public static final int MAX_ENTITY_SPAWN_Y = 20000000;
      public static final int MIN_ENTITY_SPAWN_Y = -20000000;
@@ -20,7 +20,7 @@ index ddb618fce875b1a337b139c9c47433453654017b..f50a66841fd8c798cd881612be302c29
      protected final NeighborUpdater neighborUpdater;
      private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
      private boolean tickingBlockEntities;
-@@ -1277,7 +1277,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1288,7 +1288,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              if (tickingblockentity == null) {
                  this.getCraftServer().getLogger().severe("Spigot has detected a null entity and has removed it, preventing a crash");
                  tilesThisCycle--;
@@ -29,16 +29,16 @@ index ddb618fce875b1a337b139c9c47433453654017b..f50a66841fd8c798cd881612be302c29
                  continue;
              }
              // Spigot end
-@@ -1285,7 +1285,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1296,7 +1296,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              if (tickingblockentity.isRemoved()) {
                  // Spigot start
                  tilesThisCycle--;
 -                this.blockEntityTickers.remove(this.tileTickPosition--);
 +                this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  // Spigot end
-             } else if (this.shouldTickBlocksAt(tickingblockentity.getPos())) {
+             } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) {
                  tickingblockentity.tick();
-@@ -1296,7 +1296,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1307,7 +1307,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  // Paper end - execute chunk tasks during tick
              }
          }

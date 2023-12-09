@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 79beac737c17412913983614bd478d33e3c6ed58..5812c7056d11be2cc966728de6b07cd903e8d320 100644
+index 170a915098f09ace226648da342a04c5c7583d11..5c2c47b6e01c65ade4da9df65e8a799fb2654989 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import io.papermc.paperweight.util.*
@@ -17,16 +17,16 @@ index 79beac737c17412913983614bd478d33e3c6ed58..5812c7056d11be2cc966728de6b07cd9
      id("com.github.johnrengelman.shadow")
  }
  
-@@ -13,8 +15,15 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
- val alsoShade: Configuration by configurations.creating
+@@ -27,8 +29,15 @@ repositories {
  
  dependencies {
+     extraRuntime(platform("net.kyori:adventure-bom:4.15.0-SNAPSHOT"))
 -    implementation(project(":paper-api"))
 -    implementation(project(":paper-mojangapi"))
 +    // SparklyPaper start
 +    implementation(project(":sparklypaper-api"))
 +    implementation(kotlin("reflect"))
-+    implementation("io.papermc.paper:paper-mojangapi:1.20.2-R0.1-SNAPSHOT") {
++    implementation("io.papermc.paper:paper-mojangapi:1.20.4-R0.1-SNAPSHOT") {
 +        exclude("io.papermc.paper", "paper-api")
 +    }
 +    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
@@ -35,7 +35,7 @@ index 79beac737c17412913983614bd478d33e3c6ed58..5812c7056d11be2cc966728de6b07cd9
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -64,13 +73,18 @@ tasks.jar {
+@@ -78,13 +87,18 @@ tasks.jar {
      manifest {
          val git = Git(rootProject.layout.projectDirectory.path)
          val gitHash = git("rev-parse", "--short=7", "HEAD").getText().trim()
@@ -56,7 +56,7 @@ index 79beac737c17412913983614bd478d33e3c6ed58..5812c7056d11be2cc966728de6b07cd9
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-@@ -154,7 +168,7 @@ fun TaskContainer.registerRunTask(
+@@ -168,7 +182,7 @@ fun TaskContainer.registerRunTask(
      name: String,
      block: JavaExec.() -> Unit
  ): TaskProvider<JavaExec> = register<JavaExec>(name) {
@@ -66,10 +66,10 @@ index 79beac737c17412913983614bd478d33e3c6ed58..5812c7056d11be2cc966728de6b07cd9
      standardInput = System.`in`
      workingDir = rootProject.layout.projectDirectory
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 8f31413c939cc2b0454ad3d9a1b618dbae449d00..25367df06a8a6e8b0b3a56652a5fb1c70a15632d 100644
+index 34f19ac897a30c0c4e3ab406013fcca1c8b7db93..f1c65967b74e79452870438eea0942cc700fe0e9 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1697,7 +1697,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1866,7 +1866,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -79,10 +79,10 @@ index 8f31413c939cc2b0454ad3d9a1b618dbae449d00..25367df06a8a6e8b0b3a56652a5fb1c7
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 9c08303de2891de92e06de8a939a618b7a6f7321..aaf04e2be3ed707e51a81d2b1c58dda6f7a8092a 100644
+index 782bb8ca67517dde5dba8f0a133eb8699353dd01..e81a3a5e9aab6cb0c76d9e557a31d94536680ce4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -269,7 +269,7 @@ import javax.annotation.Nullable; // Paper
+@@ -270,7 +270,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {

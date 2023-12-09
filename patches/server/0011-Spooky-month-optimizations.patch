@@ -10,10 +10,10 @@ Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies h
 Avoids unnecessary date checks, even tho that this shouldn't really improve performance that much... unless you have a lot of bats/zombies/skeletons spawning.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index d83b2f3c03c2e22a3e7c97dc4e4b156d1b321738..cebda87d198edc844f5629a5cd4c71cd6dd75caf 100644
+index 4820e5ae050966d89a0d0b587c83537d4a1e1393..f43060555bf02f13268b284606045fce2b3e911a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -309,6 +309,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -315,6 +315,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public static final long SERVER_INIT = System.nanoTime();
      // Paper end - lag compensation
      public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
@@ -22,7 +22,7 @@ index d83b2f3c03c2e22a3e7c97dc4e4b156d1b321738..cebda87d198edc844f5629a5cd4c71cd
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 9a6915a87ae8aa4ffefea575d7a7d5199c800799..7f90783254d4178e02baf6b5b0a60508a4ce2806 100644
+index b69860955a6c1efb68b17e1fc9b0c42771f40e15..734fd1ced38a16649177bb941e76d9ca66dceac5 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -227,6 +227,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -37,10 +37,10 @@ index 9a6915a87ae8aa4ffefea575d7a7d5199c800799..7f90783254d4178e02baf6b5b0a60508
          io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // init PaperBrigadierProvider
          // Paper end
 diff --git a/src/main/java/net/minecraft/world/entity/ambient/Bat.java b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-index 5beaa849a250ea005733250ad3edfa8382224667..02060f41c17dd22f27bdbf930ab7580984c5c841 100644
+index 6b614818b14ecfc8fc82b523eeb7e21fdf9bf1ba..2588e7eb1f55d3f01f4f8d794a59f3ba16f5985a 100644
 --- a/src/main/java/net/minecraft/world/entity/ambient/Bat.java
 +++ b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-@@ -227,7 +227,7 @@ public class Bat extends AmbientCreature {
+@@ -231,7 +231,7 @@ public class Bat extends AmbientCreature {
              int i = world.getMaxLocalRawBrightness(pos);
              byte b0 = 4;
  
@@ -49,7 +49,7 @@ index 5beaa849a250ea005733250ad3edfa8382224667..02060f41c17dd22f27bdbf930ab75809
                  b0 = 7;
              } else if (random.nextBoolean()) {
                  return false;
-@@ -237,6 +237,8 @@ public class Bat extends AmbientCreature {
+@@ -241,6 +241,8 @@ public class Bat extends AmbientCreature {
          }
      }
  
@@ -58,7 +58,7 @@ index 5beaa849a250ea005733250ad3edfa8382224667..02060f41c17dd22f27bdbf930ab75809
      private static boolean isHalloween() {
          LocalDate localdate = LocalDate.now();
          int i = localdate.get(ChronoField.DAY_OF_MONTH);
-@@ -244,6 +246,7 @@ public class Bat extends AmbientCreature {
+@@ -248,6 +250,7 @@ public class Bat extends AmbientCreature {
  
          return j == 10 && i >= 20 || j == 11 && i <= 3;
      }
@@ -87,7 +87,7 @@ index b319021b22c5dceba6199ed27814b2dcf47b8d50..4e7f19215bafc8ff6b06abc08076a154
                  this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
              }
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Zombie.java b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-index 5fdad1600cc7a7c22d1d9a58b6b2dda605521b97..852be41caa3434c898ef2b0731e6f864e817c02b 100644
+index 753defa8f8b48d004a2a53b2fc322fd9c083d95e..cc7073efaa9984c95b125878df94556b1e865c7a 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Zombie.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
 @@ -553,10 +553,11 @@ public class Zombie extends Monster {
