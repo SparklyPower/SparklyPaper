@@ -783,7 +783,7 @@ index 734fd1ced38a16649177bb941e76d9ca66dceac5..f1cc1083e6093d3813042f94c5229993
          // SparklyPaper start - Spooky month optimizations
          halloweenManager.startHalloweenEpochTask();
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index a9763733a0026f7785349dcdd845a01f50a022b1..61ca4b98f8a94fb6e3ffd27c395bb7e6c4b5814d 100644
+index 22213a52c5d546145d8b8de929af61e49d40375d..40878c28fa1e383e88c7ce2dfa142ab06582cf27 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -236,7 +236,7 @@ public class ServerChunkCache extends ChunkSource {
@@ -831,7 +831,7 @@ index a9763733a0026f7785349dcdd845a01f50a022b1..61ca4b98f8a94fb6e3ffd27c395bb7e6
          CompletableFuture completablefuture;
  
          if (flag1) {
-@@ -677,7 +686,7 @@ public class ServerChunkCache extends ChunkSource {
+@@ -646,7 +655,7 @@ public class ServerChunkCache extends ChunkSource {
  
                          if (true || this.level.shouldTickBlocksAt(chunkcoordintpair.toLong())) { // Paper - optimise chunk tick iteration
                              this.level.tickChunk(chunk1, l);
@@ -922,7 +922,7 @@ index 094a6ddebf79aa49b3e3cd8a032db7b8d23607c4..e640ad5dd3f1caab04a8a99f967ef20b
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 8efbbd379244e3ed54d4aba199037cc20ccd096a..131192d2eb8d0b3224b9c76f43e842861888ea09 100644
+index d1f20a8a3ccea1f074624163eb96da023142a459..0b1ff85ab00ea11182986c503873df612a99aacf 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -17,6 +17,7 @@ import java.util.OptionalInt;
@@ -1087,10 +1087,10 @@ index a35638a92479b90afa89cf201fc45b49c9e767f3..b842dc3d286a98d40267bac141749c4a
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index cfb4daaa28263aef1c74eac574b4f0e8b2f87776..7393add59bade50479843353ef9492de8e47548f 100644
+index aa6045039450c4cce8d9481aa7f56867dd15c0fa..36f9d4bf2d98ada1912ffcbc9a36cb3d1ca35c13 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -939,11 +939,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -938,11 +938,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
                  // This will be called every single tick the entity is in lava, so don't throw an event
                  this.setSecondsOnFire(15, false);
              }
@@ -1104,7 +1104,7 @@ index cfb4daaa28263aef1c74eac574b4f0e8b2f87776..7393add59bade50479843353ef9492de
              // CraftBukkit end - we also don't throw an event unless the object in lava is living, to save on some event calls
  
          }
-@@ -3445,9 +3445,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -3440,9 +3440,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
          if (this.fireImmune()) {
              return;
          }
@@ -1116,7 +1116,7 @@ index cfb4daaa28263aef1c74eac574b4f0e8b2f87776..7393add59bade50479843353ef9492de
              return;
          }
          // CraftBukkit end
-@@ -3963,6 +3963,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -3958,6 +3958,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
              this.teleportPassengers();
              this.setYHeadRot(yaw);
          } else {
@@ -2064,10 +2064,10 @@ index 9271ff2a9ea05569e3c81886399aa7ab47efb05d..e5891ed14f688413dfe9ebd2b5af6d4b
          // Paper end
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518032f3d7f 100644
+index f67ec3f5f4b7e2f678609f2387cc8afa2adce161..5ab000311e2d93a0db6af5d77f33a3404168fe33 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -246,8 +246,8 @@ import org.bukkit.potion.PotionEffect;
+@@ -243,8 +243,8 @@ import org.bukkit.potion.PotionEffect;
  import org.bukkit.util.Vector;
  
  public class CraftEventFactory {
@@ -2078,7 +2078,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
  
      // helper methods
      private static boolean canBuild(ServerLevel world, Player player, int x, int z) {
-@@ -920,7 +920,7 @@ public class CraftEventFactory {
+@@ -917,7 +917,7 @@ public class CraftEventFactory {
          return CraftEventFactory.handleBlockSpreadEvent(world, source, target, block, 2);
      }
  
@@ -2087,7 +2087,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
  
      public static boolean handleBlockSpreadEvent(LevelAccessor world, BlockPos source, BlockPos target, net.minecraft.world.level.block.state.BlockState block, int flag) {
          // Suppress during worldgen
-@@ -932,7 +932,7 @@ public class CraftEventFactory {
+@@ -929,7 +929,7 @@ public class CraftEventFactory {
          CraftBlockState state = CraftBlockStates.getBlockState(world, target, flag);
          state.setData(block);
  
@@ -2096,7 +2096,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
          Bukkit.getPluginManager().callEvent(event);
  
          if (!event.isCancelled()) {
-@@ -1057,8 +1057,8 @@ public class CraftEventFactory {
+@@ -1056,8 +1056,8 @@ public class CraftEventFactory {
      private static EntityDamageEvent handleEntityDamageEvent(Entity entity, DamageSource source, Map<DamageModifier, Double> modifiers, Map<DamageModifier, Function<? super Double, Double>> modifierFunctions, boolean cancelled) {
          if (source.is(DamageTypeTags.IS_EXPLOSION)) {
              DamageCause damageCause;
@@ -2107,7 +2107,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
              EntityDamageEvent event;
              if (damager == null) {
                  event = new EntityDamageByBlockEvent(null, entity.getBukkitEntity(), DamageCause.BLOCK_EXPLOSION, modifiers, modifierFunctions, source.explodedBlockState); // Paper - handle block state in damage
-@@ -1119,13 +1119,13 @@ public class CraftEventFactory {
+@@ -1118,13 +1118,13 @@ public class CraftEventFactory {
              }
              return event;
          } else if (source.is(DamageTypes.LAVA)) {
@@ -2125,7 +2125,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
  
              if (!event.isCancelled()) {
                  event.getEntity().setLastDamageCause(event);
-@@ -1133,9 +1133,9 @@ public class CraftEventFactory {
+@@ -1132,9 +1132,9 @@ public class CraftEventFactory {
                  entity.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
              }
              return event;
@@ -2137,7 +2137,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
              if (source.is(DamageTypes.CACTUS) || source.is(DamageTypes.SWEET_BERRY_BUSH) || source.is(DamageTypes.STALAGMITE) || source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.FALLING_ANVIL)) {
                  cause = DamageCause.CONTACT;
              } else if (source.is(DamageTypes.HOT_FLOOR)) {
-@@ -1150,9 +1150,9 @@ public class CraftEventFactory {
+@@ -1149,9 +1149,9 @@ public class CraftEventFactory {
              EntityDamageEvent event = new EntityDamageByBlockEvent(damager, entity.getBukkitEntity(), cause, modifiers, modifierFunctions);
              event.setCancelled(cancelled);
  
@@ -2149,7 +2149,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
  
              if (!event.isCancelled()) {
                  event.getEntity().setLastDamageCause(event);
-@@ -1160,10 +1160,10 @@ public class CraftEventFactory {
+@@ -1159,10 +1159,10 @@ public class CraftEventFactory {
                  entity.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
              }
              return event;
@@ -2163,7 +2163,7 @@ index e0f80414e01852b6f48c173dc2343ec928147e2f..7a2151cd5ae0848009e0ea19cf00a518
              if (source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL)) {
                  cause = DamageCause.FALLING_BLOCK;
              } else if (damager instanceof LightningStrike) {
-@@ -2132,7 +2132,7 @@ public class CraftEventFactory {
+@@ -2131,7 +2131,7 @@ public class CraftEventFactory {
          CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemStack.copyWithCount(1));
  
          org.bukkit.event.block.BlockDispenseEvent event = new org.bukkit.event.block.BlockDispenseEvent(bukkitBlock, craftItem.clone(), new org.bukkit.util.Vector(to.getX(), to.getY(), to.getZ()));
