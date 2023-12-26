@@ -1087,9 +1087,18 @@ index a35638a92479b90afa89cf201fc45b49c9e767f3..b842dc3d286a98d40267bac141749c4a
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index aa6045039450c4cce8d9481aa7f56867dd15c0fa..36f9d4bf2d98ada1912ffcbc9a36cb3d1ca35c13 100644
+index aa6045039450c4cce8d9481aa7f56867dd15c0fa..807a11fa10b1aeb46c9e4e47b9477a5f15d86149 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -808,7 +808,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     // CraftBukkit start
+     public void postTick() {
+         // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
+-        if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
++        if (false && !(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities // SparklyPaper - parallel world ticking (see issue #9, this is executed in the server level tick for non-player entities)
+             this.handleNetherPortal();
+         }
+     }
 @@ -938,11 +938,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
                  // This will be called every single tick the entity is in lava, so don't throw an event
                  this.setSecondsOnFire(15, false);
