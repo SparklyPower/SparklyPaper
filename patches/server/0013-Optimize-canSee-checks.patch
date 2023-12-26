@@ -14,10 +14,10 @@ This seems stupid, but it does seem that it improves the performance a bit, and 
 We also create a "canSee" method tailored for "ChunkMap#updatePlayer()", a method without the equals check (the "updatePlayer()" already checks if the entity is the same entity) because the CraftPlayer's `equals()` check is a *bit* expensive compared to only checking the object's identity, and because the identity has already been check, we don't need to check it twice.
 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index caa73632aee15583c6b6ed12a668c8f49b794708..fa4c8a52a57775ef8f23e48e57b76ff7abc370c0 100644
+index d9cd497bc1b654030ff1a597f038b6a881df9f6b..5c70baf0113004e5c5cbc2fd6a6d34c75cf65217 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1436,7 +1436,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1435,7 +1435,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                  // Paper end - check Y
  
                  // CraftBukkit start - respect vanish API
@@ -27,7 +27,7 @@ index caa73632aee15583c6b6ed12a668c8f49b794708..fa4c8a52a57775ef8f23e48e57b76ff7
                  }
                  // CraftBukkit end
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 3be5e4df190bff0087c8450b16e4e37b07169040..960cc85150172eae9ba1eb1b6876ea8d21f2de34 100644
+index c54df6e4aed9b7b46a41af4108a8e90d96c1fe1f..c856311f0f50d6e097b9acf27a630cae9fd855ba 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -181,7 +181,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

@@ -12,7 +12,7 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index d9acec6352adf9e7d774cf3ea9486e57fc02ff83..4c0aa4b4c79562d43df9fc07a56731056f6a2348 100644
+index 7681bce91247c13c8211ed6fd2a2998b815604f0..608259c6092f5353e818b5fbeb0e1a5249ed136b 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -1281,6 +1281,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -26,7 +26,7 @@ index d9acec6352adf9e7d774cf3ea9486e57fc02ff83..4c0aa4b4c79562d43df9fc07a5673105
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -1298,13 +1302,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1291,13 +1295,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  tilesThisCycle--;
                  this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  // Spigot end
