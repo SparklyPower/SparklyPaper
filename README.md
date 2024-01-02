@@ -94,6 +94,10 @@ These optimizations and features were originally in SparklyPaper, but now they a
   
 We attempt to upstream everything that we know helps performance and makes the server go zoom, and not stuff that we only *hope* that it improves performance. I'm still learning after all, so some of my patches may be worthless and not good enough. :)
 
+## Results
+
+If you are curious about SparklyPaper's performance, check out [our results page](docs/RESULTS.md)!
+
 ## Support
 
 Because this is a fork made for SparklyPower, we won't give support for any issues that may happen in your server when using SparklyPaper. We know that SparklyPaper may break some plugins, but unless we use these plugins on SparklyPower, we won't go out of our way to fix it!
