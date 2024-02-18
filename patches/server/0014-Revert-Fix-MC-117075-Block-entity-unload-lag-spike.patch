@@ -1,37 +1,37 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrPowerGamerBR <git@mrpowergamerbr.com>
-Date: Tue, 26 Dec 2023 16:45:54 -0300
-Subject: [PATCH] Revert "Fix MC-117075: TE Unload Lag Spike"
+Date: Sun, 18 Feb 2024 14:22:37 -0300
+Subject: [PATCH] Revert "Fix MC-117075: Block entity unload lag spike"
 
-This reverts commit f5e3e154a00754c18d557401cfb8d4aad5bc45e9.
+This reverts commit f3453b204569ea865cc1d1302edb6d125e7f0cb3.
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index fdb86e3bcd48c9a27ca91e105bcd035de5781923..ed736827a7741a54e3a712cf5fcd19195aebaee5 100644
+index e199c852f4c493dbe6ab776d18b91a53e5a36f7c..06fe87cf8bd0e48885ae5f1773bcd603b4335b5e 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1281,8 +1281,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1276,8 +1276,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          boolean flag = this.tickRateManager().runsNormally();
  
          int tilesThisCycle = 0;
--        var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - use removeAll
--        toRemove.add(null);
+-        var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
+-        toRemove.add(null); // Paper - Fix MC-117075
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -1291,7 +1289,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1286,7 +1284,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              if (tickingblockentity.isRemoved()) {
                  // Spigot start
                  tilesThisCycle--;
--                toRemove.add(tickingblockentity); // Paper - use removeAll
+-                toRemove.add(tickingblockentity); // Paper - Fix MC-117075; use removeAll
 +                this.blockEntityTickers.remove(this.tileTickPosition--);
                  // Spigot end
              } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) {
                  tickingblockentity.tick();
-@@ -1302,7 +1300,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1297,7 +1295,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  // Paper end - execute chunk tasks during tick
              }
          }
--        this.blockEntityTickers.removeAll(toRemove);
+-        this.blockEntityTickers.removeAll(toRemove); // Paper - Fix MC-117075
  
          this.timings.tileEntityTick.stopTiming(); // Spigot
          this.tickingBlockEntities = false;

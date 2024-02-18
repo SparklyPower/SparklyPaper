@@ -11,7 +11,7 @@ So instead of paying the price on each tick, we pay the price when the chunk is 
 Which, if you think about it, is actually better, since we tick chunks more than we load chunks
 
 diff --git a/src/main/java/io/papermc/paper/util/player/NearbyPlayers.java b/src/main/java/io/papermc/paper/util/player/NearbyPlayers.java
-index 17ba07cbd4792f63d88ce29d00da280f30c4abff..8e8aad958c96fa1df3d906ec120a89adecae38c4 100644
+index f164256d59b761264876ca0c85f812d101bfd5de..10465a33d90a1e43b9dbd7764c895dd39ef11b1a 100644
 --- a/src/main/java/io/papermc/paper/util/player/NearbyPlayers.java
 +++ b/src/main/java/io/papermc/paper/util/player/NearbyPlayers.java
 @@ -106,6 +106,14 @@ public final class NearbyPlayers {
@@ -30,10 +30,10 @@ index 17ba07cbd4792f63d88ce29d00da280f30c4abff..8e8aad958c96fa1df3d906ec120a89ad
          final TrackedChunk chunk = this.byChunk.get(CoordinateUtils.getChunkKey(chunkX, chunkZ));
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 44ada45d9bf2d9b48e5de1c3cb1a855902f3884b..22213a52c5d546145d8b8de929af61e49d40375d 100644
+index 366c0c9b45a819f7f94ebe3e49b8ab7f9edf9ce7..53bce70f5cc14672d41618747d3919429896001f 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -617,7 +617,7 @@ public class ServerChunkCache extends ChunkSource {
+@@ -609,7 +609,7 @@ public class ServerChunkCache extends ChunkSource {
  
                      // Paper start - optimise chunk tick iteration
                      com.destroystokyo.paper.util.maplist.ReferenceList<ServerPlayer> playersNearby

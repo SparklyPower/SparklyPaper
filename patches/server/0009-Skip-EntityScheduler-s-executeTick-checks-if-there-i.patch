@@ -73,18 +73,20 @@ index 62484ebf4550b05182f693a3180bbac5d5fd906d..67800e426445060a8343e27a7452b8d7
                  throw new IllegalStateException("Ticking retired scheduler");
              }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f1c65967b74e79452870438eea0942cc700fe0e9..4820e5ae050966d89a0d0b587c83537d4a1e1393 100644
+index 8f250966ab5e4576e3a57beba2e417d53713e84e..3aab37ae2ef5a359b09c885f0988aa7be84b0159 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -314,6 +314,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-     // Paper start - lag compensation
-     public static final long SERVER_INIT = System.nanoTime();
-     // Paper end - lag compensation
+@@ -312,7 +312,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     public volatile Thread shutdownThread; // Paper
+     public volatile boolean abnormalExit = false; // Paper
+     public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
+-
 +    public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
- 
++    
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-@@ -1640,6 +1641,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         Thread thread = new io.papermc.paper.util.TickThread(() -> { // Paper - rewrite chunk system
+@@ -1637,6 +1638,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          MinecraftTimings.bukkitSchedulerTimer.stopTiming(); // Spigot // Paper
          // Paper start - Folia scheduler API
          ((io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler) Bukkit.getGlobalRegionScheduler()).tick();
@@ -101,9 +103,9 @@ index f1c65967b74e79452870438eea0942cc700fe0e9..4820e5ae050966d89a0d0b587c83537d
 +        }
 +        /*
          getAllLevels().forEach(level -> {
-             for (final Entity entity : level.getEntityLookup().getAllCopy()) {
+             for (final Entity entity : level.getEntityLookup().getAllCopy()) { // Paper - rewrite chunk system
                  if (entity.isRemoved()) {
-@@ -1651,6 +1664,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1648,6 +1661,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  }
              }
          });
@@ -113,7 +115,7 @@ index f1c65967b74e79452870438eea0942cc700fe0e9..4820e5ae050966d89a0d0b587c83537d
          io.papermc.paper.adventure.providers.ClickCallbackProviderImpl.CALLBACK_MANAGER.handleQueue(this.tickCount); // Paper
          this.profiler.push("commandFunctions");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 1727e932ac6b9ca09b5df96f9547ff125114e15a..bcb1f764702dce94e9989c2a3cb745ff6e60753b 100644
+index 8698104e3eb98e2cc5da5de87a8f538860c1d91d..72debf1e3da28531420e13b3c2eb8ef0cfe070d0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -68,7 +68,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {

@@ -14,11 +14,11 @@ This seems stupid, but it does seem that it improves the performance a bit, and 
 We also create a "canSee" method tailored for "ChunkMap#updatePlayer()", a method without the equals check (the "updatePlayer()" already checks if the entity is the same entity) because the CraftPlayer's `equals()` check is a *bit* expensive compared to only checking the object's identity, and because the identity has already been check, we don't need to check it twice.
 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index d9cd497bc1b654030ff1a597f038b6a881df9f6b..5c70baf0113004e5c5cbc2fd6a6d34c75cf65217 100644
+index 5a7278b093e37b95fb005ad5cc3cac90ac36f8fb..6f886a44c4320df46c86f62ce2d6f070a9ca877f 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1435,7 +1435,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
-                 // Paper end - check Y
+@@ -1425,7 +1425,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+                 // Paper end - Configurable entity tracking range by Y
  
                  // CraftBukkit start - respect vanish API
 -                if (flag && !player.getBukkitEntity().canSee(this.entity.getBukkitEntity())) { // Paper - only consider hits
@@ -27,19 +27,19 @@ index d9cd497bc1b654030ff1a597f038b6a881df9f6b..5c70baf0113004e5c5cbc2fd6a6d34c7
                  }
                  // CraftBukkit end
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index da63b4050be25dcb91d04df8c2fcc643cbb0751d..bd4ca61dd2bb238bb05a64724e9926ede7063eef 100644
+index 206520f6f20b2e48b1eefdd4edb26510b88e4c92..715d9811a58a9224c72a923e4a74c76bd2b1e5f0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -181,7 +181,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -187,7 +187,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      private boolean hasPlayedBefore = false;
      private final ConversationTracker conversationTracker = new ConversationTracker();
      private final Set<String> channels = new HashSet<String>();
 -    private final Map<UUID, Set<WeakReference<Plugin>>> invertedVisibilityEntities = new HashMap<>();
 +    private final Map<UUID, Set<WeakReference<Plugin>>> invertedVisibilityEntities = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(); // SparklyPaper - optimize canSee checks
-     private final Set<UUID> unlistedEntities = new HashSet<>(); // Paper
+     private final Set<UUID> unlistedEntities = new HashSet<>(); // Paper - Add Listing API for Player
      private static final WeakHashMap<Plugin, WeakReference<Plugin>> pluginWeakReferences = new WeakHashMap<>();
      private int hash = 0;
-@@ -2138,9 +2138,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2141,9 +2141,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(org.bukkit.entity.Entity entity) {

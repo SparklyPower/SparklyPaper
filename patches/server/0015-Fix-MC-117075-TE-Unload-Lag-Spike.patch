@@ -8,19 +8,19 @@ We replaced the `blockEntityTickers` list with a custom list based on fastutil's
 This is WAY FASTER than using `removeAll` with a list of entries to be removed, because we don't need to calculate the identity of each block entity to be removed, and we can jump directly to where the search should begin, giving a performance boost for small removals (because we don't need to loop thru the entire list to find what element should be removed) and a performance boost for big removals (no need to calculate the identity of each block entity).
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index ed736827a7741a54e3a712cf5fcd19195aebaee5..7681bce91247c13c8211ed6fd2a2998b815604f0 100644
+index 06fe87cf8bd0e48885ae5f1773bcd603b4335b5e..3558e39fe8bde6bb4133cfef211a5bf9251db0de 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -120,7 +120,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -115,7 +115,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      public static final int TICKS_PER_DAY = 24000;
      public static final int MAX_ENTITY_SPAWN_Y = 20000000;
      public static final int MIN_ENTITY_SPAWN_Y = -20000000;
--    protected final List<TickingBlockEntity> blockEntityTickers = Lists.newArrayList(); public final int getTotalTileEntityTickers() { return this.blockEntityTickers.size(); } // Paper
-+    protected final net.sparklypower.sparklypaper.BlockEntityTickersList blockEntityTickers = new net.sparklypower.sparklypaper.BlockEntityTickersList(); public final int getTotalTileEntityTickers() { return this.blockEntityTickers.size(); } // Paper // SparklyPaper - optimize block entity removals
+-    public final List<TickingBlockEntity> blockEntityTickers = Lists.newArrayList(); // Paper - public
++    public final net.sparklypower.sparklypaper.BlockEntityTickersList blockEntityTickers = new net.sparklypower.sparklypaper.BlockEntityTickersList(); // Paper - public // SparklyPaper - optimize block entity removals
      protected final NeighborUpdater neighborUpdater;
      private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
      private boolean tickingBlockEntities;
-@@ -1289,7 +1289,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1284,7 +1284,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              if (tickingblockentity.isRemoved()) {
                  // Spigot start
                  tilesThisCycle--;
@@ -29,7 +29,7 @@ index ed736827a7741a54e3a712cf5fcd19195aebaee5..7681bce91247c13c8211ed6fd2a2998b
                  // Spigot end
              } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) {
                  tickingblockentity.tick();
-@@ -1300,7 +1300,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1295,7 +1295,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  // Paper end - execute chunk tasks during tick
              }
          }
@@ -43,112 +43,6 @@ new file mode 100644
 index 0000000000000000000000000000000000000000..7affec7e343c39a83390ae13ce23f3bfa0db1eb6
 --- /dev/null
 +++ b/src/main/java/net/sparklypower/sparklypaper/BlockEntityTickersList.java
-@@ -0,0 +1,100 @@
-+package net.sparklypower.sparklypaper;
-+
-+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-+import net.minecraft.world.level.block.entity.TickingBlockEntity;
-+
-+import java.util.Arrays;
-+import java.util.Collection;
-+import java.util.HashSet;
-+import java.util.Set;
-+
-+/**
-+ * A list for ServerLevel's blockEntityTickers
-+ *
-+ * This list is behaves identically to ObjectArrayList, but it has an additional method, `removeAllByIndex`, that allows a list of integers to be passed indicating what
-+ * indexes should be deleted from the list
-+ *
-+ * This is faster than using removeAll, since we don't need to compare the identity of each block entity, and faster than looping thru each index manually and deleting with remove,
-+ * since we don't need to resize the array every single remove.
-+ */
-+public final class BlockEntityTickersList extends ObjectArrayList<TickingBlockEntity> {
-+    private final IntOpenHashSet toRemove = new IntOpenHashSet();
-+    private int startSearchFromIndex = -1;
-+
-+    /** Creates a new array list with {@link #DEFAULT_INITIAL_CAPACITY} capacity. */
-+    public BlockEntityTickersList() {
-+        super();
-+    }
-+
-+    /**
-+     * Creates a new array list and fills it with a given collection.
-+     *
-+     * @param c a collection that will be used to fill the array list.
-+     */
-+    public BlockEntityTickersList(final Collection<? extends TickingBlockEntity> c) {
-+        super(c);
-+    }
-+
-+    /**
-+     * Marks an entry as removed
-+     *
-+     * @param index the index of the item on the list to be marked as removed
-+     */
-+    public void markAsRemoved(final int index) {
-+        // The block entities list always loop starting from 0, so we only need to check if the startSearchFromIndex is -1 and that's it
-+        if (this.startSearchFromIndex == -1)
-+            this.startSearchFromIndex = index;
-+        this.toRemove.add(index);
-+    }
-+
-+    /**
-+     * Removes elements that have been marked as removed.
-+     */
-+    public void removeMarkedEntries() {
-+        if (this.startSearchFromIndex == -1) // No entries in the list, skip
-+            return;
-+
-+        removeAllByIndex(startSearchFromIndex, toRemove);
-+        toRemove.clear();
-+        this.startSearchFromIndex = -1; // Reset the start search index
-+    }
-+
-+    /**
-+     * Removes elements by their index.
-+     */
-+    private void removeAllByIndex(final int startSearchFromIndex, final IntOpenHashSet c) { // can't use Set<Integer> because we want to avoid autoboxing when using contains
-+        final int requiredMatches = c.size();
-+        if (requiredMatches == 0)
-+            return; // exit early, we don't need to do anything
-+
-+        final Object[] a = this.a;
-+        int j = startSearchFromIndex;
-+        int matches = 0;
-+        for (int i = startSearchFromIndex; i < size; i++) { // If the user knows the first index to be removed, we can skip a lot of unnecessary comparsions
-+            if (!c.contains(i)) {
-+                // TODO: It can be possible to optimize this loop by tracking the start/finish and then using arraycopy to "skip" the elements,
-+                //  this would optimize cases where the index to be removed are far apart, HOWEVER it does have a big performance impact if you are doing
-+                //  "arraycopy" for each element
-+                a[j++] = a[i];
-+            } else {
-+                matches++;
-+            }
-+
-+            if (matches == requiredMatches) { // Exit the loop if we already removed everything, we don't need to check anything else
-+                // We need to update the final size here, because we know that we already found everything!
-+                // Because we know that the size must be currentSize - requiredMatches (because we have matched everything), let's update the value
-+                // However, we need to copy the rest of the stuff over
-+                if (i != (size - 1)) { // If it isn't the last index...
-+                    // i + 1 because we want to copy the *next* element over
-+                    // and the size - i - 1 is because we want to get the current size, minus the current index (which is i), and then - 1 because we want to copy -1 ahead (remember, we are adding +1 to copy the *next* element)
-+                    System.arraycopy(a, i + 1, a, j, size - i - 1);
-+                }
-+                j = size - requiredMatches;
-+                break;
-+            }
-+        }
-+        Arrays.fill(a, j, size, null);
-+        size = j;
-+    }
-+}
-diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/BlockEntityTickersList.java b/src/main/kotlin/net/sparklypower/sparklypaper/BlockEntityTickersList.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..7affec7e343c39a83390ae13ce23f3bfa0db1eb6
---- /dev/null
-+++ b/src/main/kotlin/net/sparklypower/sparklypaper/BlockEntityTickersList.java
 @@ -0,0 +1,100 @@
 +package net.sparklypower.sparklypaper;
 +

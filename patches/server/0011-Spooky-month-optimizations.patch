@@ -10,22 +10,22 @@ Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies h
 Avoids unnecessary date checks, even tho that this shouldn't really improve performance that much... unless you have a lot of bats/zombies/skeletons spawning.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 4820e5ae050966d89a0d0b587c83537d4a1e1393..f43060555bf02f13268b284606045fce2b3e911a 100644
+index ccf79aef050e2ef1ece1631e5bb165ef7fe3bca6..f2edb992729325140d4b2f6f347c3bd8c6394a77 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -315,6 +315,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-     public static final long SERVER_INIT = System.nanoTime();
-     // Paper end - lag compensation
+@@ -313,6 +313,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     public volatile boolean abnormalExit = false; // Paper
+     public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
      public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
 +    public net.sparklypower.sparklypaper.HalloweenManager halloweenManager = new net.sparklypower.sparklypaper.HalloweenManager(); // SparklyPaper - Spooky month optimizations
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index b69860955a6c1efb68b17e1fc9b0c42771f40e15..734fd1ced38a16649177bb941e76d9ca66dceac5 100644
+index d61cf0d713dcdef5a7081142838ee6960593fe95..4c549a2656183e4e4bbaf3f7d5169f3d258e81ce 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -227,6 +227,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -228,6 +228,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          }
          net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
          // SparklyPaper end
@@ -33,11 +33,11 @@ index b69860955a6c1efb68b17e1fc9b0c42771f40e15..734fd1ced38a16649177bb941e76d9ca
 +        halloweenManager.startHalloweenEpochTask();
 +        halloweenManager.waitUntilEpochHasBeenUpdated();
 +        // SparklyPaper end
-         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // load version history now
-         io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // init PaperBrigadierProvider
-         // Paper end
+         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+         io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // Paper - init PaperBrigadierProvider
+ 
 diff --git a/src/main/java/net/minecraft/world/entity/ambient/Bat.java b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-index 6b614818b14ecfc8fc82b523eeb7e21fdf9bf1ba..2588e7eb1f55d3f01f4f8d794a59f3ba16f5985a 100644
+index 44fa2d4f90389f5526746bd94a2450c03340bd0b..ed4e7673bfcc02d077b61cab5898f4199ada4d03 100644
 --- a/src/main/java/net/minecraft/world/entity/ambient/Bat.java
 +++ b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
 @@ -231,7 +231,7 @@ public class Bat extends AmbientCreature {
@@ -67,11 +67,11 @@ index 6b614818b14ecfc8fc82b523eeb7e21fdf9bf1ba..2588e7eb1f55d3f01f4f8d794a59f3ba
      @Override
      protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
 diff --git a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
-index b319021b22c5dceba6199ed27814b2dcf47b8d50..4e7f19215bafc8ff6b06abc08076a154df5307aa 100644
+index 586e3e92ccc275446df6dbbff9bf010a37a9aa8f..aaab68a2e5f28b4da0cb5bb7bca42ac08fa9d7bb 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
 @@ -162,10 +162,12 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
-         this.setCanPickUpLoot(this.level().paperConfig().entities.behavior.mobsCanAlwaysPickUpLoot.skeletons || randomsource.nextFloat() < 0.55F * difficulty.getSpecialMultiplier()); // Paper
+         this.setCanPickUpLoot(this.level().paperConfig().entities.behavior.mobsCanAlwaysPickUpLoot.skeletons || randomsource.nextFloat() < 0.55F * difficulty.getSpecialMultiplier()); // Paper - Add world settings for mobs picking up loot
          if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
              LocalDate localdate = LocalDate.now();
 -            int i = localdate.get(ChronoField.DAY_OF_MONTH);
@@ -87,7 +87,7 @@ index b319021b22c5dceba6199ed27814b2dcf47b8d50..4e7f19215bafc8ff6b06abc08076a154
                  this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
              }
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Zombie.java b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-index 753defa8f8b48d004a2a53b2fc322fd9c083d95e..cc7073efaa9984c95b125878df94556b1e865c7a 100644
+index 5c40e994007dbf46ebc12c1e6a6ca90379471b74..5a7919f05f0f4785d3ac98df067a53c53a7d4f73 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Zombie.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
 @@ -553,10 +553,11 @@ public class Zombie extends Monster {

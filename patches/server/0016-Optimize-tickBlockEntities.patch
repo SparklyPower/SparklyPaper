@@ -12,10 +12,10 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 7681bce91247c13c8211ed6fd2a2998b815604f0..608259c6092f5353e818b5fbeb0e1a5249ed136b 100644
+index 3558e39fe8bde6bb4133cfef211a5bf9251db0de..1008f136ec24efc588b41fe8bf313c926ca000ed 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1281,6 +1281,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1276,6 +1276,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          boolean flag = this.tickRateManager().runsNormally();
  
          int tilesThisCycle = 0;
@@ -26,7 +26,7 @@ index 7681bce91247c13c8211ed6fd2a2998b815604f0..608259c6092f5353e818b5fbeb0e1a52
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -1291,13 +1295,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1286,13 +1290,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  tilesThisCycle--;
                  this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  // Spigot end
@@ -65,7 +65,7 @@ index 28e3b73507b988f7234cbf29c4024c88180d0aef..427cf73383155c52bca8fb4b32f43029
 +    long getChunkCoordinateKey(); // SparklyPaper - optimize tickBlockEntities
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index fa170cc1ce7011d201295b89718292d696c7fc24..1338f91a85f5db6ce78705a0c48bec8a449a6220 100644
+index 6ec3fc801453fd54c25b642e6fa71c19b463311d..91b538f047428b8836f7ad3b62a0586fb7beb9ec 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 @@ -73,6 +73,13 @@ public class LevelChunk extends ChunkAccess {
@@ -82,7 +82,7 @@ index fa170cc1ce7011d201295b89718292d696c7fc24..1338f91a85f5db6ce78705a0c48bec8a
      };
      private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
      public boolean loaded;
-@@ -1090,7 +1097,7 @@ public class LevelChunk extends ChunkAccess {
+@@ -1089,7 +1096,7 @@ public class LevelChunk extends ChunkAccess {
      }
  
      private <T extends BlockEntity> TickingBlockEntity createTicker(T blockEntity, BlockEntityTicker<T> blockEntityTicker) {
@@ -91,7 +91,7 @@ index fa170cc1ce7011d201295b89718292d696c7fc24..1338f91a85f5db6ce78705a0c48bec8a
      }
  
      @FunctionalInterface
-@@ -1141,6 +1148,13 @@ public class LevelChunk extends ChunkAccess {
+@@ -1140,6 +1147,13 @@ public class LevelChunk extends ChunkAccess {
          public String toString() {
              return this.ticker + " <wrapped>";
          }
@@ -105,7 +105,7 @@ index fa170cc1ce7011d201295b89718292d696c7fc24..1338f91a85f5db6ce78705a0c48bec8a
      }
  
      private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
-@@ -1148,10 +1162,12 @@ public class LevelChunk extends ChunkAccess {
+@@ -1147,10 +1161,12 @@ public class LevelChunk extends ChunkAccess {
          private final T blockEntity;
          private final BlockEntityTicker<T> ticker;
          private boolean loggedInvalidBlockState;
@@ -119,7 +119,7 @@ index fa170cc1ce7011d201295b89718292d696c7fc24..1338f91a85f5db6ce78705a0c48bec8a
          }
  
          @Override
-@@ -1214,5 +1230,12 @@ public class LevelChunk extends ChunkAccess {
+@@ -1213,5 +1229,12 @@ public class LevelChunk extends ChunkAccess {
  
              return "Level ticker for " + s + "@" + this.getPos();
          }

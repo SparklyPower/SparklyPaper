@@ -6,10 +6,10 @@ Subject: [PATCH] Skip dirty stats copy when requesting player stats
 There's literally only one getDirty call. Because the map was only retrieved once, we don't actually need to create a copy of the map just to iterate it, we can just access it directly and clear it manually after use.
 
 diff --git a/src/main/java/net/minecraft/stats/ServerStatsCounter.java b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-index 9bb8d4d7be6a937980aa653db82be084d066a563..e93722fd8b7a97037914beddbace9a0de5dca8b4 100644
+index f890738d3bb9fb5e70a9d323c6cec97f9948f9cf..8685cb5bbfa26b0d77c6fdde8cf2dc8bebc06585 100644
 --- a/src/main/java/net/minecraft/stats/ServerStatsCounter.java
 +++ b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-@@ -85,12 +85,16 @@ public class ServerStatsCounter extends StatsCounter {
+@@ -90,12 +90,16 @@ public class ServerStatsCounter extends StatsCounter {
          this.dirty.add(stat);
      }
  
@@ -26,7 +26,7 @@ index 9bb8d4d7be6a937980aa653db82be084d066a563..e93722fd8b7a97037914beddbace9a0d
  
      public void parseLocal(DataFixer dataFixer, String json) {
          try {
-@@ -238,7 +242,7 @@ public class ServerStatsCounter extends StatsCounter {
+@@ -243,7 +247,7 @@ public class ServerStatsCounter extends StatsCounter {
  
      public void sendStats(ServerPlayer player) {
          Object2IntMap<Stat<?>> object2intmap = new Object2IntOpenHashMap();
@@ -35,7 +35,7 @@ index 9bb8d4d7be6a937980aa653db82be084d066a563..e93722fd8b7a97037914beddbace9a0d
  
          while (iterator.hasNext()) {
              Stat<?> statistic = (Stat) iterator.next();
-@@ -246,6 +250,8 @@ public class ServerStatsCounter extends StatsCounter {
+@@ -251,6 +255,8 @@ public class ServerStatsCounter extends StatsCounter {
              object2intmap.put(statistic, this.getValue(statistic));
          }
  

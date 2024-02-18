@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 50cc3c1e5968d95a21133e4d554a93e181aba0f6..3f0c449c373c015c1cf10165ff402e29e82ac5de 100644
+index 3b86451bdc939aec0ec6b4bf82a789cab38345b4..32fa3dbf6975b1435bbfc7bbd1094687b7e882f7 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -20,7 +20,7 @@ minecraft {
@@ -14,6 +14,6 @@ index 50cc3c1e5968d95a21133e4d554a93e181aba0f6..3f0c449c373c015c1cf10165ff402e29
      implementation("com.squareup:javapoet:1.13.0")
 -    implementation(project(":paper-api"))
 +    implementation(project(":sparklypaper-api")) // SparklyPaper
+     implementation("io.github.classgraph:classgraph:4.8.47")
  }
  
- group = "io.papermc.paper"

@@ -3,7 +3,6 @@ From: MrPowerGamerBR <git@mrpowergamerbr.com>
 Date: Sat, 12 Jun 2021 16:40:34 +0200
 Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
-
 diff --git a/build.gradle.kts b/build.gradle.kts
 index 58da26ad2f128ba0b66f86820f60853f4be352f0..f2c2d7af8d3647879702c27e8a0ee62e76afd6e7 100644
 --- a/build.gradle.kts
@@ -16,10 +15,10 @@ index 58da26ad2f128ba0b66f86820f60853f4be352f0..f2c2d7af8d3647879702c27e8a0ee62e
 +    kotlin("plugin.serialization") version "1.9.10"
      id("com.github.johnrengelman.shadow")
  }
- 
+
 @@ -13,8 +15,15 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
  val alsoShade: Configuration by configurations.creating
- 
+
  dependencies {
 -    implementation(project(":paper-api"))
 -    implementation(project(":paper-mojangapi"))
@@ -66,23 +65,23 @@ index 58da26ad2f128ba0b66f86820f60853f4be352f0..f2c2d7af8d3647879702c27e8a0ee62e
      standardInput = System.`in`
      workingDir = rootProject.layout.projectDirectory
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 34f19ac897a30c0c4e3ab406013fcca1c8b7db93..f1c65967b74e79452870438eea0942cc700fe0e9 100644
+index d06185566b447c432d4dc2e3ba04d121bcdbc71b..8f250966ab5e4576e3a57beba2e417d53713e84e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1866,7 +1866,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1855,7 +1855,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
--        return "Paper"; // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-+        return "SparklyPaper"; // SparklyPaper - SparklyPaper > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+-        return "Paper"; // Paper
++        return "SparklyPaper"; // SparklyPaper // "Paper"; // Paper
      }
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e011cfcdda2e0a609d4158b0454bdf046b04c9d9..3b28e079dcfba5ca3de2aad903f95c142e73e6a3 100644
+index 9f7ed337463cc9bb370a5541d9de5cd8f9c1a78a..404e5715a43068fb3338e7bcef52f8967e1e4bb4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -264,7 +264,7 @@ import javax.annotation.Nullable; // Paper
+@@ -266,7 +266,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -105,7 +104,7 @@ index 774556a62eb240da42e84db4502e2ed43495be17..22e504565de83f976c8b2996f0b2207b
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 40dcdf6885e99b26283a9ea2bd4d4bf6ec358e71..d502b0d45bc950a586049dd5cd242319da5ba721 100644
+index 9e638f72f180ff5ef63ec3dd6cf548c53f7bd4a5..7de20ceb7ba52178b1939deb01dbe3d51a52dfb0 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -155,14 +155,14 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
@@ -126,12 +125,12 @@ index 40dcdf6885e99b26283a9ea2bd4d4bf6ec358e71..d502b0d45bc950a586049dd5cd242319
                  //
                  if ( net.minecraft.world.level.Level.lastPhysicsProblem != null )
                  {
-@@ -190,7 +190,7 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+@@ -189,7 +189,7 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
                  }
                  // Paper end - Different message for short timeout
                  log.log( Level.SEVERE, "------------------------------" );
 -                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Paper!):" ); // Paper
 +                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to SparklyPaper!):" ); // SparklyPaper - branding changes // Paper
-                 io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper // Paper - rewrite chunk system
+                 io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper - rewrite chunk system
                  this.dumpTickingInfo(); // Paper - log detailed tick information
                  WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );

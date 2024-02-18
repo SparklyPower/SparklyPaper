@@ -56,10 +56,10 @@ index 8b5293b0c696ef21d0101493ffa41b60bf0bc86b..601198a33adb29316b0617d5390d1620
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f43060555bf02f13268b284606045fce2b3e911a..f34a9d3a255ee72e2c467376bd1f7bc2a1309443 100644
+index f2edb992729325140d4b2f6f347c3bd8c6394a77..2de67af8952f5299476c1eaa979fdcb3fe7d3203 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1730,7 +1730,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1727,7 +1727,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  worldserver.timings.doTick.startTiming(); // Spigot
@@ -77,10 +77,10 @@ index f43060555bf02f13268b284606045fce2b3e911a..f34a9d3a255ee72e2c467376bd1f7bc2
                  for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
                      regionManager.recalculateRegions();
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 676087c3addd712939c865b39ddb5d9f0bc7ce25..6999dde76bb98f9a1cb74a24fa518d705421e58e 100644
+index 6934e9dac0d69c043b73b7c46d59f2d39b37c67f..9a1f5ce72dbe116c31d9f72a8ad2dfaedf962d7d 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -692,6 +692,12 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -686,6 +686,12 @@ public class ServerLevel extends Level implements WorldGenLevel {
      }
      // Paper end - optimise nearby player retrieval
  

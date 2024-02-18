@@ -11,15 +11,15 @@ now is just updating dirty map/decoration data.
 When no bukkit renderers are added to the map, we also re-use the same packet for all players who are tracking it which avoids a lot of work.
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 35674f92a67f93382103c2766df4b678ba5c862f..bfdd0ce9acfae75a403d3689b391dd8fff7416a0 100644
+index 529ab44baaf573b97cf7e89560c548642733188f..7ee0335b02741f6b06d0c697a19faf479db2ae4b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
 @@ -111,29 +111,42 @@ public class ServerEntity {
  
          Entity entity = this.entity;
  
--        if (!this.trackedPlayers.isEmpty() && entity instanceof ItemFrame) { // Paper - Only tick item frames if players can see it
-+        if (!this.trackedPlayers.isEmpty() && entity instanceof ItemFrame frame && frame.cachedMapId != null) { // Paper - Only tick item frames if players can see it // Paper
+-        if (!this.trackedPlayers.isEmpty() && entity instanceof ItemFrame) { // Paper - Perf: Only tick item frames if players can see it
++        if (!this.trackedPlayers.isEmpty() && entity instanceof ItemFrame frame && frame.cachedMapId != null) { // Paper - Perf: Only tick item frames if players can see it // Paper
              ItemFrame entityitemframe = (ItemFrame) entity;
  
              if (true || this.tickCount % 10 == 0) { // CraftBukkit - Moved below, should always enter this block
@@ -28,7 +28,7 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..bfdd0ce9acfae75a403d3689b391dd8f
  
 -                if (this.level.paperConfig().maps.itemFrameCursorUpdateInterval > 0 && this.tickCount % this.level.paperConfig().maps.itemFrameCursorUpdateInterval == 0 && itemstack.getItem() instanceof MapItem) { // CraftBukkit - Moved this.tickCounter % 10 logic here so item frames do not enter the other blocks // Paper - Make item frame map cursor update interval configurable
 +                if (this.level.paperConfig().maps.itemFrameCursorUpdateInterval > 0 && this.tickCount % this.level.paperConfig().maps.itemFrameCursorUpdateInterval == 0 /*&& itemstack.getItem() instanceof MapItem*/) { // CraftBukkit - Moved this.tickCounter % 10 logic here so item frames do not enter the other blocks // Paper - Make item frame map cursor update interval configurable // Paper - skip redundant getItem
-                     Integer integer = entityitemframe.cachedMapId; // Paper
+                     Integer integer = entityitemframe.cachedMapId; // Paper - Perf: Cache map ids on item frames
                      MapItemSavedData worldmap = MapItem.getSavedData(integer, this.level);
  
                      if (worldmap != null) {
@@ -62,7 +62,7 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..bfdd0ce9acfae75a403d3689b391dd8f
                      }
                  }
  
-@@ -366,6 +379,19 @@ public class ServerEntity {
+@@ -372,6 +385,19 @@ public class ServerEntity {
              }
          }
  
@@ -83,13 +83,13 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..bfdd0ce9acfae75a403d3689b391dd8f
  
      private void sendDirtyEntityData() {
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index 69912c5b300b67394dce3876d2d96872033cf156..bde22dcbc67211a62c2280b0c6cf5b85aa3b96eb 100644
+index 80303f9466b8c7097151be313afc9a383693d18a..4ddcda7783750e485e283a7f7df3f52c9bed5c45 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 @@ -483,6 +483,16 @@ public class ItemFrame extends HangingEntity {
                      }
                      this.setItem(ItemStack.fromBukkitCopy(event.getItemStack()));
-                     // Paper end
+                     // Paper end - Add PlayerItemFrameChangeEvent
 +                    // Paper start - add decoration and mark everything dirty for other players who are already tracking this frame
 +                    final ItemStack item = this.getItem();
 +                    if (item.is(Items.FILLED_MAP)) {
@@ -104,7 +104,7 @@ index 69912c5b300b67394dce3876d2d96872033cf156..bde22dcbc67211a62c2280b0c6cf5b85
                      if (!player.getAbilities().instabuild) {
                          itemstack.shrink(1);
 diff --git a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-index e4c4948e076cd64686dfd16ae0568fafc1437140..fec7d474df8cfc8c36f5a69faac7ad03ad648d45 100644
+index 45269115e63cfc3bd7dc740a5694e2cc7c35bcb1..ad0c4660dd15a7dc6cf3639223dda5d704f96a4c 100644
 --- a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
 +++ b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
 @@ -67,6 +67,16 @@ public class MapItemSavedData extends SavedData {
