@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: alexthvest <alexthvest@gmail.com>
+Date: Sun, 25 Feb 2024 03:09:00 +0300
+Subject: [PATCH] Fix Nether and End portals for non-player entities
+
+Moved changeDimension from ServerLevel tick thread to main tick thread.
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 46a921568dede70e0cf865112a66003501a16562..0e3b9b273173917032ea6897c424201d5380b980 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -467,7 +467,12 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+             ((ServerPlayer) this).changeDimension(worldserver, PlayerTeleportEvent.TeleportCause.END_PORTAL);
+             return;
+         }
+-        this.teleportTo(worldserver, null);
++
++        getBukkitEntity().taskScheduler.schedule(
++            entity -> entity.teleportTo(worldserver, null),
++            entity -> {},
++            0
++        );
+     }
+     // Paper end - make end portalling safe
+     // Paper start - optimise entity tracking
+@@ -826,7 +831,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     // CraftBukkit start
+     public void postTick() {
+         // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
+-        if (false && !(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities // SparklyPaper - parallel world ticking (see issue #9, this is executed in the server level tick for non-player entities)
++        if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities // SparklyPaper - parallel world ticking (see issue #9, this is executed in the server level tick for non-player entities)
+             this.handleNetherPortal();
+         }
+     }
+@@ -3173,7 +3178,12 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+                     if (this instanceof ServerPlayer) {
+                         ((ServerPlayer) this).changeDimension(worldserver1, PlayerTeleportEvent.TeleportCause.NETHER_PORTAL);
+                     } else {
+-                        this.changeDimension(worldserver1);
++                        var destinationWorldServer = worldserver1;
++                        getBukkitEntity().taskScheduler.schedule(
++                            entity -> entity.changeDimension(destinationWorldServer),
++                            entity -> {},
++                            0
++                        );
+                     }
+                     } // Paper - Add EntityPortalReadyEvent
+                     // CraftBukkit end
