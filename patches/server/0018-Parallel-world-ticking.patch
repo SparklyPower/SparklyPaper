@@ -557,7 +557,7 @@ index cb308808906a8cdb127df8284e106e00553473ca..323d41e2bed5e83a26dfe4c88dfce7ed
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 2de67af8952f5299476c1eaa979fdcb3fe7d3203..749bd41a6913cbc6a99e994d2adfa5d9d0c1d7c9 100644
+index 3a1802c5b759604782fd7fcdf434a4c310c4455c..98a0d108c8b64759951b0f428b645642c9542c27 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -314,6 +314,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -570,7 +570,7 @@ index 2de67af8952f5299476c1eaa979fdcb3fe7d3203..749bd41a6913cbc6a99e994d2adfa5d9
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-@@ -1705,55 +1708,116 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1715,55 +1718,116 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.isIteratingOverLevels = true; // Paper - Throw exception on world create while being ticked
          Iterator iterator = this.getAllLevels().iterator(); // Paper - Throw exception on world create while being ticked; move down
@@ -819,7 +819,7 @@ index 53bce70f5cc14672d41618747d3919429896001f..ec27e20d661ecde3992a4b4366cf19b2
                      }
                  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 9a1f5ce72dbe116c31d9f72a8ad2dfaedf962d7d..919f49c4dac25fe129cb0d7ddfd63932aff89c17 100644
+index 439fabd23e8cb968879fdb6959aff6d70b28ec0e..53175d8584e19b1caebd614e0c61356cd227f29d 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -217,6 +217,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
@@ -964,10 +964,10 @@ index 58591bf2f63b9c5e97d9ce4188dff3366968a178..3debae03ef3d6e01699be2f49a43835f
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7edd151e59b 100644
+index 1e5f709115007ff19901c0a6c3cf884d9e4d3a6c..5d1b1da365a8a932094dfc3419019df6fd25ed5b 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
-@@ -134,7 +134,7 @@ public abstract class PlayerList {
+@@ -135,7 +135,7 @@ public abstract class PlayerList {
      private static final SimpleDateFormat BAN_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
      private final MinecraftServer server;
      public final List<ServerPlayer> players = new java.util.concurrent.CopyOnWriteArrayList(); // CraftBukkit - ArrayList -> CopyOnWriteArrayList: Iterator safety
@@ -976,7 +976,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
      private final UserBanList bans;
      private final IpBanList ipBans;
      private final ServerOpList ops;
-@@ -155,7 +155,7 @@ public abstract class PlayerList {
+@@ -156,7 +156,7 @@ public abstract class PlayerList {
  
      // CraftBukkit start
      private CraftServer cserver;
@@ -985,7 +985,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
      public @Nullable String collideRuleTeamName; // Paper - Configurable player collision
  
      public PlayerList(MinecraftServer server, LayeredRegistryAccess<RegistryLayer> registryManager, PlayerDataStorage saveHandler, int maxPlayers) {
-@@ -179,6 +179,7 @@ public abstract class PlayerList {
+@@ -180,6 +180,7 @@ public abstract class PlayerList {
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
  
      public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie clientData) {
@@ -993,7 +993,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
          GameProfile gameprofile = player.getGameProfile();
-@@ -817,6 +818,8 @@ public abstract class PlayerList {
+@@ -818,6 +819,8 @@ public abstract class PlayerList {
      }
  
      public ServerPlayer respawn(ServerPlayer entityplayer, ServerLevel worldserver, boolean flag, Location location, boolean avoidSuffocation, RespawnReason reason, org.bukkit.event.player.PlayerRespawnEvent.RespawnFlag...respawnFlags) {
@@ -1002,7 +1002,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
          // Paper end - Expand PlayerRespawnEvent
          entityplayer.stopRiding(); // CraftBukkit
          this.players.remove(entityplayer);
-@@ -841,6 +844,7 @@ public abstract class PlayerList {
+@@ -842,6 +845,7 @@ public abstract class PlayerList {
          ServerPlayer entityplayer1 = entityplayer;
          org.bukkit.World fromWorld = entityplayer.getBukkitEntity().getWorld();
          entityplayer.wonGame = false;
@@ -1011,10 +1011,10 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index b0b9e07da81ca0c2a0e915afbcd1a50a39e3bf20..f0db55f14388724d81640e6b4ead2429d11207c9 100644
+index 023d1dccc23efbb862c923b925b798ac415d0401..0c7939d709f75e8821eb422fa727740c77add740 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -813,7 +813,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -826,7 +826,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
      // CraftBukkit start
      public void postTick() {
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
@@ -1023,7 +1023,7 @@ index b0b9e07da81ca0c2a0e915afbcd1a50a39e3bf20..f0db55f14388724d81640e6b4ead2429
              this.handleNetherPortal();
          }
      }
-@@ -3960,6 +3960,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -3976,6 +3976,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
              this.teleportPassengers();
              this.setYHeadRot(yaw);
          } else {
@@ -1092,7 +1092,7 @@ index 3aa73cd44aa8c86b78c35bc1788e4f83018c49ed..eac9b4148d0951f7c54ce4ad8ab4d97e
              }
  
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d770541cc 100644
+index 89de470a672cce6f67c454a608d539aace2f2b7f..bc78207d41a61fdfa20753de5478236a5932193e 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -10,6 +10,8 @@ import java.util.function.Consumer;
@@ -1104,7 +1104,15 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
  import net.minecraft.ReportedException;
-@@ -820,7 +822,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -174,6 +176,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+ 
+     public final com.destroystokyo.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
+     public net.sparklypower.sparklypaper.configs.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
++    public com.destroystokyo.paper.util.RedstoneWireTurbo turbo = new com.destroystokyo.paper.util.RedstoneWireTurbo((net.minecraft.world.level.block.RedStoneWireBlock) net.minecraft.world.level.block.Blocks.REDSTONE_WIRE); // SparklyPaper - parallel world ticking (moved to world)
+     public final co.aikar.timings.WorldTimingsHandler timings; // Paper
+     public static BlockPos lastPhysicsProblem; // Spigot
+     private org.spigotmc.TickLimiter entityLimiter;
+@@ -829,7 +832,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      public final LevelChunk getChunk(int chunkX, int chunkZ) { // Paper - final to help inline
          // Paper start - Perf: make sure loaded chunks get the inlined variant of this function
          net.minecraft.server.level.ServerChunkCache cps = ((ServerLevel)this).getChunkSource();
@@ -1113,7 +1121,7 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
              LevelChunk ifLoaded = cps.getChunkAtIfLoadedMainThread(chunkX, chunkZ);
              if (ifLoaded != null) {
                  return ifLoaded;
-@@ -904,6 +906,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -913,6 +916,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      @Override
      public boolean setBlock(BlockPos pos, BlockState state, int flags, int maxUpdateDepth) {
@@ -1121,7 +1129,7 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
          // CraftBukkit start - tree generation
          if (this.captureTreeGeneration) {
              // Paper start - Protect Bedrock and End Portal/Frames from being destroyed
-@@ -1305,7 +1308,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1314,7 +1318,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
                  tickingblockentity.tick();
                  // Paper start - execute chunk tasks during tick
                  if ((this.tileTickPosition & 7) == 0) {
@@ -1130,7 +1138,7 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
                  }
                  // Paper end - execute chunk tasks during tick
                  } // SparklyPaper end
-@@ -1322,7 +1325,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1331,7 +1335,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      public <T extends Entity> void guardEntityTick(Consumer<T> tickConsumer, T entity) {
          try {
              tickConsumer.accept(entity);
@@ -1139,7 +1147,7 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
          } catch (Throwable throwable) {
              if (throwable instanceof ThreadDeath) throw throwable; // Paper
              // Paper start - Prevent block entity and entity crashes
-@@ -1429,6 +1432,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1438,6 +1442,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      @Nullable
      public BlockEntity getBlockEntity(BlockPos blockposition, boolean validate) {
@@ -1147,7 +1155,7 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
          // Paper start - Perf: Optimize capturedTileEntities lookup
          net.minecraft.world.level.block.entity.BlockEntity blockEntity;
          if (!this.capturedTileEntities.isEmpty() && (blockEntity = this.capturedTileEntities.get(blockposition)) != null) {
-@@ -1436,10 +1440,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1445,10 +1450,11 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          }
          // Paper end - Perf: Optimize capturedTileEntities lookup
          // CraftBukkit end
@@ -1160,7 +1168,7 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
          BlockPos blockposition = blockEntity.getBlockPos();
  
          if (!this.isOutsideBuildHeight(blockposition)) {
-@@ -1525,6 +1530,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1534,6 +1540,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      @Override
      public List<Entity> getEntities(@Nullable Entity except, AABB box, Predicate<? super Entity> predicate) {
@@ -1168,7 +1176,7 @@ index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d
          this.getProfiler().incrementCounter("getEntities");
          List<Entity> list = Lists.newArrayList();
          ((ServerLevel)this).getEntityLookup().getEntities(except, box, list, predicate); // Paper - optimise this call
-@@ -1791,8 +1797,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1800,8 +1807,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      }
      public final BlockPos.MutableBlockPos getRandomBlockPosition(int x, int y, int z, int l, BlockPos.MutableBlockPos out) {
          // Paper end
@@ -1230,6 +1238,28 @@ index 1f27ae8abd5891a0b8057b454f2210b088b4e95a..7549cdc77c7738d3aba753c51a11e5a6
              if (((ConfiguredFeature) ((Holder) optional.get()).value()).place(world, world.getChunkSource().getGenerator(), random, pos)) {
                  return true;
              } else {
+diff --git a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
+index b5a71fd4e2f55bf036c2c697da5d50cc90fc657c..3051d9845fd6a9533b90ddca06f25daa76703bd3 100644
+--- a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
+@@ -261,7 +261,7 @@ public class RedStoneWireBlock extends Block {
+ 
+     // Paper start - Optimize redstone (Eigencraft)
+     // The bulk of the new functionality is found in RedstoneWireTurbo.java
+-    com.destroystokyo.paper.util.RedstoneWireTurbo turbo = new com.destroystokyo.paper.util.RedstoneWireTurbo(this);
++    // com.destroystokyo.paper.util.RedstoneWireTurbo turbo = new com.destroystokyo.paper.util.RedstoneWireTurbo(this); // SparklyPaper - parallel world ticking (moved to world)
+ 
+     /*
+      * Modified version of pre-existing updateSurroundingRedstone, which is called from
+@@ -270,7 +270,7 @@ public class RedStoneWireBlock extends Block {
+      */
+     private void updateSurroundingRedstone(Level worldIn, BlockPos pos, BlockState state, BlockPos source) {
+         if (worldIn.paperConfig().misc.redstoneImplementation == io.papermc.paper.configuration.WorldConfiguration.Misc.RedstoneImplementation.EIGENCRAFT) {
+-            turbo.updateSurroundingRedstone(worldIn, pos, state, source);
++            worldIn.turbo.updateSurroundingRedstone(worldIn, pos, state, source); // turbo.updateSurroundingRedstone(worldIn, pos, state, source); // SparklyPaper - parallel world ticking
+             return;
+         }
+         updatePowerStrength(worldIn, pos, state);
 diff --git a/src/main/java/net/minecraft/world/level/block/SaplingBlock.java b/src/main/java/net/minecraft/world/level/block/SaplingBlock.java
 index 3ff0d08e4964aae82d8e51d3b8bf9aa002096f81..069f669a31b8ac5b90341c7ef066b3a32f75fc3c 100644
 --- a/src/main/java/net/minecraft/world/level/block/SaplingBlock.java
@@ -1686,7 +1716,7 @@ index 4b42ef2a876ea210d948238e63fd7a2b7035bb5b..0631fcf5749bfd7ca4ba8bad8a959fb0
          net.minecraft.server.level.ServerLevel level = this.world.getMinecraftWorld();
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
-index 53d466bfa66573f178fd0e0247bcefc04902c38f..be22fd2344a72b3eb3532af3c4c961296d403a3a 100644
+index 7cd0fae59c497861063827eda4243cc6c11e7cff..8d2f84442b8872224a0b3701dbd9876f54890efb 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
 @@ -18,7 +18,7 @@ public abstract class CraftBlockEntityState<T extends BlockEntity> extends Craft
@@ -1759,10 +1789,10 @@ index 8afc396c162d928902a9d9beb9f039b06630f755..4cde4be86dc03ebbfb5c12a910acbf99
          // Paper end
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index d677759ac6b6d3cfe5a2af76dc1f0034b216ac2d..f9ef030ab07f2da56e3b1689b9ec9dbc37975694 100644
+index cb3e9672f375a1a660757a05362729ddb5ca7504..6a6ae69a5b33a16612ee7062cd6c774ebb3f6e41 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -941,7 +941,7 @@ public class CraftEventFactory {
+@@ -942,7 +942,7 @@ public class CraftEventFactory {
          return CraftEventFactory.handleBlockSpreadEvent(world, source, target, block, 2);
      }
  
@@ -1771,7 +1801,7 @@ index d677759ac6b6d3cfe5a2af76dc1f0034b216ac2d..f9ef030ab07f2da56e3b1689b9ec9dbc
  
      public static boolean handleBlockSpreadEvent(LevelAccessor world, BlockPos source, BlockPos target, net.minecraft.world.level.block.state.BlockState block, int flag) {
          // Suppress during worldgen
-@@ -953,7 +953,7 @@ public class CraftEventFactory {
+@@ -954,7 +954,7 @@ public class CraftEventFactory {
          CraftBlockState state = CraftBlockStates.getBlockState(world, target, flag);
          state.setData(block);
  
@@ -1780,7 +1810,7 @@ index d677759ac6b6d3cfe5a2af76dc1f0034b216ac2d..f9ef030ab07f2da56e3b1689b9ec9dbc
          Bukkit.getPluginManager().callEvent(event);
  
          if (!event.isCancelled()) {
-@@ -2126,7 +2126,7 @@ public class CraftEventFactory {
+@@ -2140,7 +2140,7 @@ public class CraftEventFactory {
          CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemStack.copyWithCount(1));
  
          org.bukkit.event.block.BlockDispenseEvent event = new org.bukkit.event.block.BlockDispenseEvent(bukkitBlock, craftItem.clone(), CraftVector.toBukkit(to));
