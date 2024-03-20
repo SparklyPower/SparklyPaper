@@ -819,7 +819,7 @@ index 53bce70f5cc14672d41618747d3919429896001f..ec27e20d661ecde3992a4b4366cf19b2
                      }
                  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 9a1f5ce72dbe116c31d9f72a8ad2dfaedf962d7d..919f49c4dac25fe129cb0d7ddfd63932aff89c17 100644
+index 3ec103bad1356c7851bbb6271d04bcb0cbe994a6..996b690207a7bb9f7ddd1150d4855b6290074735 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -217,6 +217,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
@@ -964,10 +964,10 @@ index 58591bf2f63b9c5e97d9ce4188dff3366968a178..3debae03ef3d6e01699be2f49a43835f
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7edd151e59b 100644
+index 1e5f709115007ff19901c0a6c3cf884d9e4d3a6c..5d1b1da365a8a932094dfc3419019df6fd25ed5b 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
-@@ -134,7 +134,7 @@ public abstract class PlayerList {
+@@ -135,7 +135,7 @@ public abstract class PlayerList {
      private static final SimpleDateFormat BAN_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
      private final MinecraftServer server;
      public final List<ServerPlayer> players = new java.util.concurrent.CopyOnWriteArrayList(); // CraftBukkit - ArrayList -> CopyOnWriteArrayList: Iterator safety
@@ -976,7 +976,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
      private final UserBanList bans;
      private final IpBanList ipBans;
      private final ServerOpList ops;
-@@ -155,7 +155,7 @@ public abstract class PlayerList {
+@@ -156,7 +156,7 @@ public abstract class PlayerList {
  
      // CraftBukkit start
      private CraftServer cserver;
@@ -985,7 +985,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
      public @Nullable String collideRuleTeamName; // Paper - Configurable player collision
  
      public PlayerList(MinecraftServer server, LayeredRegistryAccess<RegistryLayer> registryManager, PlayerDataStorage saveHandler, int maxPlayers) {
-@@ -179,6 +179,7 @@ public abstract class PlayerList {
+@@ -180,6 +180,7 @@ public abstract class PlayerList {
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
  
      public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie clientData) {
@@ -993,7 +993,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
          GameProfile gameprofile = player.getGameProfile();
-@@ -817,6 +818,8 @@ public abstract class PlayerList {
+@@ -818,6 +819,8 @@ public abstract class PlayerList {
      }
  
      public ServerPlayer respawn(ServerPlayer entityplayer, ServerLevel worldserver, boolean flag, Location location, boolean avoidSuffocation, RespawnReason reason, org.bukkit.event.player.PlayerRespawnEvent.RespawnFlag...respawnFlags) {
@@ -1002,7 +1002,7 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
          // Paper end - Expand PlayerRespawnEvent
          entityplayer.stopRiding(); // CraftBukkit
          this.players.remove(entityplayer);
-@@ -841,6 +844,7 @@ public abstract class PlayerList {
+@@ -842,6 +845,7 @@ public abstract class PlayerList {
          ServerPlayer entityplayer1 = entityplayer;
          org.bukkit.World fromWorld = entityplayer.getBukkitEntity().getWorld();
          entityplayer.wonGame = false;
@@ -1011,10 +1011,10 @@ index 91feb12732564c90656da487664dbc12e55397fc..7dc3355c7a40081498b4a3c6a6dca7ed
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index b0b9e07da81ca0c2a0e915afbcd1a50a39e3bf20..f0db55f14388724d81640e6b4ead2429d11207c9 100644
+index b2a5dd7ddeb937b6ad5f9a035ffca6bcb48a6ba4..46a921568dede70e0cf865112a66003501a16562 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -813,7 +813,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -826,7 +826,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
      // CraftBukkit start
      public void postTick() {
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
@@ -1023,7 +1023,7 @@ index b0b9e07da81ca0c2a0e915afbcd1a50a39e3bf20..f0db55f14388724d81640e6b4ead2429
              this.handleNetherPortal();
          }
      }
-@@ -3960,6 +3960,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -3976,6 +3976,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
              this.teleportPassengers();
              this.setYHeadRot(yaw);
          } else {
@@ -1092,7 +1092,7 @@ index 3aa73cd44aa8c86b78c35bc1788e4f83018c49ed..eac9b4148d0951f7c54ce4ad8ab4d97e
              }
  
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 1008f136ec24efc588b41fe8bf313c926ca000ed..5d73bd30d6c48effd5977c7ae6a4d85d770541cc 100644
+index aa2459f48592c8c960f602ccf84db919ef50cdd9..f7222f8f0a2a2ee4e8c4769d1cccb6cc3a643bcc 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -10,6 +10,8 @@ import java.util.function.Consumer;
@@ -1759,10 +1759,10 @@ index 8afc396c162d928902a9d9beb9f039b06630f755..4cde4be86dc03ebbfb5c12a910acbf99
          // Paper end
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index d677759ac6b6d3cfe5a2af76dc1f0034b216ac2d..f9ef030ab07f2da56e3b1689b9ec9dbc37975694 100644
+index 4c2e8129481384a143384d327e14320023735b1a..da3e9f87b48215371444ff481de0db5b5bf6beda 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -941,7 +941,7 @@ public class CraftEventFactory {
+@@ -942,7 +942,7 @@ public class CraftEventFactory {
          return CraftEventFactory.handleBlockSpreadEvent(world, source, target, block, 2);
      }
  
@@ -1771,7 +1771,7 @@ index d677759ac6b6d3cfe5a2af76dc1f0034b216ac2d..f9ef030ab07f2da56e3b1689b9ec9dbc
  
      public static boolean handleBlockSpreadEvent(LevelAccessor world, BlockPos source, BlockPos target, net.minecraft.world.level.block.state.BlockState block, int flag) {
          // Suppress during worldgen
-@@ -953,7 +953,7 @@ public class CraftEventFactory {
+@@ -954,7 +954,7 @@ public class CraftEventFactory {
          CraftBlockState state = CraftBlockStates.getBlockState(world, target, flag);
          state.setData(block);
  
@@ -1780,7 +1780,7 @@ index d677759ac6b6d3cfe5a2af76dc1f0034b216ac2d..f9ef030ab07f2da56e3b1689b9ec9dbc
          Bukkit.getPluginManager().callEvent(event);
  
          if (!event.isCancelled()) {
-@@ -2126,7 +2126,7 @@ public class CraftEventFactory {
+@@ -2142,7 +2142,7 @@ public class CraftEventFactory {
          CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemStack.copyWithCount(1));
  
          org.bukkit.event.block.BlockDispenseEvent event = new org.bukkit.event.block.BlockDispenseEvent(bukkitBlock, craftItem.clone(), CraftVector.toBukkit(to));

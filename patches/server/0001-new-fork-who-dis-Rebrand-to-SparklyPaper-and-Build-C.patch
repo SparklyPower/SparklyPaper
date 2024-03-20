@@ -3,8 +3,9 @@ From: MrPowerGamerBR <git@mrpowergamerbr.com>
 Date: Sat, 12 Jun 2021 16:40:34 +0200
 Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
+
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 58da26ad2f128ba0b66f86820f60853f4be352f0..f2c2d7af8d3647879702c27e8a0ee62e76afd6e7 100644
+index 241808d8619e17c0681f79acbbc98af5bf52dd89..d7bf3d87a67f44da74c4ff2788c0726b6394cf57 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import io.papermc.paperweight.util.*
@@ -15,10 +16,10 @@ index 58da26ad2f128ba0b66f86820f60853f4be352f0..f2c2d7af8d3647879702c27e8a0ee62e
 +    kotlin("plugin.serialization") version "1.9.10"
      id("com.github.johnrengelman.shadow")
  }
-
+ 
 @@ -13,8 +15,15 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
  val alsoShade: Configuration by configurations.creating
-
+ 
  dependencies {
 -    implementation(project(":paper-api"))
 -    implementation(project(":paper-mojangapi"))
@@ -34,7 +35,7 @@ index 58da26ad2f128ba0b66f86820f60853f4be352f0..f2c2d7af8d3647879702c27e8a0ee62e
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -64,13 +73,18 @@ tasks.jar {
+@@ -65,13 +74,18 @@ tasks.jar {
      manifest {
          val git = Git(rootProject.layout.projectDirectory.path)
          val gitHash = git("rev-parse", "--short=7", "HEAD").getText().trim()
@@ -55,7 +56,7 @@ index 58da26ad2f128ba0b66f86820f60853f4be352f0..f2c2d7af8d3647879702c27e8a0ee62e
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-@@ -154,7 +168,7 @@ fun TaskContainer.registerRunTask(
+@@ -155,7 +169,7 @@ fun TaskContainer.registerRunTask(
      name: String,
      block: JavaExec.() -> Unit
  ): TaskProvider<JavaExec> = register<JavaExec>(name) {
