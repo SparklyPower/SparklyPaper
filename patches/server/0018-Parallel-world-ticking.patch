@@ -1239,7 +1239,7 @@ index 1f27ae8abd5891a0b8057b454f2210b088b4e95a..7549cdc77c7738d3aba753c51a11e5a6
                  return true;
              } else {
 diff --git a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
-index b5a71fd4e2f55bf036c2c697da5d50cc90fc657c..3051d9845fd6a9533b90ddca06f25daa76703bd3 100644
+index b5a71fd4e2f55bf036c2c697da5d50cc90fc657c..16759699834b6318927538e6d46e2f300156fc4f 100644
 --- a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
 @@ -261,7 +261,7 @@ public class RedStoneWireBlock extends Block {
@@ -1260,6 +1260,15 @@ index b5a71fd4e2f55bf036c2c697da5d50cc90fc657c..3051d9845fd6a9533b90ddca06f25daa
              return;
          }
          updatePowerStrength(worldIn, pos, state);
+@@ -361,7 +361,7 @@ public class RedStoneWireBlock extends Block {
+                 // [Space Walker] suppress shape updates and emit those manually to
+                 // bypass the new neighbor update stack.
+                 if (worldIn.setBlock(pos1, state, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_CLIENTS))
+-                    turbo.updateNeighborShapes(worldIn, pos1, state);
++                    worldIn.turbo.updateNeighborShapes(worldIn, pos1, state); // turbo.updateNeighborShapes(worldIn, pos1, state); // SparklyPaper - parallel world ticking
+             }
+         }
+ 
 diff --git a/src/main/java/net/minecraft/world/level/block/SaplingBlock.java b/src/main/java/net/minecraft/world/level/block/SaplingBlock.java
 index 3ff0d08e4964aae82d8e51d3b8bf9aa002096f81..069f669a31b8ac5b90341c7ef066b3a32f75fc3c 100644
 --- a/src/main/java/net/minecraft/world/level/block/SaplingBlock.java
