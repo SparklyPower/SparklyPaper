@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 241808d8619e17c0681f79acbbc98af5bf52dd89..d7bf3d87a67f44da74c4ff2788c0726b6394cf57 100644
+index bcfe59b6efb628ee1e7f9d60667360d4d885fb6a..fad6e6cbbd1e7ea3bb83374cb7e7a1bfac46ead1 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import io.papermc.paperweight.util.*
@@ -56,7 +56,7 @@ index 241808d8619e17c0681f79acbbc98af5bf52dd89..d7bf3d87a67f44da74c4ff2788c0726b
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-@@ -155,7 +169,7 @@ fun TaskContainer.registerRunTask(
+@@ -150,7 +164,7 @@ fun TaskContainer.registerRunTask(
      name: String,
      block: JavaExec.() -> Unit
  ): TaskProvider<JavaExec> = register<JavaExec>(name) {
@@ -66,7 +66,7 @@ index 241808d8619e17c0681f79acbbc98af5bf52dd89..d7bf3d87a67f44da74c4ff2788c0726b
      standardInput = System.`in`
      workingDir = rootProject.layout.projectDirectory
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 93b661e9cb7743aeff7da3972942cb73049a5e4c..2ed30382cb42c1957e6666a2320a4b013acd3b02 100644
+index 2dc07e5ef249636e85ad9c78e3729e9e066a8fe8..9a36662c8db97ad66e4d0528fa7651356e412757 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1865,7 +1865,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

@@ -12,7 +12,7 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index aa92150c67240ff99b7903072518ed0628c394ae..89de470a672cce6f67c454a608d539aace2f2b7f 100644
+index 0bccd7c93aaaac1f8441065361546062f3a6b962..fcb7c4937fc7684c0f5d9677af9c276fedb20361 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -1285,6 +1285,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -65,7 +65,7 @@ index 28e3b73507b988f7234cbf29c4024c88180d0aef..427cf73383155c52bca8fb4b32f43029
 +    long getChunkCoordinateKey(); // SparklyPaper - optimize tickBlockEntities
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index 6ec3fc801453fd54c25b642e6fa71c19b463311d..91b538f047428b8836f7ad3b62a0586fb7beb9ec 100644
+index 465458e8a7dbaf9afb32709a71c7b2620d1e1fd2..5fc876f1fa9a64eb2fcc33b48c0f8bdf82bd2c24 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 @@ -73,6 +73,13 @@ public class LevelChunk extends ChunkAccess {
@@ -119,7 +119,7 @@ index 6ec3fc801453fd54c25b642e6fa71c19b463311d..91b538f047428b8836f7ad3b62a0586f
          }
  
          @Override
-@@ -1213,5 +1229,12 @@ public class LevelChunk extends ChunkAccess {
+@@ -1218,5 +1234,12 @@ public class LevelChunk extends ChunkAccess {
  
              return "Level ticker for " + s + "@" + this.getPos();
          }
