@@ -5,10 +5,10 @@ Subject: [PATCH] Blazingly Simple Farm Checks
 
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 3aab37ae2ef5a359b09c885f0988aa7be84b0159..ccf79aef050e2ef1ece1631e5bb165ef7fe3bca6 100644
+index 1148b3ab0a582fff17f0101516df4b5037b49aba..9bcd4069eed4fcfce82cab01a7c116dfe0cd8911 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -313,7 +313,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -317,7 +317,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public volatile boolean abnormalExit = false; // Paper
      public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
      public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
@@ -18,7 +18,7 @@ index 3aab37ae2ef5a359b09c885f0988aa7be84b0159..ccf79aef050e2ef1ece1631e5bb165ef
          AtomicReference<S> atomicreference = new AtomicReference();
          Thread thread = new io.papermc.paper.util.TickThread(() -> { // Paper - rewrite chunk system
 diff --git a/src/main/java/net/minecraft/world/level/block/CropBlock.java b/src/main/java/net/minecraft/world/level/block/CropBlock.java
-index 5b96d1ae4bd8546311e986bc312b1f85883a67f4..ec20b138642b080c9d0050cbdb8c6d593264ecd5 100644
+index 112d2feba5f75a2a873b595617780515945c10e4..d19d6e0082c3dba2581aab4911cfe9d36dc22453 100644
 --- a/src/main/java/net/minecraft/world/level/block/CropBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/CropBlock.java
 @@ -81,6 +81,57 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
@@ -89,12 +89,12 @@ index 5b96d1ae4bd8546311e986bc312b1f85883a67f4..ec20b138642b080c9d0050cbdb8c6d59
          }
  
 diff --git a/src/main/java/net/minecraft/world/level/block/FarmBlock.java b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
-index 6e4c852c93f2418ea69e485ed3a10cbe3a6e3bd2..fc2703fcf1639a85518330e4ffcd0c23fd6e118f 100644
+index d59e33e7326489c6d55d316d0130f22235f4c63c..3a2c875f8131fc4a30807a69f426b6acb5deb557 100644
 --- a/src/main/java/net/minecraft/world/level/block/FarmBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
-@@ -92,6 +92,19 @@ public class FarmBlock extends Block {
+@@ -93,6 +93,19 @@ public class FarmBlock extends Block {
      @Override
-     public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+     protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
          int i = (Integer) state.getValue(FarmBlock.MOISTURE);
 +        // SparklyPaper start - Blazingly simple farm checks
 +        if (world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {
@@ -112,7 +112,7 @@ index 6e4c852c93f2418ea69e485ed3a10cbe3a6e3bd2..fc2703fcf1639a85518330e4ffcd0c23
          if (i > 0 && world.paperConfig().tickRates.wetFarmland != 1 && (world.paperConfig().tickRates.wetFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % world.paperConfig().tickRates.wetFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
          if (i == 0 && world.paperConfig().tickRates.dryFarmland != 1 && (world.paperConfig().tickRates.dryFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % world.paperConfig().tickRates.dryFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
  
-@@ -150,7 +163,7 @@ public class FarmBlock extends Block {
+@@ -151,7 +164,7 @@ public class FarmBlock extends Block {
          return world.getBlockState(pos.above()).is(BlockTags.MAINTAINS_FARMLAND);
      }
  
@@ -122,12 +122,12 @@ index 6e4c852c93f2418ea69e485ed3a10cbe3a6e3bd2..fc2703fcf1639a85518330e4ffcd0c23
          int xOff = pos.getX();
          int yOff = pos.getY();
 diff --git a/src/main/java/net/minecraft/world/level/block/StemBlock.java b/src/main/java/net/minecraft/world/level/block/StemBlock.java
-index 121a872cd750a87b779895687ae1abf5bb77b088..a5d1931dc80febe74601d7a8f2d975c702b357aa 100644
+index 924d80eb41d9a71d1e521c40742557251cf51832..e79ab379ac4ed5cde82a144a83c0326c8b3a6349 100644
 --- a/src/main/java/net/minecraft/world/level/block/StemBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/StemBlock.java
 @@ -73,6 +73,56 @@ public class StemBlock extends BushBlock implements BonemealableBlock {
      @Override
-     public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+     protected void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
          if (world.getRawBrightness(pos, 0) >= 9) {
 +            // SparklyPaper start - Blazingly simple farm checks
 +            if (world.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {

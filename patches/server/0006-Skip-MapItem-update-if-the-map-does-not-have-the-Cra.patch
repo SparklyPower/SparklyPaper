@@ -9,15 +9,15 @@ Optimizes "image in map" maps, without requiring the map to be locked, which som
 This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, but that's not a huuuge problem for us
 
 diff --git a/src/main/java/net/minecraft/world/item/MapItem.java b/src/main/java/net/minecraft/world/item/MapItem.java
-index 797415866a7f182d804f6b8e57ceb07a6ac2a20a..fc824f471e5d814cb3eee48516731c2b001fb54e 100644
+index ce461b1a8d7fab87ae28e30205f6fab67f1808b6..7891187eb974c3fb5ebe831ab01db6ab4c5be3bf 100644
 --- a/src/main/java/net/minecraft/world/item/MapItem.java
 +++ b/src/main/java/net/minecraft/world/item/MapItem.java
-@@ -324,7 +324,7 @@ public class MapItem extends ComplexItem {
-                     worldmap.tickCarriedBy(entityhuman, stack);
+@@ -276,7 +276,7 @@ public class MapItem extends ComplexItem {
+                     mapItemSavedData.tickCarriedBy(player, stack);
                  }
  
--                if (!worldmap.locked && (selected || entity instanceof Player && ((Player) entity).getOffhandItem() == stack)) {
-+                if (!worldmap.locked && (!world.sparklyPaperConfig.getSkipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer() || worldmap.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) && (selected || entity instanceof Player && ((Player) entity).getOffhandItem() == stack)) { // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
-                     this.update(world, entity, worldmap);
+-                if (!mapItemSavedData.locked && (selected || entity instanceof Player && ((Player)entity).getOffhandItem() == stack)) {
++                if (!mapItemSavedData.locked && (!world.sparklyPaperConfig.getSkipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer() || mapItemSavedData.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) && (selected || entity instanceof Player && ((Player)entity).getOffhandItem() == stack)) { // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
+                     this.update(world, entity, mapItemSavedData);
                  }
- 
+             }

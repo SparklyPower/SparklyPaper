@@ -10,10 +10,10 @@ Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies h
 Avoids unnecessary date checks, even tho that this shouldn't really improve performance that much... unless you have a lot of bats/zombies/skeletons spawning.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index ccf79aef050e2ef1ece1631e5bb165ef7fe3bca6..f2edb992729325140d4b2f6f347c3bd8c6394a77 100644
+index 9bcd4069eed4fcfce82cab01a7c116dfe0cd8911..b635a473d2a19bbefc24e86455ec6735b9a8c9cc 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -313,6 +313,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -317,6 +317,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public volatile boolean abnormalExit = false; // Paper
      public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
      public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
@@ -22,10 +22,10 @@ index ccf79aef050e2ef1ece1631e5bb165ef7fe3bca6..f2edb992729325140d4b2f6f347c3bd8
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index d61cf0d713dcdef5a7081142838ee6960593fe95..4c549a2656183e4e4bbaf3f7d5169f3d258e81ce 100644
+index ac8565be2334efe48d5bdc3f58bf60fb9f715da7..859faaf21635caca2a2ab471ac3d4569f04ba69b 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -228,6 +228,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -241,6 +241,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          }
          net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
          // SparklyPaper end
@@ -34,13 +34,13 @@ index d61cf0d713dcdef5a7081142838ee6960593fe95..4c549a2656183e4e4bbaf3f7d5169f3d
 +        halloweenManager.waitUntilEpochHasBeenUpdated();
 +        // SparklyPaper end
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
-         io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // Paper - init PaperBrigadierProvider
  
+         this.setPvpAllowed(dedicatedserverproperties.pvp);
 diff --git a/src/main/java/net/minecraft/world/entity/ambient/Bat.java b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-index 44fa2d4f90389f5526746bd94a2450c03340bd0b..ed4e7673bfcc02d077b61cab5898f4199ada4d03 100644
+index dc27ddf5131e7398a5390a5187261d4c7fb6ccaa..6c8664c9cf75a88007e43348059fad7e5c60f963 100644
 --- a/src/main/java/net/minecraft/world/entity/ambient/Bat.java
 +++ b/src/main/java/net/minecraft/world/entity/ambient/Bat.java
-@@ -231,7 +231,7 @@ public class Bat extends AmbientCreature {
+@@ -229,7 +229,7 @@ public class Bat extends AmbientCreature {
              int i = world.getMaxLocalRawBrightness(pos);
              byte b0 = 4;
  
@@ -49,7 +49,7 @@ index 44fa2d4f90389f5526746bd94a2450c03340bd0b..ed4e7673bfcc02d077b61cab5898f419
                  b0 = 7;
              } else if (random.nextBoolean()) {
                  return false;
-@@ -241,6 +241,8 @@ public class Bat extends AmbientCreature {
+@@ -239,6 +239,8 @@ public class Bat extends AmbientCreature {
          }
      }
  
@@ -58,19 +58,19 @@ index 44fa2d4f90389f5526746bd94a2450c03340bd0b..ed4e7673bfcc02d077b61cab5898f419
      private static boolean isHalloween() {
          LocalDate localdate = LocalDate.now();
          int i = localdate.get(ChronoField.DAY_OF_MONTH);
-@@ -248,6 +250,7 @@ public class Bat extends AmbientCreature {
+@@ -246,6 +248,7 @@ public class Bat extends AmbientCreature {
  
          return j == 10 && i >= 20 || j == 11 && i <= 3;
      }
 +    */
  
-     @Override
-     protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
+     private void setupAnimationStates() {
+         if (this.isResting()) {
 diff --git a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
-index 586e3e92ccc275446df6dbbff9bf010a37a9aa8f..aaab68a2e5f28b4da0cb5bb7bca42ac08fa9d7bb 100644
+index 0c5fe46d2da113beff3e220843593d616e37d4ca..26b81b6a0111e2149020b8a8f934f2660f59780e 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
-@@ -162,10 +162,12 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
+@@ -154,10 +154,12 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
          this.setCanPickUpLoot(this.level().paperConfig().entities.behavior.mobsCanAlwaysPickUpLoot.skeletons || randomsource.nextFloat() < 0.55F * difficulty.getSpecialMultiplier()); // Paper - Add world settings for mobs picking up loot
          if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
              LocalDate localdate = LocalDate.now();
@@ -87,10 +87,10 @@ index 586e3e92ccc275446df6dbbff9bf010a37a9aa8f..aaab68a2e5f28b4da0cb5bb7bca42ac0
                  this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
              }
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Zombie.java b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-index 5c40e994007dbf46ebc12c1e6a6ca90379471b74..5a7919f05f0f4785d3ac98df067a53c53a7d4f73 100644
+index e42dfc62bb179be1ab01b0096c05c6549d38abbc..14292ee06e065b0043f5cb087072e3d0fa11291a 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Zombie.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-@@ -553,10 +553,11 @@ public class Zombie extends Monster {
+@@ -542,10 +542,11 @@ public class Zombie extends Monster {
  
          if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
              LocalDate localdate = LocalDate.now();
