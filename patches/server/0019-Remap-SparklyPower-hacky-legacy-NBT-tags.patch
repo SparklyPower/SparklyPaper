@@ -27,7 +27,7 @@ index a5a21d1c7579e45b78eae4b42a9f023db74acc0a..921947048648ff4555b80be4ef669a6d
  
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/LegacyNBTRemapper.kt b/src/main/kotlin/net/sparklypower/sparklypaper/LegacyNBTRemapper.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..194d1ed887c389dc50648d0c05c2d71de2691c09
+index 0000000000000000000000000000000000000000..399225fb883b9771084689d00723d944a89b0902
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/LegacyNBTRemapper.kt
 @@ -0,0 +1,95 @@
@@ -99,19 +99,19 @@ index 0000000000000000000000000000000000000000..194d1ed887c389dc50648d0c05c2d71d
 +            }
 +
 +            perfectDreamsMap.getStringAndRemove("isMochila")?.let {
-+                publicBukkitValuesMap.setBoolean("is_mochila", it.toBoolean())
++                publicBukkitValuesMap.setBoolean("sparklypower:is_mochila", it.toBoolean())
 +            }
 +
 +            perfectDreamsMap.getStringAndRemove("mochilaId")?.let {
-+                publicBukkitValuesMap.setLong("mochila_id", it.toLong())
++                publicBukkitValuesMap.setLong("sparklypower:mochila_id", it.toLong())
 +            }
 +
 +            perfectDreamsMap.getStringAndRemove("customMapOwner")?.let {
-+                publicBukkitValuesMap.setString("map_custom_owner", it)
++                publicBukkitValuesMap.setString("sparklypower:map_custom_owner", it)
 +            }
 +
 +            perfectDreamsMap.getStringAndRemove("quickTeleport")?.let {
-+                publicBukkitValuesMap.setBoolean("is_quick_resources_teleport", it.toBoolean())
++                publicBukkitValuesMap.setBoolean("sparklypower:is_quick_resources_teleport", it.toBoolean())
 +            }
 +
 +            // If it is empty, then it means that we have migrated everything and we can remove the old PerfectDreams tag, yay!
