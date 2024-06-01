@@ -108,6 +108,8 @@ If you only care about some of the patches included in SparklyPaper, it is bette
 
 There are two kinds of builds: One with the Parallel World Ticking feature, and another without it. If you don't want to risk using a very experimental feature that may lead to server crashes and corruption, or if you aren't a developer that can't fix plugin issues related to the feature, then use the version without Parallel World Ticking! (We do run Parallel World Ticking in production @ SparklyPower tho, we live on the edge :3)
 
+It is recommended to use a Mojang mapped (mojmap) version unless if you *really* have a reason (example: plugins that break on a mojmap JAR) to use a Spigot mapped (reobf) version. Paper, since 1.20.5, provides a mojmapped server JAR and remaps any class/field/Reflection access made by non-mojmap aware plugins, so things (hopefully!) shouldn't break.
+
 * **SparklyPaper:** https://github.com/SparklyPower/SparklyPaper/actions/workflows/build.yml
 * **SparklyPaper (without Parallel World Ticking):** https://github.com/SparklyPower/SparklyPaper/actions/workflows/build-without-pwt.yml
 
