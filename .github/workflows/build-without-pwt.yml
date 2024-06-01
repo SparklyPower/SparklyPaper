@@ -34,12 +34,12 @@ jobs:
         run: ./gradlew -PsparklypaperImplementationVersionSuffix=without-pwt build
       - name: Create Paperclip JAR
         run: ./gradlew -PsparklypaperImplementationVersionSuffix=without-pwt createMojmapPaperclipJar createReobfPaperclipJar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         name: "Upload Mojang Mappings Paperclip JAR"
         with:
           name: SparklyPaper (without Parallel World Ticking) Paperclip (Mojang Mappings - mojmap)
           path: "build/libs/SparklyPaper-paperclip-*-mojmap.jar"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         name: "Upload Spigot Mappings (reobf) Paperclip JAR"
         with:
           name: SparklyPaper (without Parallel World Ticking) Paperclip (Spigot Mappings - reobf)

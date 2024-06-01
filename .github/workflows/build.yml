@@ -32,12 +32,12 @@ jobs:
         run: ./gradlew build
       - name: Create Paperclip JAR
         run: ./gradlew createMojmapPaperclipJar createReobfPaperclipJar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         name: "Upload Mojang Mappings Paperclip JAR"
         with:
           name: SparklyPaper Paperclip (Mojang Mappings - mojmap)
           path: "build/libs/SparklyPaper-paperclip-*-mojmap.jar"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         name: "Upload Spigot Mappings (reobf) Paperclip JAR"
         with:
           name: SparklyPaper Paperclip (Spigot Mappings - reobf)
