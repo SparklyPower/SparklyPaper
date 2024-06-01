@@ -35,10 +35,10 @@ jobs:
       - uses: actions/upload-artifact@v2
         name: "Upload Mojang Mappings Paperclip JAR"
         with:
-          name: SparklyPaper Paperclip (Mojang Mappings/mojmap)
+          name: SparklyPaper Paperclip (Mojang Mappings - mojmap)
           path: "build/libs/SparklyPaper-paperclip-*-mojmap.jar"
       - uses: actions/upload-artifact@v2
         name: "Upload Spigot Mappings (reobf) Paperclip JAR"
         with:
-          name: SparklyPaper Paperclip (Spigot Mappings/reobf)
+          name: SparklyPaper Paperclip (Spigot Mappings - reobf)
           path: "build/libs/SparklyPaper-paperclip-*-reobf.jar"
