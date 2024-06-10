@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Mon, 10 Jun 2024 14:39:10 -0300
+Subject: [PATCH] Add PlayerBlockDestroySpeedEvent
+
+
+diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
+index 2034ca2edd3aff61d94416266e75402babd3e741..3809de95cab70dbbd5feffda64a5f14e209feff1 100644
+--- a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
++++ b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
+@@ -339,6 +339,14 @@ public abstract class BlockBehaviour implements FeatureElement {
+     protected float getDestroyProgress(BlockState state, Player player, BlockGetter world, BlockPos pos) {
+         float f = state.getDestroySpeed(world, pos);
+ 
++        // SparklyPaper start - Add PlayerBlockDestroySpeedEvent
++        // *Technically* it seems that all getDestroyProgress calls use a LevelAccessor, but anyway...
++        if (world instanceof LevelAccessor) {
++            net.sparklypower.sparklypaper.event.block.PlayerBlockDestroySpeedEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerBlockDestroySpeedEvent(player, (LevelAccessor) world, pos, f);
++            f = event.getDestroySpeed();
++        }
++        // SparklyPaper end
++
+         if (f == -1.0F) {
+             return 0.0F;
+         } else {
+diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+index dfbe0914ab2771ac632fd064719878ac47559e9f..0cba343989d6d33026a8e94f2b58ca93571721a9 100644
+--- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
++++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+@@ -2196,4 +2196,13 @@ public class CraftEventFactory {
+         return event;
+     }
+     // Paper end - add EntityFertilizeEggEvent
++
++    // SparklyPaper start - add PlayerBlockDestroySpeedEvent
++    public static net.sparklypower.sparklypaper.event.block.PlayerBlockDestroySpeedEvent callPlayerBlockDestroySpeedEvent(net.minecraft.world.entity.player.Player player, LevelAccessor world, BlockPos blockPos, float destroySpeed) {
++        org.bukkit.block.Block block = CraftBlock.at(world, blockPos);
++        net.sparklypower.sparklypaper.event.block.PlayerBlockDestroySpeedEvent event = new net.sparklypower.sparklypaper.event.block.PlayerBlockDestroySpeedEvent((Player) player.getBukkitEntity(), block, destroySpeed);
++        event.callEvent();
++        return event;
++    }
++    // SparklyPaper end
+ }

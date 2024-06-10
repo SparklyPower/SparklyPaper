@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Mon, 10 Jun 2024 14:38:59 -0300
+Subject: [PATCH] Add PlayerBlockDestroySpeedEvent
+
+
+diff --git a/src/main/java/net/sparklypower/sparklypaper/event/block/PlayerBlockDestroySpeedEvent.java b/src/main/java/net/sparklypower/sparklypaper/event/block/PlayerBlockDestroySpeedEvent.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..712868898e5e69dd0d4b9ad39f7e28a01b22de59
+--- /dev/null
++++ b/src/main/java/net/sparklypower/sparklypaper/event/block/PlayerBlockDestroySpeedEvent.java
+@@ -0,0 +1,64 @@
++package net.sparklypower.sparklypaper.event.block;
++
++import org.bukkit.block.Block;
++import org.bukkit.entity.Player;
++import org.bukkit.event.Event;
++import org.bukkit.event.HandlerList;
++import org.bukkit.event.block.BlockEvent;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * Called when the block destroy speed is calculated for a block that a player is breaking.
++ * <p>
++ * Useful for custom blocks to override a server side block destroy speed to fix desynchronization issues between the server and the client. (Example: Chiseled bookshelves on the server side that are overriden by target blocks on the client side)
++ * <p>
++ * Keep in mind that you should use this event to synchronize the block destroy speed between the server and the client! Not keeping both destroy speeds in sync will cause desync issues!
++ */
++public class PlayerBlockDestroySpeedEvent extends BlockEvent {
++    private static final HandlerList handlers = new HandlerList();
++    private final Player player;
++    private float destroySpeed;
++
++    public PlayerBlockDestroySpeedEvent(Player player, Block block, float destroySpeed) {
++        super(block);
++        this.player = player;
++        this.destroySpeed = destroySpeed;
++    }
++
++    @NotNull
++    @Override
++    public HandlerList getHandlers() {
++        return handlers;
++    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return handlers;
++    }
++
++    /**
++     * Gets the Player that is breaking the block involved in this event.
++     *
++     * @return The Player that is breaking the block involved in this event
++     */
++    @NotNull
++    public Player getPlayer() {
++        return player;
++    }
++
++    /**
++     * Gets the block destroy speed of the block involved in this event.
++     *
++     * @return the block destroy speed of the block involved in this event.
++     */
++    public float getDestroySpeed() {
++        return destroySpeed;
++    }
++
++    /**
++     * Sets the block destroy speed of the block involved in this event.
++     */
++    public void setDestroySpeed(float destroySpeed) {
++        this.destroySpeed = destroySpeed;
++    }
++}

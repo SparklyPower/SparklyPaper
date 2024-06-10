@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Mon, 10 Jun 2024 12:22:15 -0300
+Subject: [PATCH] Add ClientboundPacketPreDispatchEvent
+
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index f40420a6841f03983b0837e177ea2ae7c3a37ca1..18bfe8706209141ce2174588320e84e91f15c94e 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -442,6 +442,17 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+             return;
+         }
+ 
++        // SparklyPaper start - Add ClientboundPacketPreDispatchEvent
++        net.minecraft.server.level.ServerPlayer serverPlayer = this.getPlayer();
++        org.bukkit.craftbukkit.entity.CraftPlayer craftPlayer = null;
++        if (serverPlayer != null)
++            craftPlayer = serverPlayer.getBukkitEntity();
++        net.sparklypower.sparklypaper.event.packet.ClientboundPacketPreDispatchEvent event = new net.sparklypower.sparklypaper.event.packet.ClientboundPacketPreDispatchEvent(!org.bukkit.Bukkit.isPrimaryThread(), craftPlayer, packet);
++        org.bukkit.Bukkit.getPluginManager().callEvent(event);
++        if (event.isCancelled())
++            return;
++        // SparklyPaper end
++
+         packet.onPacketDispatch(this.getPlayer());
+         if (connected && (InnerUtil.canSendImmediate(this, packet)
+             || (io.papermc.paper.util.MCUtil.isMainThread() && packet.isReady() && this.pendingActions.isEmpty()
