@@ -30,6 +30,11 @@ jobs:
         run: ./gradlew applyPatches
       - name: Build
         run: ./gradlew build
+      - name: Publish publications and dev bundle
+        run: ./gradlew -PpublishDevBundle publishDevBundlePublicationToPerfectDreams publishMavenPublicationToPerfectDreamsRepository
+        env:
+          ORG_GRADLE_PROJECT_PerfectDreamsUsername: ${{ secrets.PERFECTDREAMS_REPO_USERNAME }}
+          ORG_GRADLE_PROJECT_PerfectDreamsPassword: ${{ secrets.PERFECTDREAMS_REPO_PASSWORD }}
       - name: Create Paperclip JAR
         run: ./gradlew createMojmapPaperclipJar createReobfPaperclipJar
       - uses: actions/upload-artifact@v4
