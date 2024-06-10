@@ -31,7 +31,7 @@ index 0000000000000000000000000000000000000000..d5e097dad04ed62088aade42ba598660
 +    private final Player player;
 +    private float destroySpeed;
 +
-+    public PlayerBlockDestroySpeedEvent(@NotNull Player player, @NotNull git adBlock block, float destroySpeed) {
++    public PlayerBlockDestroySpeedEvent(@NotNull Player player, @NotNull Block block, float destroySpeed) {
 +        super(block);
 +        this.player = player;
 +        this.destroySpeed = destroySpeed;
