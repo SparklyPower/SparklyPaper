@@ -6,10 +6,10 @@ Subject: [PATCH] Add ClientboundPacketPreDispatchEvent
 
 diff --git a/src/main/java/net/sparklypower/sparklypaper/event/packet/ClientboundPacketPreDispatchEvent.java b/src/main/java/net/sparklypower/sparklypaper/event/packet/ClientboundPacketPreDispatchEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..6d36dccdc08e7e523771fde4d8d1bb73e430114c
+index 0000000000000000000000000000000000000000..91f43f880320508c9f30ae68d603d5342269f177
 --- /dev/null
 +++ b/src/main/java/net/sparklypower/sparklypaper/event/packet/ClientboundPacketPreDispatchEvent.java
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,79 @@
 +package net.sparklypower.sparklypaper.event.packet;
 +
 +import org.bukkit.entity.Player;
@@ -31,7 +31,7 @@ index 0000000000000000000000000000000000000000..6d36dccdc08e7e523771fde4d8d1bb73
 +    private static final HandlerList handlers = new HandlerList();
 +    private boolean isCancelled = false;
 +    private final Player player;
-+    private final Object packet;
++    private Object packet;
 +
 +    public ClientboundPacketPreDispatchEvent(boolean isAsync, @Nullable Player player, @NotNull Object packet) {
 +        super(isAsync);
@@ -59,6 +59,13 @@ index 0000000000000000000000000000000000000000..6d36dccdc08e7e523771fde4d8d1bb73
 +    @NotNull
 +    public Object getPacket() {
 +        return packet;
++    }
++
++    /**
++     * Sets the packet associated with this event.
++     */
++    public void setPacket(Object packet) {
++        this.packet = packet;
 +    }
 +
 +    @NotNull

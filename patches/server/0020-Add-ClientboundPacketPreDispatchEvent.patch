@@ -5,10 +5,10 @@ Subject: [PATCH] Add ClientboundPacketPreDispatchEvent
 
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index f40420a6841f03983b0837e177ea2ae7c3a37ca1..18bfe8706209141ce2174588320e84e91f15c94e 100644
+index f40420a6841f03983b0837e177ea2ae7c3a37ca1..cd3aaa7ddabbb65250c49c40d4668316284daf74 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -442,6 +442,17 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -442,6 +442,18 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
              return;
          }
  
@@ -21,6 +21,7 @@ index f40420a6841f03983b0837e177ea2ae7c3a37ca1..18bfe8706209141ce2174588320e84e9
 +        org.bukkit.Bukkit.getPluginManager().callEvent(event);
 +        if (event.isCancelled())
 +            return;
++        packet = (Packet<?>) event.getPacket();
 +        // SparklyPaper end
 +
          packet.onPacketDispatch(this.getPlayer());
