@@ -6,7 +6,7 @@ Subject: [PATCH] Add ClientboundPacketPreDispatchEvent
 
 diff --git a/src/main/java/net/sparklypower/sparklypaper/event/packet/ClientboundPacketPreDispatchEvent.java b/src/main/java/net/sparklypower/sparklypaper/event/packet/ClientboundPacketPreDispatchEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..91f43f880320508c9f30ae68d603d5342269f177
+index 0000000000000000000000000000000000000000..9a279ad0b0f9b63f5f3a37977076e0bb805cd56d
 --- /dev/null
 +++ b/src/main/java/net/sparklypower/sparklypaper/event/packet/ClientboundPacketPreDispatchEvent.java
 @@ -0,0 +1,79 @@
@@ -64,7 +64,7 @@ index 0000000000000000000000000000000000000000..91f43f880320508c9f30ae68d603d534
 +    /**
 +     * Sets the packet associated with this event.
 +     */
-+    public void setPacket(Object packet) {
++    public void setPacket(@NotNull Object packet) {
 +        this.packet = packet;
 +    }
 +
