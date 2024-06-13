@@ -70,3 +70,30 @@ index 260906f493416d98ab574a7262fce5e9b7e40c64..92b6f69e60bfafe5f325b9b16df0e56a
  
      private static ToIntFunction<BlockState> litBlockEmission(int litLevel) {
          return state -> state.getValue(BlockStateProperties.LIT) ? litLevel : 0;
+diff --git a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+index 2652359438399f2c3b1092f5dcb37a106ab22068..b5ae0f4f68fc2d90043cbbe092310bd6eb8e004d 100644
+--- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
++++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+@@ -123,7 +123,9 @@ public class LegacyTest extends AbstractTestingBase {
+             // 1.20.5
+             Material.ARMADILLO_SCUTE, Material.ARMADILLO_SPAWN_EGG, Material.BOGGED_SPAWN_EGG, Material.WIND_CHARGE, Material.WOLF_ARMOR, Material.VAULT, Material.HEAVY_CORE, Material.MACE, Material.FLOW_BANNER_PATTERN, Material.GUSTER_BANNER_PATTERN,
+             Material.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE, Material.BOLT_ARMOR_TRIM_SMITHING_TEMPLATE, Material.FLOW_POTTERY_SHERD, Material.GUSTER_POTTERY_SHERD, Material.SCRAPE_POTTERY_SHERD, Material.BREEZE_ROD, Material.OMINOUS_TRIAL_KEY, Material.OMINOUS_BOTTLE,
+-            //
++            // SparklyPaper start - custom blocks
++            Material.SPARKLYPOWER_RAINBOW_WOOL, Material.SPARKLYPOWER_RAINBOW_CONCRETE, Material.SPARKLYPOWER_RAINBOW_TERRACOTTA, Material.SPARKLYPOWER_ASPHALT_SERVER, Material.SPARKLYPOWER_ASPHALT_SERVER_SLAB, Material.SPARKLYPOWER_ASPHALT_PLAYER, Material.SPARKLYPOWER_ASPHALT_PLAYER_SLAB,
++            // SparklyPaper end
+             Material.LEGACY_AIR, Material.LEGACY_DEAD_BUSH, Material.LEGACY_BURNING_FURNACE, Material.LEGACY_WALL_SIGN, Material.LEGACY_REDSTONE_TORCH_OFF, Material.LEGACY_SKULL, Material.LEGACY_REDSTONE_COMPARATOR_ON, Material.LEGACY_WALL_BANNER, Material.LEGACY_MONSTER_EGG));
+ 
+     private final Set<Material> INVERSION_FAILS = new HashSet<>(Arrays.asList(Material.LEGACY_DOUBLE_STEP, Material.LEGACY_GLOWING_REDSTONE_ORE, Material.LEGACY_DIODE_BLOCK_ON, Material.LEGACY_REDSTONE_LAMP_ON, Material.LEGACY_WOOD_DOUBLE_STEP,
+diff --git a/src/test/java/org/bukkit/support/AbstractTestingBase.java b/src/test/java/org/bukkit/support/AbstractTestingBase.java
+index 1b1d51a68c0abe7d8f0aa1172064192c71ae645e..5d694ef3ff1bc1e193ff321a09eb86a6239c4bb5 100644
+--- a/src/test/java/org/bukkit/support/AbstractTestingBase.java
++++ b/src/test/java/org/bukkit/support/AbstractTestingBase.java
+@@ -74,6 +74,6 @@ public abstract class AbstractTestingBase {
+             }
+         }
+         INVALIDATED_MATERIALS = builder.build();
+-        assertEquals(610, INVALIDATED_MATERIALS.size(), "Expected 610 invalidated materials (got " + INVALIDATED_MATERIALS.size() + ")");
++        assertEquals(617, INVALIDATED_MATERIALS.size(), "Expected 610 invalidated materials (got " + INVALIDATED_MATERIALS.size() + ")"); // SparklyPaper - custom blocks (this always needs to be the amount of non-legacy materials in the enum)
+     }
+ }
