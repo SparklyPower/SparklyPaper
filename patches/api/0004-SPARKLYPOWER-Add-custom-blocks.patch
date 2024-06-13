@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Wed, 12 Jun 2024 11:53:27 -0300
+Subject: [PATCH] SPARKLYPOWER Add custom blocks
+
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 7509b61dfdc0a6675256970cb850b08f9e814580..5f6da439b2e7cdb63afd2e93b276a06fc1e677c1 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -3818,6 +3818,14 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     BIG_DRIPLEAF_STEM(13167, Dripleaf.class),
+     POTTED_AZALEA_BUSH(20430),
+     POTTED_FLOWERING_AZALEA_BUSH(10609),
++    // SparklyPaper start - SparklyPower Survival custom blocks
++    // The IDs themselves doesn't have any correlation with anything, Spigot invented that for backwards compatibility
++    SPARKLYPOWER_RAINBOW_WOOL(13003),
++    SPARKLYPOWER_RAINBOW_CONCRETE(13004),
++    SPARKLYPOWER_RAINBOW_TERRACOTTA(13005),
++    SPARKLYPOWER_ASPHALT_SERVER(13006),
++    SPARKLYPOWER_ASPHALT_PLAYER(13007),
++    // SparklyPaper end
+     // ----- Legacy Separator -----
+     @Deprecated
+     LEGACY_AIR(0, 0),

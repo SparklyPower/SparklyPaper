@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrPowerGamerBR <git@mrpowergamerbr.com>
 Date: Sat, 1 Jun 2024 01:22:41 -0300
-Subject: [PATCH] Remap SparklyPower hacky legacy NBT tags
+Subject: [PATCH] SPARKLYPOWER Remap SparklyPower hacky legacy NBT tags
 
 This is only useful for us in SparklyPower, but yeah...
 

@@ -12,6 +12,16 @@ SparklyPower's Paper fork, making large servers snappier with high-performance o
 
 Our fork has handmade patches to add and optimize some of the things that we have in our server, with some cherry-picked patches from other forks.
 
+## ATTENTION - PLEASE READ!
+
+SparklyPaper is a fork tailor-made for our Survival server, SparklyPower. It doesn't strive to be a public stable Paper fork like Purpur, Pufferfish, and other similar forks.
+
+We do provide SparklyPaper builds if you want to use it in your server, but keep in mind that we won't provide support for it! If your server has issues while using SparklyPaper, or if it explodes, we won't help you!
+
+This also means that unless a PR fixes an issue that we are having in SparklyPower, we (probably) won't accept it!
+
+If you have the know how, we recommend making your own Paper fork and copying the SparklyPaper's patches that you need for your server.
+
 ## Features
 
 This does not include all patches included in SparklyPaper, only the patches handmade for SparklyPaper! To see all patches, check out the ["patches" directory](patches).
@@ -67,6 +77,9 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
     * We could use a map for caching, but here's why this is way better than using a map: The block entity ticking list is sorted by chunks! Well, sort of... It is sorted by chunk when the chunk has been loaded, newly placed blocks will be appended to the end of the list until the chunk unloads and loads again.  Most block entities are things that players placed to be there for a long time anyway (like hoppers, etc)
     * But here's the thing: We don't care if we have a small performance penalty if the players have placed new block entities, the small performance hit of when a player placed new block entities is so small ('tis just a long comparsion after all), that the performance boost from already placed block entities is bigger, this helps a lot if your server has a lot of chunks with multiple block entities, and the block entities will be automatically sorted after the chunk is unloaded and loaded again, so it ain't that bad.
   * And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
+* Reset dirty flag when loading maps from the disk
+  * By default, the server will start rewriting all map datas to the disk after loading it, even if the map didn't have any changes
+  * This also slows down world saving a lot if you have a lot of maps if you have an "image on map" plugin that preloads all maps during server startup
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)

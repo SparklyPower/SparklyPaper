@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Wed, 12 Jun 2024 11:53:09 -0300
+Subject: [PATCH] SPARKLYPOWER Add custom blocks
+
+
+diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
+index 260906f493416d98ab574a7262fce5e9b7e40c64..92b6f69e60bfafe5f325b9b16df0e56a73c52124 100644
+--- a/src/main/java/net/minecraft/world/level/block/Blocks.java
++++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
+@@ -42,9 +42,9 @@ import net.minecraft.world.level.material.PushReaction;
+ 
+ public class Blocks {
+     private static final BlockBehaviour.StatePredicate NOT_CLOSED_SHULKER = (state, world, pos) -> !(
+-                world.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity
+-            )
+-            || shulkerBoxBlockEntity.isClosed();
++        world.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity
++    )
++        || shulkerBoxBlockEntity.isClosed();
+     public static final Block AIR = register("air", new AirBlock(BlockBehaviour.Properties.of().replaceable().noCollission().noLootTable().air()));
+     public static final Block STONE = register(
+         "stone",
+@@ -7658,6 +7658,48 @@ public class Blocks {
+                 .requiredFeatures(FeatureFlags.UPDATE_1_21)
+         )
+     );
++    // SparklyPaper start - SparklyPower Survival custom blocks
++    // Blocks' strength should be synced with the replaced block on the client side!
++    public static final Block SPARKLYPOWER_RAINBOW_WOOL = register(
++        "sparklypower_rainbow_wool", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS))
++    );
++    public static final Block SPARKLYPOWER_RAINBOW_CONCRETE = register(
++        "sparklypower_rainbow_concrete", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS))
++    );
++    public static final Block SPARKLYPOWER_RAINBOW_TERRACOTTA = register(
++        "sparklypower_rainbow_terracotta", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS))
++    );
++    public static final Block SPARKLYPOWER_ASPHALT_SERVER = register(
++        "sparklypower_asphalt_server", new Block(
++            BlockBehaviour.Properties.of()
++                .mapColor(MapColor.COLOR_BLACK)
++                .instrument(NoteBlockInstrument.BASEDRUM)
++                .requiresCorrectToolForDrops()
++                .strength(1.5F, 6.0F)
++        )
++    );
++    public static final Block SPARKLYPOWER_ASPHALT_SERVER_SLAB = register(
++        "sparklypower_asphalt_server_slab",
++        new SlabBlock(
++            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)
++        )
++    );
++    public static final Block SPARKLYPOWER_ASPHALT_PLAYER = register(
++        "sparklypower_asphalt_player", new Block(
++            BlockBehaviour.Properties.of()
++                .mapColor(MapColor.COLOR_BLACK)
++                .instrument(NoteBlockInstrument.BASEDRUM)
++                .requiresCorrectToolForDrops()
++                .strength(1.5F, 6.0F)
++        )
++    );
++    public static final Block SPARKLYPOWER_ASPHALT_PLAYER_SLAB = register(
++        "sparklypower_asphalt_player_slab",
++        new SlabBlock(
++            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)
++        )
++    );
++    // SparklyPaper end
+ 
+     private static ToIntFunction<BlockState> litBlockEmission(int litLevel) {
+         return state -> state.getValue(BlockStateProperties.LIT) ? litLevel : 0;
