@@ -4,11 +4,39 @@ Date: Wed, 12 Jun 2024 11:53:27 -0300
 Subject: [PATCH] SPARKLYPOWER Add custom blocks
 
 
+diff --git a/src/main/java/com/destroystokyo/paper/MaterialTags.java b/src/main/java/com/destroystokyo/paper/MaterialTags.java
+index be212b4fbeabab32a4dab6ae554768c368efaa88..fc885e551b1e8393569ec1391ee3decdce8d7efb 100644
+--- a/src/main/java/com/destroystokyo/paper/MaterialTags.java
++++ b/src/main/java/com/destroystokyo/paper/MaterialTags.java
+@@ -83,6 +83,7 @@ public class MaterialTags {
+      */
+     public static final MaterialSetTag CONCRETES = new MaterialSetTag(keyFor("concretes"))
+         .endsWith("_CONCRETE")
++        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
+         .ensureSize("CONCRETES", 16).lock();
+ 
+     /**
+@@ -161,6 +162,7 @@ public class MaterialTags {
+         .endsWith("TERRACOTTA")
+         .not(Material.TERRACOTTA)
+         .notEndsWith("GLAZED_TERRACOTTA")
++        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
+         .ensureSize("STAINED_TERRACOTTA", 16).lock();
+ 
+     /**
+@@ -168,6 +170,7 @@ public class MaterialTags {
+      */
+     public static final MaterialSetTag TERRACOTTA = new MaterialSetTag(keyFor("terracotta"))
+         .endsWith("TERRACOTTA")
++        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
+         .ensureSize("TERRACOTTA", 33).lock();
+ 
+     /**
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 7509b61dfdc0a6675256970cb850b08f9e814580..5f6da439b2e7cdb63afd2e93b276a06fc1e677c1 100644
+index 7509b61dfdc0a6675256970cb850b08f9e814580..04ec0c27b37d7e732382815dafc52a4726c098a7 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -3818,6 +3818,14 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3818,6 +3818,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      BIG_DRIPLEAF_STEM(13167, Dripleaf.class),
      POTTED_AZALEA_BUSH(20430),
      POTTED_FLOWERING_AZALEA_BUSH(10609),
@@ -18,7 +46,15 @@ index 7509b61dfdc0a6675256970cb850b08f9e814580..5f6da439b2e7cdb63afd2e93b276a06f
 +    SPARKLYPOWER_RAINBOW_CONCRETE(13004),
 +    SPARKLYPOWER_RAINBOW_TERRACOTTA(13005),
 +    SPARKLYPOWER_ASPHALT_SERVER(13006),
-+    SPARKLYPOWER_ASPHALT_PLAYER(13007),
++    /**
++     * BlockData: {@link Slab}
++     */
++    SPARKLYPOWER_ASPHALT_SERVER_SLAB(13007, Slab.class),
++    SPARKLYPOWER_ASPHALT_PLAYER(13008),
++    /**
++     * BlockData: {@link Slab}
++     */
++    SPARKLYPOWER_ASPHALT_PLAYER_SLAB(13009, Slab.class),
 +    // SparklyPaper end
      // ----- Legacy Separator -----
      @Deprecated
