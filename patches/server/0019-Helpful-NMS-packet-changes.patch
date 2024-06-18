@@ -6,10 +6,10 @@ Subject: [PATCH] Helpful NMS packet changes
 Some nice changes to the packet internals to make packet sending and manipulation easier for us to avoid Reflection and JVM internals (ooo theUnsafe spooky) usage
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
-index ee43eb8887835fbd016d28f91b2239dfeb25508e..e945e0752b41e10d16d8c766a2f919767b7b0b82 100644
+index 1a5e73fd97781f3903e5ef13aa0352c64fbc2cc1..19efe46af67cd7066f38840001cf3e84b597ba70 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
-@@ -21,7 +21,7 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+@@ -22,7 +22,7 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
      private static final double LIMIT = 3.9;
      private final int id;
      private final UUID uuid;
@@ -18,7 +18,7 @@ index ee43eb8887835fbd016d28f91b2239dfeb25508e..e945e0752b41e10d16d8c766a2f91976
      private final double x;
      private final double y;
      private final double z;
-@@ -177,6 +177,32 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+@@ -178,6 +178,32 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
          return (float)(this.yHeadRot * 360) / 256.0F;
      }
  

@@ -5,10 +5,10 @@ Subject: [PATCH] SPARKLYPOWER Add custom blocks
 
 
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
-index 260906f493416d98ab574a7262fce5e9b7e40c64..92b6f69e60bfafe5f325b9b16df0e56a73c52124 100644
+index 223259e7a09ada681b6181c898f6857888594f85..ad5ad428b72f696a68a9ed1436bede7135c534e5 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java
 +++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
-@@ -42,9 +42,9 @@ import net.minecraft.world.level.material.PushReaction;
+@@ -41,9 +41,9 @@ import net.minecraft.world.level.material.PushReaction;
  
  public class Blocks {
      private static final BlockBehaviour.StatePredicate NOT_CLOSED_SHULKER = (state, world, pos) -> !(
@@ -21,8 +21,8 @@ index 260906f493416d98ab574a7262fce5e9b7e40c64..92b6f69e60bfafe5f325b9b16df0e56a
      public static final Block AIR = register("air", new AirBlock(BlockBehaviour.Properties.of().replaceable().noCollission().noLootTable().air()));
      public static final Block STONE = register(
          "stone",
-@@ -7658,6 +7658,48 @@ public class Blocks {
-                 .requiredFeatures(FeatureFlags.UPDATE_1_21)
+@@ -7623,6 +7623,48 @@ public class Blocks {
+                 .explosionResistance(1200.0F)
          )
      );
 +    // SparklyPaper start - SparklyPower Survival custom blocks
@@ -71,13 +71,13 @@ index 260906f493416d98ab574a7262fce5e9b7e40c64..92b6f69e60bfafe5f325b9b16df0e56a
      private static ToIntFunction<BlockState> litBlockEmission(int litLevel) {
          return state -> state.getValue(BlockStateProperties.LIT) ? litLevel : 0;
 diff --git a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
-index 2652359438399f2c3b1092f5dcb37a106ab22068..b5ae0f4f68fc2d90043cbbe092310bd6eb8e004d 100644
+index ef3c97ea99ddf20e9219999927ae80a31dffa7a5..f2f73dd240a703e19e502178f901c61de269ff1b 100644
 --- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
 +++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
-@@ -123,7 +123,9 @@ public class LegacyTest extends AbstractTestingBase {
-             // 1.20.5
-             Material.ARMADILLO_SCUTE, Material.ARMADILLO_SPAWN_EGG, Material.BOGGED_SPAWN_EGG, Material.WIND_CHARGE, Material.WOLF_ARMOR, Material.VAULT, Material.HEAVY_CORE, Material.MACE, Material.FLOW_BANNER_PATTERN, Material.GUSTER_BANNER_PATTERN,
+@@ -125,7 +125,9 @@ public class LegacyTest extends AbstractTestingBase {
              Material.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE, Material.BOLT_ARMOR_TRIM_SMITHING_TEMPLATE, Material.FLOW_POTTERY_SHERD, Material.GUSTER_POTTERY_SHERD, Material.SCRAPE_POTTERY_SHERD, Material.BREEZE_ROD, Material.OMINOUS_TRIAL_KEY, Material.OMINOUS_BOTTLE,
+             // 1.21
+             Material.MUSIC_DISC_CREATOR, Material.MUSIC_DISC_CREATOR_MUSIC_BOX, Material.MUSIC_DISC_PRECIPICE,
 -            //
 +            // SparklyPaper start - custom blocks
 +            Material.SPARKLYPOWER_RAINBOW_WOOL, Material.SPARKLYPOWER_RAINBOW_CONCRETE, Material.SPARKLYPOWER_RAINBOW_TERRACOTTA, Material.SPARKLYPOWER_ASPHALT_SERVER, Material.SPARKLYPOWER_ASPHALT_SERVER_SLAB, Material.SPARKLYPOWER_ASPHALT_PLAYER, Material.SPARKLYPOWER_ASPHALT_PLAYER_SLAB,

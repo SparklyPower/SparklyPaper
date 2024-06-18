@@ -9,19 +9,21 @@ The "distanceToSqr" call is a bit expensive, so avoiding it is pretty nice, arou
 We could also check if the x,y,z coordinates are equal, but for now, let's just keep the identity check, which also helps us since Minecraft's code does reuse the original delta movement Vec3 object
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 7392a058bab0eca23cb82392d5b5cc50e8601499..072aa9f0cd26602c0251819fd02711078382f9da 100644
+index 542083a06956fa4cf3367698806a4b8909506da4..603ce9e4805d1a1f5a272034e03f995bc80a50e6 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
-@@ -228,12 +228,14 @@ public class ServerEntity {
+@@ -217,6 +217,8 @@ public class ServerEntity {
  
                  if ((this.trackDelta || this.entity.hasImpulse || this.entity instanceof LivingEntity && ((LivingEntity) this.entity).isFallFlying()) && this.tickCount > 0) {
                      Vec3 vec3d1 = this.entity.getDeltaMovement();
-+                    if (vec3d1 != this.ap) { // SparklyPaper start - skip distanceToSqr call in ServerEntity#sendChanges if the delta movement hasn't changed
-                     double d0 = vec3d1.distanceToSqr(this.ap);
++
++                    if (vec3d1 != this.lastSentMovement) { // SparklyPaper start - skip distanceToSqr call in ServerEntity#sendChanges if the delta movement hasn't changed
+                     double d0 = vec3d1.distanceToSqr(this.lastSentMovement);
  
                      if (d0 > 1.0E-7D || d0 > 0.0D && vec3d1.lengthSqr() == 0.0D) {
-                         this.ap = vec3d1;
-                         this.broadcast.accept(new ClientboundSetEntityMotionPacket(this.entity.getId(), this.ap));
+@@ -231,6 +233,7 @@ public class ServerEntity {
+                             this.broadcast.accept(new ClientboundSetEntityMotionPacket(this.entity.getId(), this.lastSentMovement));
+                         }
                      }
 +                    } // SparklyPaper end
                  }

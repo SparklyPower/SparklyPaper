@@ -10,6 +10,8 @@ So instead of paying the price on each tick, we pay the price when the chunk is 
 
 Which, if you think about it, is actually better, since we tick chunks more than we load chunks
 
+UNAPPLIED REASON: Requires "Optimise-chunk-tick-iteration" patch
+
 diff --git a/src/main/java/io/papermc/paper/util/player/NearbyPlayers.java b/src/main/java/io/papermc/paper/util/player/NearbyPlayers.java
 index f164256d59b761264876ca0c85f812d101bfd5de..10465a33d90a1e43b9dbd7764c895dd39ef11b1a 100644
 --- a/src/main/java/io/papermc/paper/util/player/NearbyPlayers.java

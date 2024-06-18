@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 4998aff0b7cb084dcda15c6a18bbe45e99b6000a..b2003e125fb923f531bf3777ebe39be0889601e4 100644
+index 299b7b029384c58fed80d53cc0b77c420d62eed7..81d47c381c97d52951860566b6f0f8fdebf56f2a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import java.time.Instant
@@ -70,10 +70,10 @@ index 774556a62eb240da42e84db4502e2ed43495be17..9bc7b99b5b39a8ffe4118b8d86f5b806
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 6db566e3111ec08a99aa429624979cb83a85e272..ac350a7108a54c64cf162a683f979a04712ce4c6 100644
+index b0a3ec17a50f4c302d6a9dd75bf907b01c567209..6195408e7f43924c0c32e4d9a665b03a949a7f17 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
-@@ -155,14 +155,14 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+@@ -83,14 +83,14 @@ public class WatchdogThread extends Thread
                  if (isLongTimeout) {
                  // Paper end
                  log.log( Level.SEVERE, "------------------------------" );
@@ -91,12 +91,12 @@ index 6db566e3111ec08a99aa429624979cb83a85e272..ac350a7108a54c64cf162a683f979a04
                  //
                  if ( net.minecraft.world.level.Level.lastPhysicsProblem != null )
                  {
-@@ -189,7 +189,7 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+@@ -117,7 +117,7 @@ public class WatchdogThread extends Thread
                  }
                  // Paper end - Different message for short timeout
                  log.log( Level.SEVERE, "------------------------------" );
 -                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Paper!):" ); // Paper
 +                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to SparklyPaper!):" ); // SparklyPaper - branding changes // Paper
-                 io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper - rewrite chunk system
-                 this.dumpTickingInfo(); // Paper - log detailed tick information
+                 ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper - rewrite chunk system
                  WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
+                 log.log( Level.SEVERE, "------------------------------" );

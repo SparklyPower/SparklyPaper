@@ -5,10 +5,10 @@ Subject: [PATCH] Add ClientboundPacketPreDispatchEvent
 
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index f40420a6841f03983b0837e177ea2ae7c3a37ca1..cd3aaa7ddabbb65250c49c40d4668316284daf74 100644
+index 90a2c61c42cba7e38f167eccdd7a951a947963c4..f1bbe862dd044f755a789a3f9aa91078c86c8099 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -442,6 +442,18 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -450,6 +450,18 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
              return;
          }
  

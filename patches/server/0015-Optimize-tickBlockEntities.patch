@@ -12,10 +12,10 @@ But here's the thing: We don't care if we have a small performance penalty if th
 And finally, we also cache the chunk's coordinate key when creating the block entity, which is actually "free" because we just reuse the already cached chunk coordinate key from the chunk!
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 65d1d84bf4c381492d394bb61055cfa308ce24f7..6ed4efec4eda74af9472e6e3fc637251f9c2a21c 100644
+index 175402a4ce41a048429a6fdccce4190add75f17a..5c28b6491c3a23f850ca22da59261cedc774eddd 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1268,6 +1268,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -957,6 +957,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
          boolean flag = this.tickRateManager().runsNormally();
  
          int tilesThisCycle = 0;
@@ -26,7 +26,7 @@ index 65d1d84bf4c381492d394bb61055cfa308ce24f7..6ed4efec4eda74af9472e6e3fc637251
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -1278,13 +1282,25 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -967,8 +971,20 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
                  tilesThisCycle--;
                  this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // this.blockEntityTickers.remove(this.tileTickPosition--); // SparklyPaper - optimize block entity removals
                  // Spigot end
@@ -44,11 +44,6 @@ index 65d1d84bf4c381492d394bb61055cfa308ce24f7..6ed4efec4eda74af9472e6e3fc637251
 +                }
 +                if (shouldTick) {
                  tickingblockentity.tick();
-                 // Paper start - execute chunk tasks during tick
-                 if ((this.tileTickPosition & 7) == 0) {
-                     MinecraftServer.getServer().executeMidTickTasks();
-                 }
-                 // Paper end - execute chunk tasks during tick
 +                } // SparklyPaper end
              }
          }
@@ -65,10 +60,10 @@ index 28e3b73507b988f7234cbf29c4024c88180d0aef..427cf73383155c52bca8fb4b32f43029
 +    long getChunkCoordinateKey(); // SparklyPaper - optimize tickBlockEntities
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index 14ee7b5b9b804bebd4e2a846b238547a28a36035..9af0da6c3a9805542b1b31fb32f0b3bcb1efe1c8 100644
+index 435f5f0a17901f743bd565b28f9feb5d4058c819..3e03946202cc6aca535322446c6e5e9a0a0dcf15 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -75,6 +75,13 @@ public class LevelChunk extends ChunkAccess {
+@@ -74,6 +74,13 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          public String getType() {
              return "<null>";
          }
@@ -82,7 +77,7 @@ index 14ee7b5b9b804bebd4e2a846b238547a28a36035..9af0da6c3a9805542b1b31fb32f0b3bc
      };
      private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
      public boolean loaded;
-@@ -1087,7 +1094,7 @@ public class LevelChunk extends ChunkAccess {
+@@ -1035,7 +1042,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
      }
  
      private <T extends BlockEntity> TickingBlockEntity createTicker(T blockEntity, BlockEntityTicker<T> blockEntityTicker) {
@@ -91,7 +86,7 @@ index 14ee7b5b9b804bebd4e2a846b238547a28a36035..9af0da6c3a9805542b1b31fb32f0b3bc
      }
  
      @FunctionalInterface
-@@ -1138,6 +1145,13 @@ public class LevelChunk extends ChunkAccess {
+@@ -1086,6 +1093,13 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          public String toString() {
              return String.valueOf(this.ticker) + " <wrapped>";
          }
@@ -105,7 +100,7 @@ index 14ee7b5b9b804bebd4e2a846b238547a28a36035..9af0da6c3a9805542b1b31fb32f0b3bc
      }
  
      private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
-@@ -1145,10 +1159,12 @@ public class LevelChunk extends ChunkAccess {
+@@ -1093,10 +1107,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          private final T blockEntity;
          private final BlockEntityTicker<T> ticker;
          private boolean loggedInvalidBlockState;
@@ -119,7 +114,7 @@ index 14ee7b5b9b804bebd4e2a846b238547a28a36035..9af0da6c3a9805542b1b31fb32f0b3bc
          }
  
          @Override
-@@ -1216,5 +1232,12 @@ public class LevelChunk extends ChunkAccess {
+@@ -1164,5 +1180,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
  
              return "Level ticker for " + s + "@" + String.valueOf(this.getPos());
          }

@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    remapper("net.fabricmc:tiny-remapper:0.10.2:fat") // Must be kept in sync with upstream
+    remapper("net.fabricmc:tiny-remapper:0.10.3:fat") // Must be kept in sync with upstream
     decompiler("org.vineflower:vineflower:1.10.1") // Must be kept in sync with upstream
     paperclip("io.papermc:paperclip:3.0.3") // You probably want this to be kept in sync with upstream
 }
