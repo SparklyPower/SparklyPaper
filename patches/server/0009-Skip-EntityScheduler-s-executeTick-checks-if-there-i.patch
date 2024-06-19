@@ -73,7 +73,7 @@ index 62484ebf4550b05182f693a3180bbac5d5fd906d..67800e426445060a8343e27a7452b8d7
                  throw new IllegalStateException("Ticking retired scheduler");
              }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index eb0a740f884fde081cabaec5a61c9b642a85a1b4..30dfcd4f9379754a3c104e689efec70d22be0e7e 100644
+index b9b8a46f1de9867cc2161ac71c2993ab422cdfbf..46cd3fba13d1590ebb0b8bb7a55dea3bc1548ae8 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -322,6 +322,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -101,7 +101,7 @@ index eb0a740f884fde081cabaec5a61c9b642a85a1b4..30dfcd4f9379754a3c104e689efec70d
 +        }
 +        /*
          getAllLevels().forEach(level -> {
-             for (final Entity entity : level.getEntities().getAll()) {
+             for (final Entity entity : level.moonrise$getEntityLookup().getAllCopy()) { // Paper - rewrite chunk system
                  if (entity.isRemoved()) {
 @@ -1666,6 +1679,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  }

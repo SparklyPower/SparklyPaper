@@ -6,7 +6,7 @@ Subject: [PATCH] Parallel world ticking
 "mom can we have folia?" "we already have folia at home" folia at home:
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-index 5576924839c9c5a42a8c430c30cb5a6275ae6f23..649126713e597224f9850488e15b20e8c3e4b27e 100644
+index ad339978cd2e8d78b0566c2daf0495a418d127c7..b01c325f43a7f8989dea279e99fd87caf17969bb 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 @@ -1007,7 +1007,7 @@ public final class ChunkHolderManager {
@@ -27,15 +27,7 @@ index 5576924839c9c5a42a8c430c30cb5a6275ae6f23..649126713e597224f9850488e15b20e8
  
          if (BLOCK_TICKET_UPDATES.get() == Boolean.TRUE) {
              throw new IllegalStateException("Cannot unload chunks recursively");
-@@ -1307,14 +1307,14 @@ public final class ChunkHolderManager {
-     }
- 
-     private boolean processTicketUpdates(final boolean processFullUpdates, List<ChunkProgressionTask> scheduledTasks) {
--        io.papermc.paper.util.TickThread.ensureTickThread("Cannot process ticket levels off-main");
-+        io.papermc.paper.util.TickThread.ensureTickThread(world, "Cannot process ticket levels off-main"); // SparklyPaper - parallel world ticking
-         if (BLOCK_TICKET_UPDATES.get() == Boolean.TRUE) {
-             throw new IllegalStateException("Cannot update ticket level while unloading chunks or updating entity manager");
-         }
+@@ -1313,7 +1313,7 @@ public final class ChunkHolderManager {
  
          List<NewChunkHolder> changedFullStatus = null;
  
@@ -45,10 +37,10 @@ index 5576924839c9c5a42a8c430c30cb5a6275ae6f23..649126713e597224f9850488e15b20e8
          boolean ret = false;
          final boolean canProcessFullUpdates = processFullUpdates & isTickThread;
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
-index bfb53d1f2f96539fbe62946252faa506188560a1..f95e79c8a72d6e4e137cfd188ce121bc1ea899ee 100644
+index faf76a5c2f9fa2eea38d2c7f2ab1c43873254e72..66f61697b96d5b250a182b55f7870493800b95a1 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
-@@ -365,7 +365,7 @@ public final class ChunkTaskScheduler {
+@@ -372,7 +372,7 @@ public final class ChunkTaskScheduler {
      public void scheduleTickingState(final int chunkX, final int chunkZ, final FullChunkStatus toStatus,
                                       final boolean addTicket, final PrioritisedExecutor.Priority priority,
                                       final Consumer<LevelChunk> onComplete) {
@@ -57,7 +49,7 @@ index bfb53d1f2f96539fbe62946252faa506188560a1..f95e79c8a72d6e4e137cfd188ce121bc
              this.scheduleChunkTask(chunkX, chunkZ, () -> {
                  ChunkTaskScheduler.this.scheduleTickingState(chunkX, chunkZ, toStatus, addTicket, priority, onComplete);
              }, priority);
-@@ -552,7 +552,7 @@ public final class ChunkTaskScheduler {
+@@ -563,7 +563,7 @@ public final class ChunkTaskScheduler {
  
      public void scheduleChunkLoad(final int chunkX, final int chunkZ, final ChunkStatus toStatus, final boolean addTicket,
                                    final PrioritisedExecutor.Priority priority, final Consumer<ChunkAccess> onComplete) {
@@ -549,7 +541,7 @@ index cb308808906a8cdb127df8284e106e00553473ca..323d41e2bed5e83a26dfe4c88dfce7ed
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 086ff182abaf0a3df4d20f98c6e5f9ddce26dc83..37fe8b0d66aa99d74fe70b00a1fff2c209d9ebeb 100644
+index cb93aed058c050107f948e95396975d50d53bfb1..7da56241422fab1ff3fe53af4e1b9a943e0cc85c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -324,6 +324,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -686,7 +678,7 @@ index 086ff182abaf0a3df4d20f98c6e5f9ddce26dc83..37fe8b0d66aa99d74fe70b00a1fff2c2
          this.isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
  
          this.profiler.popPush("connection");
-@@ -2905,7 +2924,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2912,7 +2931,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
@@ -785,7 +777,7 @@ index 681fdab250d924a29ca160acffbcbf7f8a3ca78a..f3c5c66baf5e4d87d43c6e790923e223
  
          if (flag1) {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index f6d0b7d94995fff41def7edcf66fac40c43fec61..47a1e391a9ed800616b055ce1ef0026943e2ab89 100644
+index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f697de99ec7 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -222,6 +222,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
@@ -1329,7 +1321,7 @@ index 597599138f69c9ee05dc7657c51c25336337875e..c9876514091f5cd0fc9c24b4f1577b1a
      // CraftBukkit end
  
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index 3e03946202cc6aca535322446c6e5e9a0a0dcf15..88dfeaa0fdd02cc7ee88a46a3c1ad2a5faac0484 100644
+index 652490f2d75940241ed93239a3d6b8b73048fd5f..b8f32894b14db232c26b5ee61c35e84dba22342a 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 @@ -425,6 +425,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
@@ -1380,10 +1372,10 @@ index d8b4196adf955f8d414688dc451caac2d9c609d9..fd638b1bb9d21e3a69c5b8a3a6c70d52
          // To ensure nothing weird happens with dimension travelling, do not iterate over new entries...
          // (by dfl iterator() is configured to not iterate over new entries)
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645bbd5a4bed 100644
+index 8045d6c9398d1c88595da6e41aa1ed27fb6fbad0..4839884f3c8a473e74b32681a5f98c30bc8236de 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -427,7 +427,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -428,7 +428,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
  
      private boolean unloadChunk0(int x, int z, boolean save) {
@@ -1392,7 +1384,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          if (!this.isChunkLoaded(x, z)) {
              return true;
          }
-@@ -442,6 +442,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -443,6 +443,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean regenerateChunk(int x, int z) {
@@ -1400,7 +1392,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          org.spigotmc.AsyncCatcher.catchOp("chunk regenerate"); // Spigot
          throw new UnsupportedOperationException("Not supported in this Minecraft version! Unless you can fix it, this is not a bug :)");
          /*
-@@ -469,6 +470,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -470,6 +471,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean refreshChunk(int x, int z) {
@@ -1408,7 +1400,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          ChunkHolder playerChunk = this.world.getChunkSource().chunkMap.getVisibleChunkIfPresent(ChunkPos.asLong(x, z));
          if (playerChunk == null) return false;
  
-@@ -529,7 +531,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -530,7 +532,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean loadChunk(int x, int z, boolean generate) {
@@ -1417,7 +1409,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          warnUnsafeChunk("loading a faraway chunk", x, z); // Paper
          ChunkAccess chunk = this.world.getChunkSource().getChunk(x, z, generate || isChunkGenerated(x, z) ? ChunkStatus.FULL : ChunkStatus.EMPTY, true); // Paper
  
-@@ -781,6 +783,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -782,6 +784,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean generateTree(Location loc, TreeType type, BlockChangeDelegate delegate) {
@@ -1425,7 +1417,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          this.world.captureTreeGeneration = true;
          this.world.captureBlockStates = true;
          boolean grownTree = this.generateTree(loc, type);
-@@ -891,6 +894,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -892,6 +895,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean createExplosion(double x, double y, double z, float power, boolean setFire, boolean breakBlocks, Entity source) {
@@ -1433,7 +1425,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          net.minecraft.world.level.Level.ExplosionInteraction explosionType;
          if (!breakBlocks) {
              explosionType = net.minecraft.world.level.Level.ExplosionInteraction.NONE; // Don't break blocks
-@@ -905,6 +909,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -906,6 +910,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      // Paper start
      @Override
      public boolean createExplosion(Entity source, Location loc, float power, boolean setFire, boolean breakBlocks) {
@@ -1441,7 +1433,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          return !world.explode(source != null ? ((org.bukkit.craftbukkit.entity.CraftEntity) source).getHandle() : null, loc.getX(), loc.getY(), loc.getZ(), power, setFire, breakBlocks ? net.minecraft.world.level.Level.ExplosionInteraction.MOB : net.minecraft.world.level.Level.ExplosionInteraction.NONE).wasCanceled;
      }
      // Paper end
-@@ -981,6 +986,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -982,6 +987,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public int getHighestBlockYAt(int x, int z, org.bukkit.HeightMap heightMap) {
@@ -1449,7 +1441,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          warnUnsafeChunk("getting a faraway chunk", x >> 4, z >> 4); // Paper
          // Transient load for this tick
          return this.world.getChunk(x >> 4, z >> 4).getHeight(CraftHeightMap.toNMS(heightMap), x, z);
-@@ -1011,6 +1017,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1012,6 +1018,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      @Override
      public void setBiome(int x, int y, int z, Holder<net.minecraft.world.level.biome.Biome> bb) {
          BlockPos pos = new BlockPos(x, 0, z);
@@ -1457,7 +1449,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          if (this.world.hasChunkAt(pos)) {
              net.minecraft.world.level.chunk.LevelChunk chunk = this.world.getChunkAt(pos);
  
-@@ -2280,6 +2287,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -2281,6 +2288,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public void sendGameEvent(Entity sourceEntity, org.bukkit.GameEvent gameEvent, Vector position) {
@@ -1465,7 +1457,7 @@ index 95de729f0a02a202632ea85a4061607d632588e9..3f3721596c09a6d3226ed6e3abeb645b
          getHandle().gameEvent(sourceEntity != null ? ((CraftEntity) sourceEntity).getHandle(): null, net.minecraft.core.registries.BuiltInRegistries.GAME_EVENT.getHolder(org.bukkit.craftbukkit.util.CraftNamespacedKey.toMinecraft(gameEvent.getKey())).orElseThrow(), org.bukkit.craftbukkit.util.CraftVector.toBlockPos(position));
      }
      // Paper end
-@@ -2408,7 +2416,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -2409,7 +2417,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      // Paper start
      public java.util.concurrent.CompletableFuture<Chunk> getChunkAtAsync(int x, int z, boolean gen, boolean urgent) {
          warnUnsafeChunk("getting a faraway chunk async", x, z); // Paper
