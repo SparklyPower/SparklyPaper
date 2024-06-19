@@ -70,7 +70,7 @@ index 774556a62eb240da42e84db4502e2ed43495be17..9bc7b99b5b39a8ffe4118b8d86f5b806
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index b0a3ec17a50f4c302d6a9dd75bf907b01c567209..6195408e7f43924c0c32e4d9a665b03a949a7f17 100644
+index e5e41dc2d4f7a8c3fea704212507ca0b951664db..d5b0c26e667104852a7afc375861eaa558a9efb5 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -83,14 +83,14 @@ public class WatchdogThread extends Thread
@@ -97,6 +97,6 @@ index b0a3ec17a50f4c302d6a9dd75bf907b01c567209..6195408e7f43924c0c32e4d9a665b03a
                  log.log( Level.SEVERE, "------------------------------" );
 -                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Paper!):" ); // Paper
 +                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to SparklyPaper!):" ); // SparklyPaper - branding changes // Paper
-                 ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper - rewrite chunk system
+                 ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(MinecraftServer.getServer(), isLongTimeout); // Paper - rewrite chunk system
                  WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
                  log.log( Level.SEVERE, "------------------------------" );

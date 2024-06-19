@@ -6,7 +6,7 @@ Subject: [PATCH] Parallel world ticking
 "mom can we have folia?" "we already have folia at home" folia at home:
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-index ad339978cd2e8d78b0566c2daf0495a418d127c7..b01c325f43a7f8989dea279e99fd87caf17969bb 100644
+index 3d902f382977a194e09986419391c3ca1568885c..5e58a77cf84daa931a632e4f5dc917b6639b8fb4 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 @@ -1007,7 +1007,7 @@ public final class ChunkHolderManager {
@@ -37,10 +37,10 @@ index ad339978cd2e8d78b0566c2daf0495a418d127c7..b01c325f43a7f8989dea279e99fd87ca
          boolean ret = false;
          final boolean canProcessFullUpdates = processFullUpdates & isTickThread;
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
-index faf76a5c2f9fa2eea38d2c7f2ab1c43873254e72..66f61697b96d5b250a182b55f7870493800b95a1 100644
+index c1c119e2e788d5963de3a74a6b9724c71a168a8a..158a517f34ed0e6d340adc8e01b083bbd611760f 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkTaskScheduler.java
-@@ -372,7 +372,7 @@ public final class ChunkTaskScheduler {
+@@ -384,7 +384,7 @@ public final class ChunkTaskScheduler {
      public void scheduleTickingState(final int chunkX, final int chunkZ, final FullChunkStatus toStatus,
                                       final boolean addTicket, final PrioritisedExecutor.Priority priority,
                                       final Consumer<LevelChunk> onComplete) {
@@ -49,7 +49,7 @@ index faf76a5c2f9fa2eea38d2c7f2ab1c43873254e72..66f61697b96d5b250a182b55f7870493
              this.scheduleChunkTask(chunkX, chunkZ, () -> {
                  ChunkTaskScheduler.this.scheduleTickingState(chunkX, chunkZ, toStatus, addTicket, priority, onComplete);
              }, priority);
-@@ -563,7 +563,7 @@ public final class ChunkTaskScheduler {
+@@ -575,7 +575,7 @@ public final class ChunkTaskScheduler {
  
      public void scheduleChunkLoad(final int chunkX, final int chunkZ, final ChunkStatus toStatus, final boolean addTicket,
                                    final PrioritisedExecutor.Priority priority, final Consumer<ChunkAccess> onComplete) {
@@ -682,7 +682,7 @@ index 2d88bdf9aab500cff26f7c35df9b1c178ab6897b..7181ca59c564406da3da7673fe98e11a
      public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
      public ChatDecorator getChatDecorator() {
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 17c862b5c33312539aab9be215834c06add818e7..7152b8126fa942c0ebcf98b570a70d18e3a307e5 100644
+index dd16fb1ae3b4da951b8d4d03937bbb2239eea007..0c41589622f99fd7d318a36aa0fa8720b8f8b227 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -18,6 +18,7 @@ import java.util.Collections;
