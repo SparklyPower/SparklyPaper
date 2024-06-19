@@ -108,7 +108,7 @@ index 0048077dedd19adc6c5a88e7d916d88a71662115..358efd39ae73f0a8a5c25d116af48c3e
              List list;
  
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 3bb88e49fa4513011a082f06d592e70e759fd2ae..26aab541e157b3dafbbffbeab9bcc1dbf13c13c2 100644
+index c45507dce50ca8b553a620b4a0820883e9af2487..a17136f7a762b19ce4c6240323d2b74f91ebfba3 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -182,6 +182,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -119,7 +119,7 @@ index 3bb88e49fa4513011a082f06d592e70e759fd2ae..26aab541e157b3dafbbffbeab9bcc1db
      }
  
      void updateMaps(ServerPlayer player) {
-@@ -222,6 +223,10 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -197,6 +198,10 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
      public final io.papermc.paper.util.player.NearbyPlayers nearbyPlayers;
      // Paper end
@@ -130,7 +130,7 @@ index 3bb88e49fa4513011a082f06d592e70e759fd2ae..26aab541e157b3dafbbffbeab9bcc1db
  
      public ChunkMap(ServerLevel world, LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, StructureTemplateManager structureTemplateManager, Executor executor, BlockableEventLoop<Runnable> mainThreadExecutor, LightChunkGetter chunkProvider, ChunkGenerator chunkGenerator, ChunkProgressListener worldGenerationProgressListener, ChunkStatusUpdateListener chunkStatusChangeListener, Supplier<DimensionDataStorage> persistentStateManagerFactory, int viewDistance, boolean dsync) {
          super(new RegionStorageInfo(session.getLevelId(), world.dimension(), "chunk"), session.getDimensionPath(world.dimension()).resolve("region"), dataFixer, dsync);
-@@ -335,7 +340,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -308,7 +313,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
          return this.randomState;
      }
  
@@ -187,10 +187,10 @@ index 71abe25cfb73af3857cbc85980aa32d0201aab62..51c5901efbe4b5e6789aa9b7edbe973b
  
      public String getDebugStatus() {
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index f3c5c66baf5e4d87d43c6e790923e22383211666..9ae1a0d7a0b36eea43f85e0a0cdc2296aef2e655 100644
+index 5bb01450d46106c8b1976ce66726a0867d6d6bca..4c396b34ed9c7ea2bef762da9e894c3de6a844b3 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -524,18 +524,10 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -446,18 +446,10 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
  
              gameprofilerfiller.push("pollingChunks");
              gameprofilerfiller.push("filteringLoadedChunks");
@@ -211,7 +211,7 @@ index f3c5c66baf5e4d87d43c6e790923e22383211666..9ae1a0d7a0b36eea43f85e0a0cdc2296
  
              if (this.level.tickRateManager().runsNormally()) {
                  gameprofilerfiller.popPush("naturalSpawnCount");
-@@ -570,36 +562,107 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -492,36 +484,107 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                  gameprofilerfiller.popPush("spawnAndTick");
                  boolean flag = this.level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) && !this.level.players().isEmpty(); // CraftBukkit
  
@@ -335,7 +335,7 @@ index f3c5c66baf5e4d87d43c6e790923e22383211666..9ae1a0d7a0b36eea43f85e0a0cdc2296
                  this.level.timings.chunkTicks.stopTiming(); // Paper
  
                  gameprofilerfiller.popPush("customSpawners");
-@@ -611,11 +674,23 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -533,11 +596,23 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
              }
  
              gameprofilerfiller.popPush("broadcast");

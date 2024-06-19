@@ -8,7 +8,7 @@ We replaced the `blockEntityTickers` list with a custom list based on fastutil's
 This is WAY FASTER than using `removeAll` with a list of entries to be removed, because we don't need to calculate the identity of each block entity to be removed, and we can jump directly to where the search should begin, giving a performance boost for small removals (because we don't need to loop thru the entire list to find what element should be removed) and a performance boost for big removals (no need to calculate the identity of each block entity).
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 913abd2ae85cb2c558ba953ea446aab939074f43..175402a4ce41a048429a6fdccce4190add75f17a 100644
+index 9f94c999f1f004d673a1844a4a10fe1443ffac22..5c7edd7323fd6cf82eead6822e3f65666c889462 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -115,7 +115,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
@@ -20,7 +20,7 @@ index 913abd2ae85cb2c558ba953ea446aab939074f43..175402a4ce41a048429a6fdccce4190a
      protected final NeighborUpdater neighborUpdater;
      private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
      private boolean tickingBlockEntities;
-@@ -965,13 +965,13 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -963,13 +963,13 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
              if (tickingblockentity.isRemoved()) {
                  // Spigot start
                  tilesThisCycle--;

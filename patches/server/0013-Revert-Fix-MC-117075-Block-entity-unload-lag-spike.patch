@@ -6,10 +6,10 @@ Subject: [PATCH] Revert "Fix MC-117075: Block entity unload lag spike"
 This reverts commit f3453b204569ea865cc1d1302edb6d125e7f0cb3.
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 7fc7419988491dc558c10016a58ebaae485b6cfc..913abd2ae85cb2c558ba953ea446aab939074f43 100644
+index c8d5eb0b67678666f400d2f9e419655e23d43365..9f94c999f1f004d673a1844a4a10fe1443ffac22 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -957,8 +957,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -955,8 +955,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
          boolean flag = this.tickRateManager().runsNormally();
  
          int tilesThisCycle = 0;
@@ -18,7 +18,7 @@ index 7fc7419988491dc558c10016a58ebaae485b6cfc..913abd2ae85cb2c558ba953ea446aab9
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -967,13 +965,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -965,13 +963,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
              if (tickingblockentity.isRemoved()) {
                  // Spigot start
                  tilesThisCycle--;

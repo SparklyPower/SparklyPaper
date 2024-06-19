@@ -56,9 +56,18 @@ index 8b5293b0c696ef21d0101493ffa41b60bf0bc86b..601198a33adb29316b0617d5390d1620
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index a832b608fceb12b5ceeb4ff1f824e7d542bad32f..086ff182abaf0a3df4d20f98c6e5f9ddce26dc83 100644
+index 4f6175470b865ec32c3dafd79c6c1640639fbcc2..2d88bdf9aab500cff26f7c35df9b1c178ab6897b 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1670,7 +1670,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         }
+         /*
+         getAllLevels().forEach(level -> {
+-            for (final Entity entity : level.moonrise$getEntityLookup().getAllCopy()) { // Paper - rewrite chunk system
++            for (final Entity entity : level.getEntities().getAll()) {
+                 if (entity.isRemoved()) {
+                     continue;
+                 }
 @@ -1746,7 +1746,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
@@ -73,11 +82,25 @@ index a832b608fceb12b5ceeb4ff1f824e7d542bad32f..086ff182abaf0a3df4d20f98c6e5f9dd
 +                worldserver.tickTimes10s.add(this.tickCount, j);
 +                worldserver.tickTimes60s.add(this.tickCount, j);
 +                // SparklyPaper end
-                 // Paper start
-                 for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
-                     regionManager.recalculateRegions();
+                 worldserver.timings.doTick.stopTiming(); // Spigot
+             } catch (Throwable throwable) {
+                 CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
+@@ -2743,13 +2752,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
+     }
+ 
+-    // Paper start - rewrite chunk system
+-    @Override
+-    public boolean isSameThread() {
+-        return io.papermc.paper.util.TickThread.isTickThread();
+-    }
+-    // Paper end - rewrite chunk system
+-
+     // CraftBukkit start
+     public boolean isDebugging() {
+         return false;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index b81ac6db8ba1ee0722e9e85f8de8ef91169a3198..f6d0b7d94995fff41def7edcf66fac40c43fec61 100644
+index 798016774df02c3f7ebf909c9cc125f8427a39be..7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -496,6 +496,12 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.

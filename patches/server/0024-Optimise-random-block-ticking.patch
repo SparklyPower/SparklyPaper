@@ -90,7 +90,7 @@ index 0000000000000000000000000000000000000000..7d93652c1abbb6aee6eb7c26cf35d4d0
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 47a1e391a9ed800616b055ce1ef0026943e2ab89..2c8d65efb164508318900319454b7ef0ab402f4d 100644
+index 5857d889f3debcfcc383914e7bb22f697de99ec7..9ec3a5332d5ad30d753bb3829dc8f933dcbaa1a7 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -804,6 +804,10 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
@@ -324,10 +324,10 @@ index 4bfa947531c4a67989e18032754dabf4c69e989c..caf4120721be8f2f7e2d737abbf73296
  
      public BlockPos getHomePos() {
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index f4e69d6496d6960147436b8244d7d73fa10d148b..661c004c543c5114dbbbd7663cf0cdc300154b7b 100644
+index 38acdc61426b33ed4aceb46b9a63d47d894fe8cb..678228ed89809f613e6d95c2dd0446935fe27a23 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1512,9 +1512,17 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1515,9 +1515,17 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
      public abstract RecipeManager getRecipeManager();
  
      public BlockPos getBlockRandomPos(int x, int y, int z, int l) {
