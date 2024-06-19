@@ -90,10 +90,10 @@ index 0000000000000000000000000000000000000000..7d93652c1abbb6aee6eb7c26cf35d4d0
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 5857d889f3debcfcc383914e7bb22f697de99ec7..9ec3a5332d5ad30d753bb3829dc8f933dcbaa1a7 100644
+index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..7e4dba6a45ff559cd2701e9225b0c347f7887454 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -804,6 +804,10 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -802,6 +802,10 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
              entityplayer.stopSleepInBed(false, false);
          });
      }
@@ -104,7 +104,7 @@ index 5857d889f3debcfcc383914e7bb22f697de99ec7..9ec3a5332d5ad30d753bb3829dc8f933
  
      public void tickChunk(LevelChunk chunk, int randomTickSpeed) {
          ChunkPos chunkcoordintpair = chunk.getPos();
-@@ -813,8 +817,10 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -811,8 +815,10 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
          ProfilerFiller gameprofilerfiller = this.getProfiler();
  
          gameprofilerfiller.push("thunder");
@@ -116,7 +116,7 @@ index 5857d889f3debcfcc383914e7bb22f697de99ec7..9ec3a5332d5ad30d753bb3829dc8f933
  
              if (this.isRainingAt(blockposition)) {
                  DifficultyInstance difficultydamagescaler = this.getCurrentDifficultyAt(blockposition);
-@@ -846,7 +852,10 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -844,7 +850,10 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
          if (!this.paperConfig().environment.disableIceAndSnow) { // Paper - Option to disable ice and snow
          for (int l = 0; l < randomTickSpeed; ++l) {
              if (this.random.nextInt(48) == 0) {
@@ -128,7 +128,7 @@ index 5857d889f3debcfcc383914e7bb22f697de99ec7..9ec3a5332d5ad30d753bb3829dc8f933
              }
          }
          } // Paper - Option to disable ice and snow
-@@ -854,36 +863,37 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -852,36 +861,37 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
          gameprofilerfiller.popPush("tickBlocks");
          timings.chunkTicksBlocks.startTiming(); // Paper
          if (randomTickSpeed > 0) {
@@ -190,7 +190,7 @@ index 5857d889f3debcfcc383914e7bb22f697de99ec7..9ec3a5332d5ad30d753bb3829dc8f933
  
          timings.chunkTicksBlocks.stopTiming(); // Paper
          gameprofilerfiller.pop();
-@@ -891,17 +901,25 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -889,17 +899,25 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
  
      @VisibleForTesting
      public void tickPrecipitation(BlockPos pos) {
@@ -220,7 +220,7 @@ index 5857d889f3debcfcc383914e7bb22f697de99ec7..9ec3a5332d5ad30d753bb3829dc8f933
              if (i > 0 && biomebase.shouldSnow(this, blockposition1)) {
                  BlockState iblockdata = this.getBlockState(blockposition1);
  
-@@ -919,12 +937,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -917,12 +935,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                  }
              }
  
@@ -324,10 +324,10 @@ index 4bfa947531c4a67989e18032754dabf4c69e989c..caf4120721be8f2f7e2d737abbf73296
  
      public BlockPos getHomePos() {
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 38acdc61426b33ed4aceb46b9a63d47d894fe8cb..678228ed89809f613e6d95c2dd0446935fe27a23 100644
+index bc11ecc01fe67bcadc3a6417a20cd28f9dd450a7..77b9cbcf6c68c9af919ffb1ee5af56cf1f47069d 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1515,9 +1515,17 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1503,10 +1503,18 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
      public abstract RecipeManager getRecipeManager();
  
      public BlockPos getBlockRandomPos(int x, int y, int z, int l) {
@@ -338,7 +338,8 @@ index 38acdc61426b33ed4aceb46b9a63d47d894fe8cb..678228ed89809f613e6d95c2dd044693
 +    }
 +    public final BlockPos.MutableBlockPos getRandomBlockPosition(int x, int y, int z, int l, BlockPos.MutableBlockPos out) {
 +        // Paper end
-         int i1 = this.random.nextInt() >> 2; // SparklyPaper - parallel world ticking
+         this.randValue = this.randValue * 3 + 1013904223;
+         int i1 = this.randValue >> 2;
  
 -        return new BlockPos(x + (i1 & 15), y + (i1 >> 16 & l), z + (i1 >> 8 & 15));
 +        out.set(x + (i1 & 15), y + (i1 >> 16 & l), z + (i1 >> 8 & 15)); // Paper - change to setValues call

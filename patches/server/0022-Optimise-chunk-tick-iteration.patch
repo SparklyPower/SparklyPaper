@@ -187,10 +187,10 @@ index 71abe25cfb73af3857cbc85980aa32d0201aab62..51c5901efbe4b5e6789aa9b7edbe973b
  
      public String getDebugStatus() {
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 5bb01450d46106c8b1976ce66726a0867d6d6bca..4c396b34ed9c7ea2bef762da9e894c3de6a844b3 100644
+index 82e7f7c3c2f51bc135585f43bc5167bcde2f8a98..90091a8f3b2ef1db64ad0d8b571c0270da624577 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -446,18 +446,10 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -421,18 +421,10 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
  
              gameprofilerfiller.push("pollingChunks");
              gameprofilerfiller.push("filteringLoadedChunks");
@@ -211,7 +211,7 @@ index 5bb01450d46106c8b1976ce66726a0867d6d6bca..4c396b34ed9c7ea2bef762da9e894c3d
  
              if (this.level.tickRateManager().runsNormally()) {
                  gameprofilerfiller.popPush("naturalSpawnCount");
-@@ -492,36 +484,107 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -467,36 +459,107 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
                  gameprofilerfiller.popPush("spawnAndTick");
                  boolean flag = this.level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) && !this.level.players().isEmpty(); // CraftBukkit
  
@@ -335,7 +335,7 @@ index 5bb01450d46106c8b1976ce66726a0867d6d6bca..4c396b34ed9c7ea2bef762da9e894c3d
                  this.level.timings.chunkTicks.stopTiming(); // Paper
  
                  gameprofilerfiller.popPush("customSpawners");
-@@ -533,11 +596,23 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -508,11 +571,23 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
              }
  
              gameprofilerfiller.popPush("broadcast");
@@ -363,19 +363,16 @@ index 5bb01450d46106c8b1976ce66726a0867d6d6bca..4c396b34ed9c7ea2bef762da9e894c3d
              gameprofilerfiller.pop();
          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 2cd3e99fe31b074c8051fc69a2b6201745bd05a6..f60ebe355c968f35c05c64149baa507869f1f78f 100644
+index 89ed20e9c629cf39a24c7a0ce5c4fee41fc64fd5..ce3ee47a605876529f86b95cc072fe36fa194e40 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -332,8 +332,10 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -331,6 +331,9 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+         return this.viewDistanceHolder;
      }
      // Paper end - rewrite chunk system
-     public boolean hasTickedAtLeastOnceInNewWorld = false; // SparklyPaper - parallel world ticking (fixes bug in DreamResourceReset where the inventory is opened AFTER the player has changed worlds, if you click with the quick tp torch in a chest, because the inventory is opened AFTER the player has teleported)
--
--    public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
 +    // Paper start - optimise chunk tick iteration
 +    public double lastEntitySpawnRadiusSquared = -1.0;
 +    // Paper end - optimise chunk tick iteration
-+         public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
+ 
+     public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
          super(world, world.getSharedSpawnPos(), world.getSharedSpawnAngle(), profile);
-         this.chatVisibility = ChatVisiblity.FULL;
-         this.canChatColor = true;

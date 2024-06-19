@@ -711,7 +711,7 @@ index 17c862b5c33312539aab9be215834c06add818e7..7152b8126fa942c0ebcf98b570a70d18
          // SparklyPaper start - Spooky month optimizations
          halloweenManager.startHalloweenEpochTask();
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 82e7f7c3c2f51bc135585f43bc5167bcde2f8a98..5bb01450d46106c8b1976ce66726a0867d6d6bca 100644
+index 90091a8f3b2ef1db64ad0d8b571c0270da624577..4c396b34ed9c7ea2bef762da9e894c3de6a844b3 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -192,6 +192,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
@@ -770,7 +770,7 @@ index 82e7f7c3c2f51bc135585f43bc5167bcde2f8a98..5bb01450d46106c8b1976ce66726a086
  
          if (flag1) {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f697de99ec7 100644
+index 7e4dba6a45ff559cd2701e9225b0c347f7887454..9ec3a5332d5ad30d753bb3829dc8f933dcbaa1a7 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -222,6 +222,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
@@ -798,7 +798,7 @@ index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f69
      }
  
      // Paper start
-@@ -1153,7 +1155,6 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -1172,7 +1174,6 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
          if (fluid1.is(fluid)) {
              fluid1.tick(this, pos);
          }
@@ -806,7 +806,7 @@ index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f69
      }
  
      private void tickBlock(BlockPos pos, Block block) {
-@@ -1162,10 +1163,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -1181,10 +1182,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
          if (iblockdata.is(block)) {
              iblockdata.tick(this, pos, this.random);
          }
@@ -819,7 +819,7 @@ index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f69
          ++TimingHistory.entityTicks; // Paper - timings
          // Spigot start
          co.aikar.timings.Timing timer; // Paper
-@@ -1416,6 +1418,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -1435,6 +1437,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
      }
  
      private void addPlayer(ServerPlayer player) {
@@ -827,7 +827,7 @@ index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f69
          Entity entity = (Entity) this.getEntities().get(player.getUUID());
  
          if (entity != null) {
-@@ -1429,7 +1432,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -1448,7 +1451,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
  
      // CraftBukkit start
      private boolean addEntity(Entity entity, CreatureSpawnEvent.SpawnReason spawnReason) {
@@ -836,7 +836,7 @@ index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f69
          entity.generation = false; // Paper - Don't fire sync event during generation; Reset flag if it was added during a ServerLevel generation process
          // Paper start - extra debug info
          if (entity.valid) {
-@@ -2333,6 +2336,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -2352,6 +2355,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
      public void close() throws IOException {
          super.close();
          // Paper - rewrite chunk system
@@ -845,18 +845,18 @@ index 7e47c6f128090ea32ff36cf4fb2e660cc5ce04ef..5857d889f3debcfcc383914e7bb22f69
  
      @Override
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 89ed20e9c629cf39a24c7a0ce5c4fee41fc64fd5..2cd3e99fe31b074c8051fc69a2b6201745bd05a6 100644
+index ce3ee47a605876529f86b95cc072fe36fa194e40..d5157c0201421880d0f86c8b2ff511f6c68ba585 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -331,6 +331,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
-         return this.viewDistanceHolder;
-     }
-     // Paper end - rewrite chunk system
+@@ -334,6 +334,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+     // Paper start - optimise chunk tick iteration
+     public double lastEntitySpawnRadiusSquared = -1.0;
+     // Paper end - optimise chunk tick iteration
 +    public boolean hasTickedAtLeastOnceInNewWorld = false; // SparklyPaper - parallel world ticking (fixes bug in DreamResourceReset where the inventory is opened AFTER the player has changed worlds, if you click with the quick tp torch in a chest, because the inventory is opened AFTER the player has teleported)
  
      public ServerPlayer(MinecraftServer server, ServerLevel world, GameProfile profile, ClientInformation clientOptions) {
          super(world, world.getSharedSpawnPos(), world.getSharedSpawnAngle(), profile);
-@@ -759,6 +760,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -762,6 +763,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
  
      @Override
      public void tick() {
@@ -864,7 +864,7 @@ index 89ed20e9c629cf39a24c7a0ce5c4fee41fc64fd5..2cd3e99fe31b074c8051fc69a2b62017
          // CraftBukkit start
          if (this.joining) {
              this.joining = false;
-@@ -1723,6 +1725,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -1726,6 +1728,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                  return OptionalInt.empty();
              } else {
                  // CraftBukkit start
@@ -877,7 +877,7 @@ index 89ed20e9c629cf39a24c7a0ce5c4fee41fc64fd5..2cd3e99fe31b074c8051fc69a2b62017
                  this.containerMenu = container;
                  if (!this.isImmobile()) this.connection.send(new ClientboundOpenScreenPacket(container.containerId, container.getType(), Objects.requireNonNullElseGet(title, container::getTitle))); // Paper - Add titleOverride to InventoryOpenEvent
                  // CraftBukkit end
-@@ -1786,6 +1794,11 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -1789,6 +1797,11 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      }
      @Override
      public void closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason reason) {
@@ -1018,7 +1018,7 @@ index d524fcc191cb95d6ec7f12ae7fceeb8077bb08fc..451e5719613fc31bacf49c37978d4e49
              }
  
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index bc11ecc01fe67bcadc3a6417a20cd28f9dd450a7..38acdc61426b33ed4aceb46b9a63d47d894fe8cb 100644
+index 77b9cbcf6c68c9af919ffb1ee5af56cf1f47069d..678228ed89809f613e6d95c2dd0446935fe27a23 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -10,6 +10,8 @@ import java.util.function.Consumer;
@@ -1091,16 +1091,16 @@ index bc11ecc01fe67bcadc3a6417a20cd28f9dd450a7..38acdc61426b33ed4aceb46b9a63d47d
          this.getProfiler().incrementCounter("getEntities");
          // Paper start - rewrite chunk system
          final List<Entity> ret = new java.util.ArrayList<>();
-@@ -1503,8 +1515,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
-     public abstract RecipeManager getRecipeManager();
- 
-     public BlockPos getBlockRandomPos(int x, int y, int z, int l) {
+@@ -1510,8 +1522,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+     }
+     public final BlockPos.MutableBlockPos getRandomBlockPosition(int x, int y, int z, int l, BlockPos.MutableBlockPos out) {
+         // Paper end
 -        this.randValue = this.randValue * 3 + 1013904223;
 -        int i1 = this.randValue >> 2;
 +        int i1 = this.random.nextInt() >> 2; // SparklyPaper - parallel world ticking
  
-         return new BlockPos(x + (i1 & 15), y + (i1 >> 16 & l), z + (i1 >> 8 & 15));
-     }
+         out.set(x + (i1 & 15), y + (i1 >> 16 & l), z + (i1 >> 8 & 15)); // Paper - change to setValues call
+         return out; // Paper
 diff --git a/src/main/java/net/minecraft/world/level/block/DispenserBlock.java b/src/main/java/net/minecraft/world/level/block/DispenserBlock.java
 index f6edfea463b3725d3a79aca38825e86dbf82175c..c62d576a94308dece71eaef451280456dd87861c 100644
 --- a/src/main/java/net/minecraft/world/level/block/DispenserBlock.java
