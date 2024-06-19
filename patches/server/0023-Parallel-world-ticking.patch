@@ -711,18 +711,10 @@ index dd16fb1ae3b4da951b8d4d03937bbb2239eea007..0c41589622f99fd7d318a36aa0fa8720
          // SparklyPaper start - Spooky month optimizations
          halloweenManager.startHalloweenEpochTask();
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 90091a8f3b2ef1db64ad0d8b571c0270da624577..4c396b34ed9c7ea2bef762da9e894c3de6a844b3 100644
+index 90091a8f3b2ef1db64ad0d8b571c0270da624577..b7c7418a107046c9c55b0ade409b176e7a95f859 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -192,6 +192,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
- 
-     @Nullable
-     public LevelChunk getChunkAtIfLoadedImmediately(int x, int z) {
-+        io.papermc.paper.util.TickThread.ensureTickThread(level, x, z, "Cannot get chunks immediately asyncronously"); // SparklyPaper - parallel world ticking
-         return this.fullChunks.get(ChunkPos.asLong(x, z));
-     }
-     // Paper end
-@@ -226,6 +227,18 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -226,6 +226,18 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
      @Override
      public ChunkAccess getChunk(int x, int z, ChunkStatus leastStatus, boolean create) {
          // Paper start - rewrite chunk system
@@ -741,7 +733,7 @@ index 90091a8f3b2ef1db64ad0d8b571c0270da624577..4c396b34ed9c7ea2bef762da9e894c3d
          if (leastStatus == ChunkStatus.FULL) {
              final LevelChunk ret = this.fullChunks.get(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(x, z));
  
-@@ -243,6 +256,18 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -243,6 +255,18 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
      @Nullable
      @Override
      public LevelChunk getChunkNow(int chunkX, int chunkZ) {
@@ -760,7 +752,7 @@ index 90091a8f3b2ef1db64ad0d8b571c0270da624577..4c396b34ed9c7ea2bef762da9e894c3d
          return ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getFullChunkIfLoaded(chunkX, chunkZ); // Paper - rewrite chunk system
      }
  
-@@ -253,7 +278,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -253,7 +277,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
      }
  
      public CompletableFuture<ChunkResult<ChunkAccess>> getChunkFuture(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
