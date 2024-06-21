@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 21 Jun 2024 18:07:25 -0300
+Subject: [PATCH] Allow item version downgrades
+
+The server WON'T convert the item data from a newer version to an older version, so proceed with caution
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index f99353a60e3f236735ef6e2e6f13381b50ae9b7b..c285b9ab77f53270d570c55b007b57597eff8c03 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -78,6 +78,7 @@ import org.bukkit.potion.PotionType;
+ @SuppressWarnings("deprecation")
+ public final class CraftMagicNumbers implements UnsafeValues {
+     public static final UnsafeValues INSTANCE = new CraftMagicNumbers();
++    private static final boolean JUST_CORRUPT_IT = Boolean.getBoolean("sparklypaper.ignoreItemDataVersion"); // SparklyPaper - allow item downgrades
+ 
+     private CraftMagicNumbers() {}
+ 
+@@ -256,7 +257,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+     @Override
+     public Material getMaterial(String material, int version) {
+         Preconditions.checkArgument(material != null, "material == null");
+-        Preconditions.checkArgument(version <= this.getDataVersion(), "Newer version! Server downgrades are not supported!");
++        Preconditions.checkArgument(JUST_CORRUPT_IT || version <= this.getDataVersion(), "Newer version! Server downgrades are not supported!"); // SparklyPaper - allow item downgrades
+ 
+         // Fastpath up to date materials
+         if (version == this.getDataVersion()) {
+@@ -576,7 +577,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+             throw new RuntimeException(ex);
+         }
+         int dataVersion = compound.getInt("DataVersion");
+-        Preconditions.checkArgument(dataVersion <= getDataVersion(), "Newer version! Server downgrades are not supported!");
++        Preconditions.checkArgument(JUST_CORRUPT_IT || dataVersion <= getDataVersion(), "Newer version! Server downgrades are not supported!"); // SparklyPaper - allow item downgrades
+         return compound;
+     }
+ 
