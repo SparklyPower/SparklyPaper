@@ -14,7 +14,7 @@ index 1bfab581e59c607c7a30eeda17c88bb2938536f2..923e6a05f07922764b979ce7c3ebe708
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
 +        // SparklyPaper start
 +        try {
-+            net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.init((java.io.File) options.valueOf("sparklypaper-settings"));
++            net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.init((java.io.File) options.valueOf("bubblecore-settings"));
 +        } catch (Exception e) {
 +            DedicatedServer.LOGGER.error("Unable to load server configuration", e);
 +            return false;
@@ -69,9 +69,9 @@ index 0000000000000000000000000000000000000000..bc0ec96f91f7c9ab9f9a865a50f69707
 +public class SparklyPaperCommand extends Command {
 +    public SparklyPaperCommand(String name) {
 +        super(name);
-+        this.description = "SparklyPaper related commands";
-+        this.usageMessage = "/sparklypaper [reload | version]";
-+        this.setPermission("bukkit.command.sparklypaper");
++        this.description = "BubbleCore related commands";
++        this.usageMessage = "/bubblecore [reload | version]";
++        this.setPermission("bukkit.command.bubblecore");
 +    }
 +
 +    @Override
@@ -104,7 +104,7 @@ index 0000000000000000000000000000000000000000..bc0ec96f91f7c9ab9f9a865a50f69707
 +            }
 +            console.server.reloadCount++;
 +
-+            Command.broadcastCommandMessage(sender, ChatColor.GREEN + "SparklyPaper config reload complete.");
++            Command.broadcastCommandMessage(sender, ChatColor.GREEN + "BubbleCore config reload complete.");
 +        } else if (args[0].equalsIgnoreCase("version")) {
 +            Command verCmd = org.bukkit.Bukkit.getServer().getCommandMap().getCommand("version");
 +            if (verCmd != null) {
@@ -187,13 +187,13 @@ index 0000000000000000000000000000000000000000..614e64ce6bf5bb7fab5758250927a0d3
 +@DefaultQualifier(NonNull::class)
 +object SparklyPaperCommands {
 +    private val COMMANDS = mapOf(
-+        "sparklypaper" to SparklyPaperCommand("sparklypaper")
++        "bubblecore" to SparklyPaperCommand("bubblecore")
 +    )
 +
 +    fun registerCommands(server: MinecraftServer) {
 +        COMMANDS.forEach { (s: String, command: Command) ->
 +            server.server.commandMap.register(
-+                s, "SparklyPaper", command
++                s, "BubbleCore", command
 +            )
 +        }
 +    }
@@ -277,7 +277,7 @@ index 0000000000000000000000000000000000000000..8b78f0e8b1de1a6a2506e686be9d71ce
 +        val loadedConfig = try {
 +            yaml.decodeFromString<SparklyPaperConfig>(configFile.readText())
 +        } catch (e: SerializationException) {
-+            Bukkit.getLogger().log(Level.SEVERE, "Could not load sparklypaper.yml, please correct your syntax errors", e)
++            Bukkit.getLogger().log(Level.SEVERE, "Could not load bubblecore.yml, please correct your syntax errors", e)
 +            throw Throwables.propagate(e)
 +        }
 +        // Rewrite the config file to remove old fields and stuff
@@ -287,7 +287,7 @@ index 0000000000000000000000000000000000000000..8b78f0e8b1de1a6a2506e686be9d71ce
 +    }
 +
 +    fun getWorldSettings(levelName: String): SparklyPaperWorldConfig {
-+        return config.worldSettings[levelName] ?: config.worldSettings["default"] ?: error("Missing default world-settings in sparklypaper.yml!")
++        return config.worldSettings[levelName] ?: config.worldSettings["default"] ?: error("Missing default world-settings in bubblecore.yml!")
 +    }
 +}
 \ No newline at end of file
