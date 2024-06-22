@@ -35,9 +35,9 @@ index 299b7b029384c58fed80d53cc0b77c420d62eed7..81d47c381c97d52951860566b6f0f8fd
          val mcVersion = rootProject.providers.gradleProperty("mcVersion").get()
          val build = System.getenv("BUILD_NUMBER") ?: null
          val gitHash = git("rev-parse", "--short=7", "HEAD").getText().trim()
--        val implementationVersion = "$mcVersion-${build ?: "DEV"}-$gitHash"
+-        val implementationVersion = "$mcVersion-${build ?: "ALPHA"}-$gitHash"
 +        // SparklyPaper start
-+        var implementationVersion = "$mcVersion-${build ?: "DEV"}-$gitHash"
++        var implementationVersion = "$mcVersion-${build ?: "ALPHA"}-$gitHash"
 +        if (project.hasProperty("sparklypaperImplementationVersionSuffix")) {
 +            implementationVersion += "/${project.property("sparklypaperImplementationVersionSuffix")}"
 +        }
@@ -52,7 +52,7 @@ index 299b7b029384c58fed80d53cc0b77c420d62eed7..81d47c381c97d52951860566b6f0f8fd
 -            "Brand-Id" to "papermc:paper",
 -            "Brand-Name" to "Paper",
 +            "Brand-Id" to "sparklypower:sparklypaper", // SparklyPaper
-+            "Brand-Name" to "SparklyPaper", // SparklyPaper
++            "Brand-Name" to "BubbleCore", // SparklyPaper
              "Build-Number" to (build ?: ""),
              "Build-Time" to Instant.now().toString(),
              "Git-Branch" to gitBranch, // Paper
@@ -78,7 +78,7 @@ index e5e41dc2d4f7a8c3fea704212507ca0b951664db..d5b0c26e667104852a7afc375861eaa5
                  // Paper end
                  log.log( Level.SEVERE, "------------------------------" );
 -                log.log( Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug." ); // Paper
-+                log.log( Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug. This could be a SparklyPaper bug and, in that case, MrPowerGamerBR probably made a fucky wucky!" ); // SparklyPaper - branding changes // Paper
++                log.log( Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug. This could be a BubbleCore bug and, in that case, dead_luv probably made a fuc*ing shitty core!" ); // SparklyPaper - branding changes // Paper
                  log.log( Level.SEVERE, "If you see a plugin in the Server thread dump below, then please report it to that author" );
                  log.log( Level.SEVERE, "\t *Especially* if it looks like HTTP or MySQL operations are occurring" );
                  log.log( Level.SEVERE, "If you see a world save or edit, then it means you did far more than your server can handle at once" );
@@ -87,7 +87,7 @@ index e5e41dc2d4f7a8c3fea704212507ca0b951664db..d5b0c26e667104852a7afc375861eaa5
 +                log.log( Level.SEVERE, "If you are unsure or still think this is a SparklyPaper bug, please report this to https://github.com/SparklyPower/SparklyPaper/issues - and if you think this is a Paper bug, please report this to https://github.com/PaperMC/Paper/issues" );
                  log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
 -                log.log( Level.SEVERE, "Paper version: " + Bukkit.getServer().getVersion() );
-+                log.log( Level.SEVERE, "SparklyPaper version: " + Bukkit.getServer().getVersion() ); // SparklyPaper - branding changes
++                log.log( Level.SEVERE, "BubbleCore version: " + Bukkit.getServer().getVersion() ); // BubbleCore - branding changes
                  //
                  if ( net.minecraft.world.level.Level.lastPhysicsProblem != null )
                  {
@@ -96,7 +96,7 @@ index e5e41dc2d4f7a8c3fea704212507ca0b951664db..d5b0c26e667104852a7afc375861eaa5
                  // Paper end - Different message for short timeout
                  log.log( Level.SEVERE, "------------------------------" );
 -                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Paper!):" ); // Paper
-+                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to SparklyPaper!):" ); // SparklyPaper - branding changes // Paper
++                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to BubbleCore!):" ); // BubbleCore - branding changes // Paper
                  ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(MinecraftServer.getServer(), isLongTimeout); // Paper - rewrite chunk system
                  WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
                  log.log( Level.SEVERE, "------------------------------" );
