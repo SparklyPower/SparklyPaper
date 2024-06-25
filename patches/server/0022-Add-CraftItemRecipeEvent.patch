@@ -32,27 +32,31 @@ index 4ae88bfcead40cd05f9514a48a922a37767cb3cf..1093fbbeb534d2639571c6b7814ba325
                          }
  
 diff --git a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
-index 4d315bd1df9f4647814500135195375166c578b3..1c69cd23b7f9dd1aacc0e26fe7181b99bb94d3ec 100644
+index 4d315bd1df9f4647814500135195375166c578b3..9d3bc5b7ff57a5ff10fef788f22a21d1d54f1a50 100644
 --- a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
-@@ -162,6 +162,7 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -162,7 +162,10 @@ public class CrafterBlock extends BaseEntityBlock {
              } else {
                  RecipeHolder<CraftingRecipe> recipeHolder = optional.get();
                  ItemStack itemStack = recipeHolder.value().assemble(crafterBlockEntity, world.registryAccess());
-+                itemStack = org.bukkit.craftbukkit.event.CraftEventFactory.callCraftItemRecipeEvent(crafterBlockEntity, recipeHolder.toBukkitRecipe(), itemStack); // SparklyPaper - add CraftItemRecipeEvent
-                 if (itemStack.isEmpty()) {
+-                if (itemStack.isEmpty()) {
++                // SparklyPaper - add CraftItemRecipeEvent
++                net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callCraftItemRecipeEvent(crafterBlockEntity, recipeHolder.toBukkitRecipe(), itemStack);
++                itemStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getResult());
++                if (itemStack.isEmpty() || event.isCancelled()) { // SparklyPaper - add CraftItemRecipeEvent
                      world.levelEvent(1050, pos, 0);
                  } else {
+                     crafterBlockEntity.setCraftingTicksRemaining(6);
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index 0cba343989d6d33026a8e94f2b58ca93571721a9..bbde12198b15ebbe7f34ec28b79ff0f96bbed38f 100644
+index 0cba343989d6d33026a8e94f2b58ca93571721a9..4de9187d66d10b5a2c0ee8fe11b585f5d369df4f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -1442,6 +1442,25 @@ public class CraftEventFactory {
+@@ -1442,6 +1442,23 @@ public class CraftEventFactory {
          return CraftItemStack.asNMSCopy(bitem);
      }
  
 +    // SparklyPaper start - add CraftItemRecipeEvent
-+    public static ItemStack callCraftItemRecipeEvent(net.minecraft.world.inventory.CraftingContainer container, Recipe recipe, ItemStack result) {
++    public static net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent callCraftItemRecipeEvent(net.minecraft.world.inventory.CraftingContainer container, Recipe recipe, ItemStack result) {
 +        org.bukkit.inventory.ItemStack[] matrix = new org.bukkit.inventory.ItemStack[container.getItems().size()];
 +        int i = 0;
 +        for (ItemStack item : container.getItems()) {
@@ -64,9 +68,7 @@ index 0cba343989d6d33026a8e94f2b58ca93571721a9..bbde12198b15ebbe7f34ec28b79ff0f9
 +        net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent event = new net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent(matrix, recipe, bukkitResult);
 +        Bukkit.getPluginManager().callEvent(event);
 +
-+        org.bukkit.inventory.ItemStack bitem = event.getResult();
-+
-+        return CraftItemStack.asNMSCopy(bitem);
++        return event;
 +    }
 +    // SparklyPaper end
 +
