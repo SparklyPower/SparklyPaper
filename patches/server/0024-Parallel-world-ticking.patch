@@ -1425,6 +1425,32 @@ index 83a39f900551e39d5af6f17a339a386ddee4feef..1f3ae0cc95a7e9ca9380493315ace4e1
          // Paper start - replace with better logic, do not delay removals/additions
          // To ensure nothing weird happens with dimension travelling, do not iterate over new entries...
          // (by dfl iterator() is configured to not iterate over new entries)
+diff --git a/src/main/java/net/minecraft/world/level/saveddata/maps/MapIndex.java b/src/main/java/net/minecraft/world/level/saveddata/maps/MapIndex.java
+index 763b315b1d761bc3bd82d9b847ed3f64fd5ce991..b67dddabbae835cbe7261768fb14bfac4ad6c921 100644
+--- a/src/main/java/net/minecraft/world/level/saveddata/maps/MapIndex.java
++++ b/src/main/java/net/minecraft/world/level/saveddata/maps/MapIndex.java
+@@ -34,17 +34,21 @@ public class MapIndex extends SavedData {
+ 
+     @Override
+     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider registryLookup) {
++        synchronized (this.usedAuxIds) { // SparklyPaper start - make map data thread-safe
+         for (Entry<String> entry : this.usedAuxIds.object2IntEntrySet()) {
+             nbt.putInt(entry.getKey(), entry.getIntValue());
+         }
++        } // SparklyPaper end - make map data thread-safe
+ 
+         return nbt;
+     }
+ 
+     public MapId getFreeAuxValueForMap() {
++        synchronized (this.usedAuxIds) { // SparklyPaper start - make map data thread-safe
+         int i = this.usedAuxIds.getInt("map") + 1;
+         this.usedAuxIds.put("map", i);
+         this.setDirty();
+         return new MapId(i);
++        } // SparklyPaper end - make map data thread-safe
+     }
+ }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 index 6303760f10af17f1da1d92d6c4dc7dd6f5778f94..8037850766e76ff92941eb071b4154fba9163ddc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
