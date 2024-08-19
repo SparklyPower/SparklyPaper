@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: 'SparklyPaper'
-          ref: 'ver/1.20.6'
+          ref: 'ver/1.21.1'
           token: ${{ secrets.LORITTA_PAT }}
         
       - name: Checkout Paper Repository
@@ -19,7 +19,7 @@ jobs:
         with:
           path: 'Paper'
           repository: "PaperMC/Paper"
-          ref: 'ver/1.20.6'
+          ref: 'master'
           token: ${{ secrets.LORITTA_PAT }}
       
       - name: Get Paper Latest Commit Hash
