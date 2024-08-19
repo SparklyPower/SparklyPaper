@@ -1703,16 +1703,3 @@ index 8b78f0e8b1de1a6a2506e686be9d71ced72352dd..ce608ca9640cdea0fe690ef610213558
  
      fun init(configFile: File) {
          // Write default config if the file doesn't exist
-diff --git a/src/test/java/io/papermc/paper/adventure/AdventureCodecsTest.java b/src/test/java/io/papermc/paper/adventure/AdventureCodecsTest.java
-index 69b3aa957161e75d6344e437a8b4a4533ef00523..4b6252c9403dba1f2443ebbec4fa8fd29ba154cf 100644
---- a/src/test/java/io/papermc/paper/adventure/AdventureCodecsTest.java
-+++ b/src/test/java/io/papermc/paper/adventure/AdventureCodecsTest.java
-@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
- import com.mojang.serialization.DynamicOps;
- import com.mojang.serialization.JavaOps;
- import com.mojang.serialization.JsonOps;
--import io.papermc.paper.util.MethodParameterSource;
-+import ca.spottedleaf.moonrise.common.util.MethodParameterSource;
- import java.io.IOException;
- import java.lang.annotation.ElementType;
- import java.lang.annotation.Retention;
