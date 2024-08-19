@@ -6,11 +6,11 @@ Subject: [PATCH] Revert "Fix MC-117075: Block entity unload lag spike"
 This reverts commit f3453b204569ea865cc1d1302edb6d125e7f0cb3.
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 5ff499481583d4cb68297b8600d5ea210eceece9..2144ffc34b2fc233f85c8ff56eefefde2a4b16ef 100644
+index e086114c3d4b1d8ed46eec98e4b66cfc21451139..2d44c17a63b12df0e3c5b39cb9a80924470a8428 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1268,8 +1268,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
-         boolean flag = this.tickRateManager().runsNormally();
+@@ -1387,8 +1387,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+         int tickedEntities = 0; // Paper - rewrite chunk system
  
          int tilesThisCycle = 0;
 -        var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
@@ -18,7 +18,7 @@ index 5ff499481583d4cb68297b8600d5ea210eceece9..2144ffc34b2fc233f85c8ff56eefefde
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -1278,7 +1276,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1397,7 +1395,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
              if (tickingblockentity.isRemoved()) {
                  // Spigot start
                  tilesThisCycle--;
@@ -27,8 +27,8 @@ index 5ff499481583d4cb68297b8600d5ea210eceece9..2144ffc34b2fc233f85c8ff56eefefde
                  // Spigot end
              } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) {
                  tickingblockentity.tick();
-@@ -1289,7 +1287,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
-                 // Paper end - execute chunk tasks during tick
+@@ -1408,7 +1406,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+                 // Paper end - rewrite chunk system
              }
          }
 -        this.blockEntityTickers.removeAll(toRemove); // Paper - Fix MC-117075

@@ -6,7 +6,7 @@ Subject: [PATCH] Skip dirty stats copy when requesting player stats
 There's literally only one getDirty call. Because the map was only retrieved once, we don't actually need to create a copy of the map just to iterate it, we can just access it directly and clear it manually after use.
 
 diff --git a/src/main/java/net/minecraft/stats/ServerStatsCounter.java b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
-index f890738d3bb9fb5e70a9d323c6cec97f9948f9cf..8685cb5bbfa26b0d77c6fdde8cf2dc8bebc06585 100644
+index fb7342f7a5008a283c3400c6313c637de8210dfa..1f9b3cacb276c144ecbef104e5d598b78dc0c025 100644
 --- a/src/main/java/net/minecraft/stats/ServerStatsCounter.java
 +++ b/src/main/java/net/minecraft/stats/ServerStatsCounter.java
 @@ -90,12 +90,16 @@ public class ServerStatsCounter extends StatsCounter {

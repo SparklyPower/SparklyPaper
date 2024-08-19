@@ -6,18 +6,18 @@ Subject: [PATCH] Allow item version downgrades
 The server WON'T convert the item data from a newer version to an older version, so proceed with caution
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index f99353a60e3f236735ef6e2e6f13381b50ae9b7b..c285b9ab77f53270d570c55b007b57597eff8c03 100644
+index 28dbe30a98a6730839949bc9a6a90b78619ff84d..48e0c6fec6f847ce030ec79655d866be47364c73 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -78,6 +78,7 @@ import org.bukkit.potion.PotionType;
- @SuppressWarnings("deprecation")
+@@ -75,6 +75,7 @@ import org.bukkit.potion.PotionType;
  public final class CraftMagicNumbers implements UnsafeValues {
      public static final UnsafeValues INSTANCE = new CraftMagicNumbers();
+     public static final boolean DISABLE_OLD_API_SUPPORT = Boolean.getBoolean("paper.disableOldApiSupport"); // Paper
 +    private static final boolean JUST_CORRUPT_IT = Boolean.getBoolean("sparklypaper.ignoreItemDataVersion"); // SparklyPaper - allow item downgrades
  
      private CraftMagicNumbers() {}
  
-@@ -256,7 +257,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -236,7 +237,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
      @Override
      public Material getMaterial(String material, int version) {
          Preconditions.checkArgument(material != null, "material == null");
@@ -26,7 +26,7 @@ index f99353a60e3f236735ef6e2e6f13381b50ae9b7b..c285b9ab77f53270d570c55b007b5759
  
          // Fastpath up to date materials
          if (version == this.getDataVersion()) {
-@@ -576,7 +577,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -559,7 +560,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
              throw new RuntimeException(ex);
          }
          int dataVersion = compound.getInt("DataVersion");

@@ -6,7 +6,7 @@
 <h1 align="center">✨ SparklyPaper ✨</h1>
 </p>
 
-![Minecraft Version](https://badgen.now.sh/badge/minecraft%20version/1.20.6/blue) ![Blazing Fast](https://badgen.now.sh/badge/speed/blazing%20%F0%9F%94%A5/green)
+![Minecraft Version](https://badgen.now.sh/badge/minecraft%20version/1.21.1/blue) ![Blazing Fast](https://badgen.now.sh/badge/speed/blazing%20%F0%9F%94%A5/green)
 
 SparklyPower's Paper fork, making large servers snappier with high-performance optimizations and improvements! Focused on performance improvements for Survival servers with high player counts.
 

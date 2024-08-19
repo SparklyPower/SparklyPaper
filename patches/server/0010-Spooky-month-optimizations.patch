@@ -10,10 +10,10 @@ Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies h
 Avoids unnecessary date checks, even tho that this shouldn't really improve performance that much... unless you have a lot of bats/zombies/skeletons spawning.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 1148b3ab0a582fff17f0101516df4b5037b49aba..b635a473d2a19bbefc24e86455ec6735b9a8c9cc 100644
+index 7f2e25b2ebb8fb698a4adb12d77670e126549405..b198e2b7a1a96972ecf761e1713085d618aadead 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -317,7 +317,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -324,7 +324,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public volatile boolean abnormalExit = false; // Paper
      public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
      public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
@@ -22,12 +22,12 @@ index 1148b3ab0a582fff17f0101516df4b5037b49aba..b635a473d2a19bbefc24e86455ec6735
 +
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-         Thread thread = new io.papermc.paper.util.TickThread(() -> { // Paper - rewrite chunk system
+         Thread thread = new ca.spottedleaf.moonrise.common.util.TickThread(() -> { // Paper - rewrite chunk system
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index ac8565be2334efe48d5bdc3f58bf60fb9f715da7..859faaf21635caca2a2ab471ac3d4569f04ba69b 100644
+index b7c39d2e93abbc5f988271d738490de68ce50b3b..1395e8f98bd87a060fb609c65a3311c220f5e9a8 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -241,6 +241,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -247,6 +247,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          }
          net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
          // SparklyPaper end
@@ -69,10 +69,10 @@ index dc27ddf5131e7398a5390a5187261d4c7fb6ccaa..6c8664c9cf75a88007e43348059fad7e
      private void setupAnimationStates() {
          if (this.isResting()) {
 diff --git a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
-index 0c5fe46d2da113beff3e220843593d616e37d4ca..26b81b6a0111e2149020b8a8f934f2660f59780e 100644
+index 3b5cf6ffb74d11bea5eb21bd66d679734ff5000c..97bdeb56fee6fb4ae924973730e34dbf933eef68 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
-@@ -154,10 +154,12 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
+@@ -157,10 +157,12 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
          this.setCanPickUpLoot(this.level().paperConfig().entities.behavior.mobsCanAlwaysPickUpLoot.skeletons || randomsource.nextFloat() < 0.55F * difficulty.getSpecialMultiplier()); // Paper - Add world settings for mobs picking up loot
          if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
              LocalDate localdate = LocalDate.now();
@@ -89,10 +89,10 @@ index 0c5fe46d2da113beff3e220843593d616e37d4ca..26b81b6a0111e2149020b8a8f934f266
                  this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
              }
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Zombie.java b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-index e42dfc62bb179be1ab01b0096c05c6549d38abbc..14292ee06e065b0043f5cb087072e3d0fa11291a 100644
+index 2280004638fd19ed018cb3e77d53a018b34ec516..fb15112f920174d7ea6a3bd683418772c0910780 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Zombie.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-@@ -542,10 +542,11 @@ public class Zombie extends Monster {
+@@ -553,10 +553,11 @@ public class Zombie extends Monster {
  
          if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
              LocalDate localdate = LocalDate.now();

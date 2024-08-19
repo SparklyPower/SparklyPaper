@@ -6,7 +6,7 @@ Subject: [PATCH] SPARKLYPOWER Remap SparklyPower hacky legacy NBT tags
 This is only useful for us in SparklyPower, but yeah...
 
 diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
-index a5a21d1c7579e45b78eae4b42a9f023db74acc0a..921947048648ff4555b80be4ef669a6dd53b12af 100644
+index 2d29d89cc45866822189a62bffbe1a8fe57c477b..f54dd842ed40f2a2854c232b17009f932a1926a8 100644
 --- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
 +++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
 @@ -9,6 +9,7 @@ import ca.spottedleaf.dataconverter.types.ObjectType;
@@ -17,7 +17,7 @@ index a5a21d1c7579e45b78eae4b42a9f023db74acc0a..921947048648ff4555b80be4ef669a6d
  import java.util.Arrays;
  import java.util.HashSet;
  import java.util.Set;
-@@ -1220,6 +1221,7 @@ public final class ConverterItemStackToDataComponents {
+@@ -1221,6 +1222,7 @@ public final class ConverterItemStackToDataComponents {
              ret.setString("id", this.id);
              ret.setInt("count", this.count);
              if (!this.tag.isEmpty()) {

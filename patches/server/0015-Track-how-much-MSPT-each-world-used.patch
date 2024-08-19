@@ -56,10 +56,10 @@ index 8b5293b0c696ef21d0101493ffa41b60bf0bc86b..601198a33adb29316b0617d5390d1620
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index b635a473d2a19bbefc24e86455ec6735b9a8c9cc..8394e89af7b8aa2638a6ccf711897470484b47ef 100644
+index b198e2b7a1a96972ecf761e1713085d618aadead..1633d2b2816d3cf958f13d2613812f582b2d1591 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1792,7 +1792,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1819,7 +1819,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  worldserver.timings.doTick.startTiming(); // Spigot
@@ -73,16 +73,16 @@ index b635a473d2a19bbefc24e86455ec6735b9a8c9cc..8394e89af7b8aa2638a6ccf711897470
 +                worldserver.tickTimes10s.add(this.tickCount, j);
 +                worldserver.tickTimes60s.add(this.tickCount, j);
 +                // SparklyPaper end
-                 // Paper start
-                 for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
-                     regionManager.recalculateRegions();
+                 worldserver.timings.doTick.stopTiming(); // Spigot
+             } catch (Throwable throwable) {
+                 CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index ca56a0b596976448da6bb2a0e82b3d5cd4133e12..172e835359ffa12abbc887d12be5af7403dae5ab 100644
+index 2fe9d9b38c01d04416843fdd48d3e33899b7de63..f162a3639f55d20bb691e34b60a7c8c55a99daf6 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -691,6 +691,12 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -497,6 +497,12 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
      }
-     // Paper end - optimise nearby player retrieval
+     // Paper end - lag compensation
  
 +    // SparklyPaper start - track world's MSPT
 +    public final MinecraftServer.TickTimes tickTimes5s = new MinecraftServer.TickTimes(100);

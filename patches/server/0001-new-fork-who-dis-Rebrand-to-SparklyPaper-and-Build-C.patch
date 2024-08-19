@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 4998aff0b7cb084dcda15c6a18bbe45e99b6000a..b2003e125fb923f531bf3777ebe39be0889601e4 100644
+index 421f6b3dc8890d63d2e7aa774d0bf8f7e15890ab..6c6d3af271c6b60304d6961fc22c7a84e0a8d342 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import java.time.Instant
@@ -31,7 +31,7 @@ index 4998aff0b7cb084dcda15c6a18bbe45e99b6000a..b2003e125fb923f531bf3777ebe39be0
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -75,7 +82,12 @@ tasks.jar {
+@@ -79,7 +86,12 @@ tasks.jar {
          val mcVersion = rootProject.providers.gradleProperty("mcVersion").get()
          val build = System.getenv("BUILD_NUMBER") ?: null
          val gitHash = git("rev-parse", "--short=7", "HEAD").getText().trim()
@@ -45,7 +45,7 @@ index 4998aff0b7cb084dcda15c6a18bbe45e99b6000a..b2003e125fb923f531bf3777ebe39be0
          val date = git("show", "-s", "--format=%ci", gitHash).getText().trim() // Paper
          val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
          attributes(
-@@ -86,8 +98,8 @@ tasks.jar {
+@@ -90,8 +102,8 @@ tasks.jar {
              "Specification-Title" to "Paper",
              "Specification-Version" to project.version,
              "Specification-Vendor" to "Paper Team",
@@ -70,10 +70,10 @@ index 774556a62eb240da42e84db4502e2ed43495be17..9bc7b99b5b39a8ffe4118b8d86f5b806
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 6db566e3111ec08a99aa429624979cb83a85e272..ac350a7108a54c64cf162a683f979a04712ce4c6 100644
+index f7a4fee9bb25ff256dc2e5ea26bfbceca6a49167..e7321e56c6ba3c601641c6466857331e9fe5f4bb 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
-@@ -155,14 +155,14 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+@@ -155,14 +155,14 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
                  if (isLongTimeout) {
                  // Paper end
                  log.log( Level.SEVERE, "------------------------------" );
@@ -91,12 +91,12 @@ index 6db566e3111ec08a99aa429624979cb83a85e272..ac350a7108a54c64cf162a683f979a04
                  //
                  if ( net.minecraft.world.level.Level.lastPhysicsProblem != null )
                  {
-@@ -189,7 +189,7 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+@@ -189,7 +189,7 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
                  }
                  // Paper end - Different message for short timeout
                  log.log( Level.SEVERE, "------------------------------" );
 -                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Paper!):" ); // Paper
 +                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to SparklyPaper!):" ); // SparklyPaper - branding changes // Paper
-                 io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper - rewrite chunk system
+                 ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(MinecraftServer.getServer(), isLongTimeout); // Paper - rewrite chunk system
                  this.dumpTickingInfo(); // Paper - log detailed tick information
                  WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );

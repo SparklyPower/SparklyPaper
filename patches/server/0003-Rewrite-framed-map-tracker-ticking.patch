@@ -11,10 +11,10 @@ now is just updating dirty map/decoration data.
 When no bukkit renderers are added to the map, we also re-use the same packet for all players who are tracking it which avoids a lot of work.
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index a2279262c93408c11f5d2290b48fd794975e8cfe..7392a058bab0eca23cb82392d5b5cc50e8601499 100644
+index 8ea2f24695f5dad55e21f238b69442513e7a90c6..e8781c8857d4b8b241515c811a4686feda437abb 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
-@@ -120,27 +120,40 @@ public class ServerEntity {
+@@ -124,27 +124,40 @@ public class ServerEntity {
  
          Entity entity = this.entity;
  
@@ -60,7 +60,7 @@ index a2279262c93408c11f5d2290b48fd794975e8cfe..7392a058bab0eca23cb82392d5b5cc50
                      }
                  }
  
-@@ -382,6 +395,19 @@ public class ServerEntity {
+@@ -383,6 +396,19 @@ public class ServerEntity {
              }
          }
  
@@ -79,12 +79,12 @@ index a2279262c93408c11f5d2290b48fd794975e8cfe..7392a058bab0eca23cb82392d5b5cc50
 +        // Paper end
      }
  
-     private void sendDirtyEntityData() {
+     public Vec3 getPositionBase() {
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index da0d1c9a1c4ae081bff9ca4230c9a1503885c354..c6f6e3588f7cb966af6d67dcec765b041869baae 100644
+index 5b7245cd99593ee90e17c97e0104f3aba9ae05ea..03432d084f8ed0cb7716d612b35f740943dcc4c0 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-@@ -461,6 +461,16 @@ public class ItemFrame extends HangingEntity {
+@@ -419,6 +419,16 @@ public class ItemFrame extends HangingEntity {
                      }
                      this.setItem(ItemStack.fromBukkitCopy(event.getItemStack()));
                      // Paper end - Add PlayerItemFrameChangeEvent
@@ -102,10 +102,10 @@ index da0d1c9a1c4ae081bff9ca4230c9a1503885c354..c6f6e3588f7cb966af6d67dcec765b04
                      itemstack.consume(1, player);
                  }
 diff --git a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-index cf8ae635fce7ea66d4e1ab1dc05575f035fa95ef..6e3eb9a28b6c190acfe37a03efce573da2da2749 100644
+index 17f33c83c6033564d6bf4fbd388b0b847c68adb3..6bcb565cd60b60be9255ef537591ee821caab7b5 100644
 --- a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
 +++ b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-@@ -79,6 +79,16 @@ public class MapItemSavedData extends SavedData {
+@@ -80,6 +80,16 @@ public class MapItemSavedData extends SavedData {
      private final Map<String, MapFrame> frameMarkers = Maps.newHashMap();
      private int trackedDecorationCount;
      private org.bukkit.craftbukkit.map.RenderData vanillaRender = new org.bukkit.craftbukkit.map.RenderData(); // Paper
@@ -122,7 +122,7 @@ index cf8ae635fce7ea66d4e1ab1dc05575f035fa95ef..6e3eb9a28b6c190acfe37a03efce573d
  
      // CraftBukkit start
      public final CraftMapView mapView;
-@@ -351,6 +361,7 @@ public class MapItemSavedData extends SavedData {
+@@ -352,6 +362,7 @@ public class MapItemSavedData extends SavedData {
          }
  
          this.setDecorationsDirty();
@@ -130,7 +130,7 @@ index cf8ae635fce7ea66d4e1ab1dc05575f035fa95ef..6e3eb9a28b6c190acfe37a03efce573d
      }
  
      public static void addTargetDecoration(ItemStack stack, BlockPos pos, String id, Holder<MapDecorationType> decorationType) {
-@@ -432,6 +443,7 @@ public class MapItemSavedData extends SavedData {
+@@ -433,6 +444,7 @@ public class MapItemSavedData extends SavedData {
              }
  
              this.setDecorationsDirty();
@@ -138,7 +138,7 @@ index cf8ae635fce7ea66d4e1ab1dc05575f035fa95ef..6e3eb9a28b6c190acfe37a03efce573d
          }
  
      }
-@@ -445,6 +457,20 @@ public class MapItemSavedData extends SavedData {
+@@ -446,6 +458,20 @@ public class MapItemSavedData extends SavedData {
  
      public void setColorsDirty(int x, int z) {
          this.setDirty();
@@ -159,16 +159,16 @@ index cf8ae635fce7ea66d4e1ab1dc05575f035fa95ef..6e3eb9a28b6c190acfe37a03efce573d
          Iterator iterator = this.carriedBy.iterator();
  
          while (iterator.hasNext()) {
-@@ -527,6 +553,7 @@ public class MapItemSavedData extends SavedData {
+@@ -528,6 +554,7 @@ public class MapItemSavedData extends SavedData {
      public void removedFromFrame(BlockPos pos, int id) {
-         this.removeDecoration("frame-" + id);
+         this.removeDecoration(MapItemSavedData.getFrameKey(id));
          this.frameMarkers.remove(MapFrame.frameId(pos));
 +        this.dirtyFrameDecorations = true; // Paper
      }
  
      public boolean updateColor(int x, int z, byte color) {
-@@ -584,6 +611,93 @@ public class MapItemSavedData extends SavedData {
-         return this.trackedDecorationCount >= decorationCount;
+@@ -589,6 +616,93 @@ public class MapItemSavedData extends SavedData {
+         return "frame-" + id;
      }
  
 +    // Paper start
