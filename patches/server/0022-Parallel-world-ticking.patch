@@ -799,7 +799,7 @@ index 6c280abdef5f80b668d6090f9d35283a33e21e0c..078dc55c474c9f1e227c8ccd4f2b0bd4
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 0368d6ba9cc9fe557d3c7172a87a7a5b15445e47..fdf15a1c82ddfc8fa2c9149095744eff82575258 100644
+index 0368d6ba9cc9fe557d3c7172a87a7a5b15445e47..d9dd9f7902dae41b05ba604a829fbe81a8f69e38 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -137,7 +137,7 @@ public abstract class PlayerList {
@@ -828,16 +828,21 @@ index 0368d6ba9cc9fe557d3c7172a87a7a5b15445e47..fdf15a1c82ddfc8fa2c9149095744eff
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
          GameProfile gameprofile = player.getGameProfile();
-@@ -806,6 +807,8 @@ public abstract class PlayerList {
+@@ -806,6 +807,13 @@ public abstract class PlayerList {
      }
  
      public ServerPlayer respawn(ServerPlayer entityplayer, boolean flag, Entity.RemovalReason entity_removalreason, RespawnReason reason, Location location) {
 +        System.out.println("respawning player - current player container is " + entityplayer.containerMenu + " but their inventory is " + entityplayer.inventoryMenu);
-+        ca.spottedleaf.moonrise.common.util.TickThread.ensureOnlyTickThread("Cannot respawn player off-main, from world " + entityplayer.serverLevel().getWorld().getName() + " to world " + location.getWorld().getName()); // SparklyPaper - parallel world ticking (additional concurrency issues logs)
++        // SparklyPaper - parallel world ticking (additional concurrency issues logs)
++        if (location != null)
++            ca.spottedleaf.moonrise.common.util.TickThread.ensureOnlyTickThread("Cannot respawn player off-main, from world " + entityplayer.serverLevel().getWorld().getName() + " to world " + location.getWorld().getName());
++        else
++            ca.spottedleaf.moonrise.common.util.TickThread.ensureOnlyTickThread("Cannot respawn player off-main, respawning in world " + entityplayer.serverLevel().getWorld().getName());
++        // SparklyPaper end
          entityplayer.stopRiding(); // CraftBukkit
          this.players.remove(entityplayer);
          this.playersByName.remove(entityplayer.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
-@@ -818,6 +821,7 @@ public abstract class PlayerList {
+@@ -818,6 +826,7 @@ public abstract class PlayerList {
          ServerPlayer entityplayer1 = entityplayer;
          Level fromWorld = entityplayer.level();
          entityplayer.wonGame = false;
