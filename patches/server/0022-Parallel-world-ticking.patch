@@ -746,7 +746,7 @@ index f162a3639f55d20bb691e34b60a7c8c55a99daf6..0090b494cc86202a197a0673b0ec1748
  
      @Override
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 6c280abdef5f80b668d6090f9d35283a33e21e0c..078dc55c474c9f1e227c8ccd4f2b0bd4c0cde431 100644
+index 6c280abdef5f80b668d6090f9d35283a33e21e0c..140615c669c3e50cba9985d8ec2d2d366029ce06 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -332,6 +332,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
@@ -765,14 +765,14 @@ index 6c280abdef5f80b668d6090f9d35283a33e21e0c..078dc55c474c9f1e227c8ccd4f2b0bd4
          // CraftBukkit start
          if (this.joining) {
              this.joining = false;
-@@ -1335,6 +1337,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
-             ServerLevel worldserver1 = this.serverLevel();
-             // CraftBukkit start
-             ResourceKey<LevelStem> resourcekey = worldserver1.getTypeKey();
-+            ca.spottedleaf.moonrise.common.util.TickThread.ensureOnlyTickThread("Cannot change dimension of a player off-main, from world " + serverLevel().getWorld().getName() + " to world " + worldserver.getWorld().getName()); // SparklyPaper - parallel world ticking (additional concurrency issues logs)
- 
-             if (worldserver != null && worldserver.dimension() == worldserver1.dimension()) { // CraftBukkit
-                 // Paper start - gateway-specific teleport event
+@@ -1357,6 +1359,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+                 teleportTarget.postDimensionTransition().onTransition(this);
+                 return this;
+             } else {
++                ca.spottedleaf.moonrise.common.util.TickThread.ensureOnlyTickThread("Cannot change dimension of a player off-main, from world " + serverLevel().getWorld().getName() + " to world " + worldserver.getWorld().getName()); // SparklyPaper - parallel world ticking (additional concurrency issues logs)
+                 // CraftBukkit start
+                 /*
+                 this.isChangingDimension = true;
 @@ -1723,6 +1726,12 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                  return OptionalInt.empty();
              } else {
