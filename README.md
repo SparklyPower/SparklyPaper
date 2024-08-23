@@ -80,6 +80,9 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
 * Reset dirty flag when loading maps from the disk
   * By default, the server will start rewriting all map datas to the disk after loading it, even if the map didn't have any changes
   * This also slows down world saving a lot if you have a lot of maps if you have an "image on map" plugin that preloads all maps during server startup
+* Allow throttling hopper checks if the target container is full
+  * If a hopper has items in it, it will try to eject the items to a container (chest, another hopper, etc). However, if the target container is full, the hopper won't be on the default transfer cooldown (vanilla 8 ticks), this can cause TPS drops due to the `ejectItems`, especially due to the hopper checking if the target container `isFullContainer`.
+  * By throttling hopper checks when the target container is full, you can avoid hoppers causing lag when the players aren't emptying the target containers, with the only disadvantage that the hopper may take longer to "get running" again after the target container is not full anymore.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
