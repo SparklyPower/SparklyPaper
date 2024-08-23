@@ -25,14 +25,14 @@ index dd56c8e041116ef3602a9f89c998c8208ab89b51..b7c39d2e93abbc5f988271d738490de6
  
          this.setPvpAllowed(dedicatedserverproperties.pvp);
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index e2a0487089eb5a7bdc1433e4c75f69d8e9f9d5f9..e086114c3d4b1d8ed46eec98e4b66cfc21451139 100644
+index e2a0487089eb5a7bdc1433e4c75f69d8e9f9d5f9..d6c5c6090b455475098fe799d69389b3a137eb36 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -173,6 +173,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
      // Paper end - add paper world config
  
      public final com.destroystokyo.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
-+    public net.sparklypower.sparklypaper.configs.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
++    public net.sparklypower.sparklypaper.configs.SparklyPaperConfig.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
      public final co.aikar.timings.WorldTimingsHandler timings; // Paper
      public static BlockPos lastPhysicsProblem; // Spigot
      private org.spigotmc.TickLimiter entityLimiter;
@@ -201,10 +201,10 @@ index 0000000000000000000000000000000000000000..614e64ce6bf5bb7fab5758250927a0d3
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c24dc8ac41
+index 0000000000000000000000000000000000000000..f633fe54c176c4e6ec46e54078f8485efadf0fce
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfig.kt
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,50 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import kotlinx.serialization.SerialName
@@ -212,41 +212,80 @@ index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c2
 +
 +@Serializable
 +class SparklyPaperConfig(
++    @SerialName("config-version")
++    override val configVersion: Int,
 +    @SerialName("parallel-world-ticking")
 +    val parallelWorldTicking: ParallelWorldTicking,
 +    @SerialName("world-settings")
 +    val worldSettings: Map<String, SparklyPaperWorldConfig>
-+) {
++) : UpgradeableConfig {
++    override fun isNewest() = true
++
++    override fun upgradeToNext() = error("This config is already the newest version!")
++
 +    @Serializable
 +    class ParallelWorldTicking(
 +        val threads: Int
 +    )
++
++    @Serializable
++    class SparklyPaperWorldConfig(
++        @SerialName("skip-map-item-data-updates-if-map-does-not-have-craftmaprenderer")
++        val skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer: Boolean,
++        @SerialName("blazingly-simple-farm-checks")
++        val blazinglySimpleFarmChecks: BlazinglySimpleFarmChecks,
++        @SerialName("ticks-per")
++        val ticksPer: TicksPer,
++    ) {
++        @Serializable
++        data class BlazinglySimpleFarmChecks(
++            val enabled: Boolean,
++            @SerialName("default-growth-speed")
++            val defaultGrowthSpeed: Float,
++            @SerialName("moist-growth-speed")
++            val moistGrowthSpeed: Float,
++            @SerialName("skip-middle-aging-stages-for-crops")
++            val skipMiddleAgingStagesForCrops: Boolean
++        )
++
++        @Serializable
++        data class TicksPer(
++            @SerialName("hopper-cooldown-when-target-container-is-full")
++            val hopperCooldownWhenTargetContainerIsFull: Int
++        )
++    }
 +}
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..da04a39bbdbb98d4b0725e9c23b1cbab6c7079a5
+index 0000000000000000000000000000000000000000..072b5811acf9ecc58e3bba7f74dc0dcf8556e848
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,93 @@
 +package net.sparklypower.sparklypaper.configs
 +
-+import com.charleskorn.kaml.Yaml
-+import com.charleskorn.kaml.YamlConfiguration
++import com.charleskorn.kaml.*
 +import com.google.common.base.Throwables
 +import kotlinx.serialization.SerializationException
 +import kotlinx.serialization.decodeFromString
 +import kotlinx.serialization.encodeToString
++import net.sparklypower.sparklypaper.configs.previous.SparklyPaperConfigV1
 +import org.bukkit.Bukkit
 +import java.io.File
 +import java.util.logging.Level
 +
 +object SparklyPaperConfigUtils {
++    private const val CURRENT_CONFIG_VERSION = 2
 +    val yaml = Yaml(
 +        configuration = YamlConfiguration(
 +            strictMode = false
 +        )
 +    )
++    val deserializationStrategiesForVersions = mapOf(
++        1 to SparklyPaperConfigV1.serializer(),
++        CURRENT_CONFIG_VERSION to SparklyPaperConfig.serializer()
++    )
++
 +    lateinit var config: SparklyPaperConfig
 +
 +    fun init(configFile: File) {
@@ -255,19 +294,20 @@ index 0000000000000000000000000000000000000000..da04a39bbdbb98d4b0725e9c23b1cbab
 +            configFile.writeText(
 +                yaml.encodeToString(
 +                    SparklyPaperConfig(
++                        CURRENT_CONFIG_VERSION,
 +                        SparklyPaperConfig.ParallelWorldTicking(
 +                            threads = 8
 +                        ),
 +                        mapOf(
-+                            "default" to SparklyPaperWorldConfig(
++                            "default" to SparklyPaperConfig.SparklyPaperWorldConfig(
 +                                skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer = true,
-+                                blazinglySimpleFarmChecks = SparklyPaperWorldConfig.BlazinglySimpleFarmChecks(
++                                blazinglySimpleFarmChecks = SparklyPaperConfig.SparklyPaperWorldConfig.BlazinglySimpleFarmChecks(
 +                                    enabled = false,
 +                                    defaultGrowthSpeed = 1.0f,
 +                                    moistGrowthSpeed = 5.0f,
 +                                    skipMiddleAgingStagesForCrops = true
 +                                ),
-+                                SparklyPaperWorldConfig.TicksPer(
++                                SparklyPaperConfig.SparklyPaperWorldConfig.TicksPer(
 +                                    hopperCooldownWhenTargetContainerIsFull = 0
 +                                )
 +                            )
@@ -278,7 +318,29 @@ index 0000000000000000000000000000000000000000..da04a39bbdbb98d4b0725e9c23b1cbab
 +        }
 +
 +        val loadedConfig = try {
-+            yaml.decodeFromString<SparklyPaperConfig>(configFile.readText())
++            // Read the version file from the config before attempting to parse
++            val yamlNode = yaml.parseToYamlNode(configFile.readText())
++            var configVersion = yamlNode.yamlMap.getScalar("config-version")?.toInt() ?: 1 // The first config version didn't have the "config-version" key
++
++            if (configVersion != CURRENT_CONFIG_VERSION) {
++                var upgradedVersion: UpgradeableConfig? = null
++
++                while (configVersion != CURRENT_CONFIG_VERSION) {
++                    Bukkit.getLogger().log(Level.INFO, "Attempting to upgrade SparklyPaper Config from version $configVersion to the next version...")
++
++                    val upgradeableConfig = yaml.decodeFromYamlNode(deserializationStrategiesForVersions[configVersion]!!, yamlNode)
++                    if (!upgradeableConfig.isNewest()) {
++                        upgradedVersion = upgradeableConfig.upgradeToNext()
++
++                        Bukkit.getLogger().log(Level.INFO, "Upgraded SparklyPaper Config from version $configVersion to ${upgradedVersion.configVersion}")
++                        configVersion = upgradedVersion.configVersion
++                    }
++                }
++
++                upgradedVersion as SparklyPaperConfig
++            } else {
++                yaml.decodeFromYamlNode(SparklyPaperConfig.serializer(), yamlNode)
++            }
 +        } catch (e: SerializationException) {
 +            Bukkit.getLogger().log(Level.SEVERE, "Could not load sparklypaper.yml, please correct your syntax errors", e)
 +            throw Throwables.propagate(e)
@@ -289,46 +351,94 @@ index 0000000000000000000000000000000000000000..da04a39bbdbb98d4b0725e9c23b1cbab
 +        config = loadedConfig
 +    }
 +
-+    fun getWorldSettings(levelName: String): SparklyPaperWorldConfig {
++    fun getWorldSettings(levelName: String): SparklyPaperConfig.SparklyPaperWorldConfig {
 +        return config.worldSettings[levelName] ?: config.worldSettings["default"] ?: error("Missing default world-settings in sparklypaper.yml!")
 +    }
 +}
 \ No newline at end of file
-diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
+diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/UpgradeableConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/UpgradeableConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..00d8f4104a55ce84483b3d81350f8c21d2d6d7f0
+index 0000000000000000000000000000000000000000..e6de89ef69bd492a9e9facaa189e260678e2c6e6
 --- /dev/null
-+++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
-@@ -0,0 +1,31 @@
++++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/UpgradeableConfig.kt
+@@ -0,0 +1,7 @@
 +package net.sparklypower.sparklypaper.configs
++
++interface UpgradeableConfig {
++    abstract val configVersion: Int
++    fun isNewest(): Boolean
++    fun upgradeToNext(): UpgradeableConfig
++}
+\ No newline at end of file
+diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/previous/SparklyPaperConfigV1.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/previous/SparklyPaperConfigV1.kt
+new file mode 100644
+index 0000000000000000000000000000000000000000..fe86a557388cea29dfad8ba5e3990e3272cf0c55
+--- /dev/null
++++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/previous/SparklyPaperConfigV1.kt
+@@ -0,0 +1,65 @@
++package net.sparklypower.sparklypaper.configs.previous
 +
 +import kotlinx.serialization.SerialName
 +import kotlinx.serialization.Serializable
++import net.sparklypower.sparklypaper.configs.SparklyPaperConfig
++import net.sparklypower.sparklypaper.configs.UpgradeableConfig
 +
 +@Serializable
-+class SparklyPaperWorldConfig(
-+    @SerialName("skip-map-item-data-updates-if-map-does-not-have-craftmaprenderer")
-+    val skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer: Boolean,
-+    @SerialName("blazingly-simple-farm-checks")
-+    val blazinglySimpleFarmChecks: BlazinglySimpleFarmChecks,
-+    @SerialName("ticks-per")
-+    val ticksPer: TicksPer,
-+) {
++class SparklyPaperConfigV1(
++    @SerialName("parallel-world-ticking")
++    val parallelWorldTicking: ParallelWorldTicking,
++    @SerialName("world-settings")
++    val worldSettings: Map<String, SparklyPaperWorldConfig>
++) : UpgradeableConfig {
++    override val configVersion = 1
++
++    override fun isNewest() = false
++
++    override fun upgradeToNext(): UpgradeableConfig {
++        return SparklyPaperConfig(
++            2,
++            SparklyPaperConfig.ParallelWorldTicking(
++                this.parallelWorldTicking.threads
++            ),
++            worldSettings.mapValues {
++                SparklyPaperConfig.SparklyPaperWorldConfig(
++                    it.value.skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer,
++                    SparklyPaperConfig.SparklyPaperWorldConfig.BlazinglySimpleFarmChecks(
++                        it.value.blazinglySimpleFarmChecks.enabled,
++                        it.value.blazinglySimpleFarmChecks.defaultGrowthSpeed,
++                        it.value.blazinglySimpleFarmChecks.moistGrowthSpeed,
++                        it.value.blazinglySimpleFarmChecks.skipMiddleAgingStagesForCrops,
++                    ),
++                    SparklyPaperConfig.SparklyPaperWorldConfig.TicksPer(
++                        0
++                    )
++                )
++            }
++        )
++    }
++
 +    @Serializable
-+    data class BlazinglySimpleFarmChecks(
-+        val enabled: Boolean,
-+        @SerialName("default-growth-speed")
-+        val defaultGrowthSpeed: Float,
-+        @SerialName("moist-growth-speed")
-+        val moistGrowthSpeed: Float,
-+        @SerialName("skip-middle-aging-stages-for-crops")
-+        val skipMiddleAgingStagesForCrops: Boolean
++    class ParallelWorldTicking(
++        val threads: Int
 +    )
 +
 +    @Serializable
-+    data class TicksPer(
-+        @SerialName("hopper-cooldown-when-target-container-is-full")
-+        val hopperCooldownWhenTargetContainerIsFull: Int
-+    )
++    class SparklyPaperWorldConfig(
++        @SerialName("skip-map-item-data-updates-if-map-does-not-have-craftmaprenderer")
++        val skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer: Boolean,
++        @SerialName("blazingly-simple-farm-checks")
++        val blazinglySimpleFarmChecks: BlazinglySimpleFarmChecks
++    ) {
++        @Serializable
++        data class BlazinglySimpleFarmChecks(
++            val enabled: Boolean,
++            @SerialName("default-growth-speed")
++            val defaultGrowthSpeed: Float,
++            @SerialName("moist-growth-speed")
++            val moistGrowthSpeed: Float,
++            @SerialName("skip-middle-aging-stages-for-crops")
++            val skipMiddleAgingStagesForCrops: Boolean
++        )
++    }
 +}
 \ No newline at end of file

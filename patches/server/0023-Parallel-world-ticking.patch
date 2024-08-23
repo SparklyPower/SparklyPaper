@@ -932,13 +932,13 @@ index d524fcc191cb95d6ec7f12ae7fceeb8077bb08fc..451e5719613fc31bacf49c37978d4e49
              }
  
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 38d73f50360685a573740e811f186d7fa582003c..b372fc523b49d969518384d0502589256fe4fc13 100644
+index b9c81680c34d71e0bb66c5d49cc115c945769e6b..4ce51383bc4526079e28e4549563629aa8910e2b 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -174,6 +174,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
  
      public final com.destroystokyo.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
-     public net.sparklypower.sparklypaper.configs.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
+     public net.sparklypower.sparklypaper.configs.SparklyPaperConfig.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
 +    public com.destroystokyo.paper.util.RedstoneWireTurbo turbo = new com.destroystokyo.paper.util.RedstoneWireTurbo((net.minecraft.world.level.block.RedStoneWireBlock) net.minecraft.world.level.block.Blocks.REDSTONE_WIRE); // SparklyPaper - parallel world ticking (moved to world)
      public final co.aikar.timings.WorldTimingsHandler timings; // Paper
      public static BlockPos lastPhysicsProblem; // Spigot
@@ -1697,12 +1697,12 @@ index 0000000000000000000000000000000000000000..9a40afbd7e5085179dc016c900ecb60e
 +}
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-index da04a39bbdbb98d4b0725e9c23b1cbab6c7079a5..d35381d1fd657fb70418769a1ec453dd6bf74e99 100644
+index 072b5811acf9ecc58e3bba7f74dc0dcf8556e848..ddb2fec6ff1604577705477237bdc6a7b2702328 100644
 --- a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -17,6 +17,7 @@ object SparklyPaperConfigUtils {
-         )
+@@ -23,6 +23,7 @@ object SparklyPaperConfigUtils {
      )
+ 
      lateinit var config: SparklyPaperConfig
 +    val logContainerCreationStacktraces = java.lang.Boolean.getBoolean("sparklypaper.logContainerCreationStacktraces")
  
