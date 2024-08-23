@@ -225,10 +225,10 @@ index 0000000000000000000000000000000000000000..6398c7b40ba82ffc8588eca458ce92c2
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..8b78f0e8b1de1a6a2506e686be9d71ced72352dd
+index 0000000000000000000000000000000000000000..da04a39bbdbb98d4b0725e9c23b1cbab6c7079a5
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,64 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import com.charleskorn.kaml.Yaml
@@ -266,6 +266,9 @@ index 0000000000000000000000000000000000000000..8b78f0e8b1de1a6a2506e686be9d71ce
 +                                    defaultGrowthSpeed = 1.0f,
 +                                    moistGrowthSpeed = 5.0f,
 +                                    skipMiddleAgingStagesForCrops = true
++                                ),
++                                SparklyPaperWorldConfig.TicksPer(
++                                    hopperCooldownWhenTargetContainerIsFull = 0
 +                                )
 +                            )
 +                        )
@@ -293,10 +296,10 @@ index 0000000000000000000000000000000000000000..8b78f0e8b1de1a6a2506e686be9d71ce
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
 new file mode 100644
-index 0000000000000000000000000000000000000000..0909362629aa4f6cdfd4052b4b1dc847cbdb57d8
+index 0000000000000000000000000000000000000000..00d8f4104a55ce84483b3d81350f8c21d2d6d7f0
 --- /dev/null
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperWorldConfig.kt
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,31 @@
 +package net.sparklypower.sparklypaper.configs
 +
 +import kotlinx.serialization.SerialName
@@ -308,6 +311,8 @@ index 0000000000000000000000000000000000000000..0909362629aa4f6cdfd4052b4b1dc847
 +    val skipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer: Boolean,
 +    @SerialName("blazingly-simple-farm-checks")
 +    val blazinglySimpleFarmChecks: BlazinglySimpleFarmChecks,
++    @SerialName("ticks-per")
++    val ticksPer: TicksPer,
 +) {
 +    @Serializable
 +    data class BlazinglySimpleFarmChecks(
@@ -318,6 +323,12 @@ index 0000000000000000000000000000000000000000..0909362629aa4f6cdfd4052b4b1dc847
 +        val moistGrowthSpeed: Float,
 +        @SerialName("skip-middle-aging-stages-for-crops")
 +        val skipMiddleAgingStagesForCrops: Boolean
++    )
++
++    @Serializable
++    data class TicksPer(
++        @SerialName("hopper-cooldown-when-target-container-is-full")
++        val hopperCooldownWhenTargetContainerIsFull: Int
 +    )
 +}
 \ No newline at end of file

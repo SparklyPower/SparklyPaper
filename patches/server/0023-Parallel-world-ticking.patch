@@ -1697,7 +1697,7 @@ index 0000000000000000000000000000000000000000..9a40afbd7e5085179dc016c900ecb60e
 +}
 \ No newline at end of file
 diff --git a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
-index 8b78f0e8b1de1a6a2506e686be9d71ced72352dd..ce608ca9640cdea0fe690ef61021355822284cf6 100644
+index da04a39bbdbb98d4b0725e9c23b1cbab6c7079a5..d35381d1fd657fb70418769a1ec453dd6bf74e99 100644
 --- a/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 +++ b/src/main/kotlin/net/sparklypower/sparklypaper/configs/SparklyPaperConfigUtils.kt
 @@ -17,6 +17,7 @@ object SparklyPaperConfigUtils {
