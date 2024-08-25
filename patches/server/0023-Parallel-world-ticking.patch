@@ -305,6 +305,43 @@ index 58d3d1a47e9f2423c467bb329c2d5f4b58a8b5ef..0055e299220c8e0f4fa8ce13d61db36f
  
          boolean ret = false;
          final boolean canProcessFullUpdates = processFullUpdates & isTickThread;
+diff --git a/src/main/java/io/papermc/paper/command/MSPTCommand.java b/src/main/java/io/papermc/paper/command/MSPTCommand.java
+index 601198a33adb29316b0617d5390d1620b7c1095c..6e4c0985320344bbaa3a5258adc7d26e908bcf1f 100644
+--- a/src/main/java/io/papermc/paper/command/MSPTCommand.java
++++ b/src/main/java/io/papermc/paper/command/MSPTCommand.java
+@@ -2,6 +2,7 @@ package io.papermc.paper.command;
+ 
+ import net.kyori.adventure.text.Component;
+ import net.minecraft.server.MinecraftServer;
++import net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils;
+ import org.bukkit.Location;
+ import org.bukkit.command.Command;
+ import org.bukkit.command.CommandSender;
+@@ -101,13 +102,15 @@ public final class MSPTCommand extends Command {
+                 text(":", YELLOW)
+             )
+         );
++        int idx = 0; // SparklyPaper - parallel world ticking (show in which thread executor it'll be scheduled)
+         for (net.minecraft.server.level.ServerLevel serverLevel : server.getAllLevels()) {
+             List<Component> worldTimes = new ArrayList<>();
+             worldTimes.addAll(eval(serverLevel.tickTimes5s.getTimes()));
+             worldTimes.addAll(eval(serverLevel.tickTimes10s.getTimes()));
+             worldTimes.addAll(eval(serverLevel.tickTimes60s.getTimes()));
+ 
+-            sender.sendMessage(text().content("◴ " + serverLevel.getWorld().getName() + ": ").color(GOLD)
++            int executeInThread = idx % SparklyPaperConfigUtils.config.getParallelWorldTicking().getThreads(); // SparklyPaper - parallel world ticking (show in which thread executor it'll be scheduled)
++            sender.sendMessage(text().content("[#" + executeInThread + "] ◴ " + serverLevel.getWorld().getName() + ": ").color(GOLD) // SparklyPaper - parallel world ticking (show in which thread executor it'll be scheduled)
+                 .append(text().color(GRAY)
+                     .append(
+                         worldTimes.get(0), SLASH, worldTimes.get(1), SLASH, worldTimes.get(2), text(", ", YELLOW),
+@@ -116,6 +119,7 @@ public final class MSPTCommand extends Command {
+                     )
+                 )
+             );
++            idx++; // SparklyPaper - parallel world ticking (show in which executor the world will be scheduled)
+         }
+         // SparklyPaper end
+         return true;
 diff --git a/src/main/java/net/minecraft/core/dispenser/BoatDispenseItemBehavior.java b/src/main/java/net/minecraft/core/dispenser/BoatDispenseItemBehavior.java
 index 6df0db8b4cdab23494ea34236949ece4989110a3..62943b954835fb30ce916c1a17fed39620a7882d 100644
 --- a/src/main/java/net/minecraft/core/dispenser/BoatDispenseItemBehavior.java
