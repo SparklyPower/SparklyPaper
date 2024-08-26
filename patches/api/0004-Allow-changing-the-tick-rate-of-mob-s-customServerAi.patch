@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sun, 25 Aug 2024 22:28:20 -0300
+Subject: [PATCH] Allow changing the tick rate of mob's "customServerAiStep"
+
+
+diff --git a/src/main/java/org/bukkit/entity/Mob.java b/src/main/java/org/bukkit/entity/Mob.java
+index 9a10262a952e330f42187d6e4edab5a225bfba62..bbc8f5970249da0fc677c0374d657a5cc93d2daa 100644
+--- a/src/main/java/org/bukkit/entity/Mob.java
++++ b/src/main/java/org/bukkit/entity/Mob.java
+@@ -229,4 +229,20 @@ public interface Mob extends LivingEntity, Lootable, io.papermc.paper.entity.Lea
+      */
+     public int getPossibleExperienceReward();
+     // Paper end - mob xp reward API
++
++    // SparklyPaper - allow changing the tick rate of custom server AI steps
++    /**
++     * Gets the tick rate of this entity's "customServerAiStep" function.
++     *
++     * @return the current tick rate
++     */
++    int getCustomServerAiStepTickRate();
++
++    /**
++     * Sets the tick rate of the entity's "customServerAiStep" function.
++     * <p>
++     * Decreasing the tick rate may improve performance, but watch out that changing the tick rate may break the mob AI!
++     */
++    void setCustomServerAiStepTickRate(int newValue);
++    // SparklyPaper end
+ }

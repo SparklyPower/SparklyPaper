@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sun, 25 Aug 2024 22:25:56 -0300
+Subject: [PATCH] Allow changing the tick rate of mob's "customServerAiStep"
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
+index f36a814bfd90af6457171512c131601b19905737..c09ee64f3777b42d4bd7b57e844f366db5992b4d 100644
+--- a/src/main/java/net/minecraft/world/entity/Mob.java
++++ b/src/main/java/net/minecraft/world/entity/Mob.java
+@@ -147,6 +147,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+     private float restrictRadius;
+ 
+     public boolean aware = true; // CraftBukkit
++    public int customServerAiStepTickRate = 1; // SparklyPaper - allow changing the tick rate of custom server AI steps
+ 
+     protected Mob(EntityType<? extends Mob> type, Level world) {
+         super(type, world);
+@@ -950,7 +951,7 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Leashab
+         this.navigation.tick();
+         gameprofilerfiller.pop();
+         gameprofilerfiller.push("mob tick");
+-        this.customServerAiStep();
++        if (tickCount % customServerAiStepTickRate == 0) this.customServerAiStep(); // SparklyPaper - allow changing the tick rate of custom server AI steps
+         gameprofilerfiller.pop();
+         gameprofilerfiller.push("controls");
+         gameprofilerfiller.push("move");
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftMob.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftMob.java
+index 5f9f7e325e3e0276f7a475c4a4725cc0e1b54afd..71d60f72d645abe074c0641b027e716ad4a0b698 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftMob.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftMob.java
+@@ -192,4 +192,17 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob, io.pape
+         return io.papermc.paper.entity.PaperLeashable.super.setLeashHolder(holder);
+     }
+     // Paper end - Leashable API
++
++    // SparklyPaper - allow changing the tick rate of server AI steps
++    @Override
++    public int getCustomServerAiStepTickRate() {
++        return this.getHandle().customServerAiStepTickRate;
++    }
++
++    @Override
++    public void setCustomServerAiStepTickRate(int newValue) {
++        com.google.common.base.Preconditions.checkArgument(0 >= newValue, "newValue cannot be less than or equal to zero");
++        this.getHandle().customServerAiStepTickRate = newValue;
++    }
++    // SparklyPaper end
+ }
