@@ -42,7 +42,7 @@ index 5f9f7e325e3e0276f7a475c4a4725cc0e1b54afd..71d60f72d645abe074c0641b027e716a
 +
 +    @Override
 +    public void setCustomServerAiStepTickRate(int newValue) {
-+        com.google.common.base.Preconditions.checkArgument(0 >= newValue, "newValue cannot be less than or equal to zero");
++        com.google.common.base.Preconditions.checkArgument(newValue > 0, "newValue cannot be less than or equal to zero");
 +        this.getHandle().customServerAiStepTickRate = newValue;
 +    }
 +    // SparklyPaper end
