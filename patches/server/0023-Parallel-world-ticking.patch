@@ -851,32 +851,65 @@ index 0368d6ba9cc9fe557d3c7172a87a7a5b15445e47..d9dd9f7902dae41b05ba604a829fbe81
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index e0827d8bb3fa17d4f590a5342ff41a514f623e68..b8f75df55edd2d241c93bc0fa3f1d47d91d7bfe9 100644
+index e0827d8bb3fa17d4f590a5342ff41a514f623e68..c0292d0980666e8fd8da0b0c212d21b204b531b3 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -852,7 +852,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
-     public void postTick() {
-         // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
-         if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
--            this.handlePortal();
-+            // SparklyPaper start - parallel world ticking
-+            getBukkitEntity().taskScheduler.schedule(
-+                entity -> entity.handlePortal(),
-+                entity -> {},
-+                0
-+            );
-+            // SparklyPaper end - parallel world ticking
-         }
-     }
-     // CraftBukkit end
-@@ -3992,6 +3998,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
-             this.teleportPassengers();
-             this.setYHeadRot(yaw);
-         } else {
-+            ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(world, "Cannot teleport entity to another world off-main, from world " + level.getWorld().getName() + " to world " + world.getWorld().getName()); // SparklyPaper - parallel world ticking (additional concurrency issues logs)
-             this.unRide();
-             Entity entity = this.getType().create(world);
+@@ -3264,15 +3264,21 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+                 if (this.portalProcess.processPortalTeleportation(worldserver, this, this.canUsePortal(false))) {
+                     worldserver.getProfiler().push("portal");
+                     this.setPortalCooldown();
+-                    DimensionTransition dimensiontransition = this.portalProcess.getPortalDestination(worldserver, this);
++                    // SparklyPaper start - parallel world ticking
++                    getBukkitEntity().taskScheduler.schedule(
++                        entity -> {DimensionTransition dimensiontransition = entity.portalProcess.getPortalDestination(worldserver, entity);
  
+-                    if (dimensiontransition != null) {
+-                        ServerLevel worldserver1 = dimensiontransition.newLevel();
++                            if (dimensiontransition != null) {
++                                ServerLevel worldserver1 = dimensiontransition.newLevel();
+ 
+-                        if (this instanceof ServerPlayer || (worldserver1 != null && (worldserver1.dimension() == worldserver.dimension() || this.canChangeDimensions(worldserver, worldserver1)))) { // CraftBukkit - always call event for players
+-                            this.changeDimension(dimensiontransition);
+-                        }
+-                    }
++                                if (entity instanceof ServerPlayer || (worldserver1 != null && (worldserver1.dimension() == worldserver.dimension() || entity.canChangeDimensions(worldserver, worldserver1)))) { // CraftBukkit - always call event for players
++                                    entity.changeDimension(dimensiontransition);
++                                }
++                            }},
++                        entity -> {},
++                        0
++                    );
++                    // SparklyPaper end - parallel world ticking
+ 
+                     worldserver.getProfiler().pop();
+                 } else if (this.portalProcess.hasExpired()) {
+diff --git a/src/main/java/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java b/src/main/java/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
+index a33d89fe9ca9e343edab8bb1cc88c54130ddb4a7..351dac70b47d5ab44d667b84f9199b90f1688534 100644
+--- a/src/main/java/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
++++ b/src/main/java/net/minecraft/world/entity/boss/enderdragon/EndCrystal.java
+@@ -58,7 +58,7 @@ public class EndCrystal extends Entity {
+     public void tick() {
+         ++this.time;
+         this.checkInsideBlocks();
+-        this.handlePortal();
++        // this.handlePortal(); // SparklyPaper - parallel world ticking (handled in postTick)
+         if (this.level() instanceof ServerLevel) {
+             BlockPos blockposition = this.blockPosition();
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
+index b83be9bbb9f348da83c0fd1ecc7f65c8a58b45b9..612f02a999dbab62557bd79173ee0fff4caffd04 100644
+--- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
++++ b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
+@@ -160,7 +160,7 @@ public class FallingBlockEntity extends Entity {
+                 return;
+             }
+             // Paper end - Configurable falling blocks height nerf
+-            this.handlePortal();
++            // this.handlePortal(); // SparklyPaper - parallel world ticking (handled in postTick)
+             if (!this.level().isClientSide && (this.isAlive() || this.forceTickAfterTeleportToDuplicate)) {
+                 BlockPos blockposition = this.blockPosition();
+                 boolean flag = this.blockState.getBlock() instanceof ConcretePowderBlock;
+
 diff --git a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
 index dd4218e108f87f3305b76fbc8d88f488b447c609..1f980e8336ad51056aed827ab43f634d60e4c7a1 100644
 --- a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
