@@ -14,10 +14,10 @@ This seems stupid, but it does seem that it improves the performance a bit, and 
 We also create a "canSee" method tailored for "ChunkMap#updatePlayer()", a method without the equals check (the "updatePlayer()" already checks if the entity is the same entity) because the CraftPlayer's `equals()` check is a *bit* expensive compared to only checking the object's identity, and because the identity has already been check, we don't need to check it twice.
 
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 1e0a6e5a3c907ab55ee6f2780a7d43bd455f2b7b..15bc677119ae394e0334e2570bc01d774fe1a264 100644
+index af8cb316ac169aa8d98a88765b85bb013b9ba961..250f8ba3c77830ea0978fdeeb7748336ca150939 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1257,7 +1257,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1258,7 +1258,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                  // Paper end - Configurable entity tracking range by Y
  
                  // CraftBukkit start - respect vanish API
@@ -27,7 +27,7 @@ index 1e0a6e5a3c907ab55ee6f2780a7d43bd455f2b7b..15bc677119ae394e0334e2570bc01d77
                  }
                  // CraftBukkit end
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index a0d5082590ee03060f0dbb4770d196efc316c328..00c6e2ab7e79750a7eef8d25c03caa787b011b14 100644
+index 42d7660efe5baa6f796f2a7606686c765b6f2478..d047114737164e12491223bc68a141efc1c389fe 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -200,7 +200,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
@@ -39,7 +39,7 @@ index a0d5082590ee03060f0dbb4770d196efc316c328..00c6e2ab7e79750a7eef8d25c03caa78
      private final Set<UUID> unlistedEntities = new HashSet<>(); // Paper - Add Listing API for Player
      private static final WeakHashMap<Plugin, WeakReference<Plugin>> pluginWeakReferences = new WeakHashMap<>();
      private int hash = 0;
-@@ -2248,9 +2248,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2252,9 +2252,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(org.bukkit.entity.Entity entity) {

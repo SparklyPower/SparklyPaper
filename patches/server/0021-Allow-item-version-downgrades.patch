@@ -6,7 +6,7 @@ Subject: [PATCH] Allow item version downgrades
 The server WON'T convert the item data from a newer version to an older version, so proceed with caution
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 28dbe30a98a6730839949bc9a6a90b78619ff84d..48e0c6fec6f847ce030ec79655d866be47364c73 100644
+index f78744b6d6075f584d9a88612661854f3f04aed1..395f98cf320e40cae0c2561bcc243e503def2dcd 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -75,6 +75,7 @@ import org.bukkit.potion.PotionType;
@@ -26,7 +26,7 @@ index 28dbe30a98a6730839949bc9a6a90b78619ff84d..48e0c6fec6f847ce030ec79655d866be
  
          // Fastpath up to date materials
          if (version == this.getDataVersion()) {
-@@ -559,7 +560,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -588,7 +589,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
              throw new RuntimeException(ex);
          }
          int dataVersion = compound.getInt("DataVersion");

@@ -73,10 +73,10 @@ index c03608fec96b51e1867f43d8f42e5aefb1520e46..15b21fa3907db1b77ed5b5d1050a37f4
                  throw new IllegalStateException("Ticking retired scheduler");
              }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 23ddd26af762c1cd7fb3920669abb96b3213ab37..7f2e25b2ebb8fb698a4adb12d77670e126549405 100644
+index 696d075ca2883f3c37e35f983c4d020e5db89d16..1a7daaebdfd616e1417eb6aade727ca23fa77b18 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -323,7 +323,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -322,7 +322,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public volatile Thread shutdownThread; // Paper
      public volatile boolean abnormalExit = false; // Paper
      public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
@@ -86,7 +86,7 @@ index 23ddd26af762c1cd7fb3920669abb96b3213ab37..7f2e25b2ebb8fb698a4adb12d77670e1
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
          Thread thread = new ca.spottedleaf.moonrise.common.util.TickThread(() -> { // Paper - rewrite chunk system
-@@ -1727,6 +1728,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1725,6 +1726,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          MinecraftTimings.bukkitSchedulerTimer.stopTiming(); // Spigot // Paper
          // Paper start - Folia scheduler API
          ((io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler) Bukkit.getGlobalRegionScheduler()).tick();
@@ -105,7 +105,7 @@ index 23ddd26af762c1cd7fb3920669abb96b3213ab37..7f2e25b2ebb8fb698a4adb12d77670e1
          getAllLevels().forEach(level -> {
              for (final Entity entity : level.moonrise$getEntityLookup().getAllCopy()) { // Paper - rewrite chunk system
                  if (entity.isRemoved()) {
-@@ -1738,6 +1751,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1736,6 +1749,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  }
              }
          });
@@ -115,7 +115,7 @@ index 23ddd26af762c1cd7fb3920669abb96b3213ab37..7f2e25b2ebb8fb698a4adb12d77670e1
          io.papermc.paper.adventure.providers.ClickCallbackProviderImpl.CALLBACK_MANAGER.handleQueue(this.tickCount); // Paper
          this.profiler.push("commandFunctions");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index cd789c235acf740ec29c30b180e7fbe1a140caa9..e3da31426e5fe2cf3b0c3cc6b665503cc88665a5 100644
+index 89c8713d2c2206d1b0d8c0a392c9d13b3e736f0c..0495941a51c1dafa796c7f08a77d34bc377d3774 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -71,7 +71,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {

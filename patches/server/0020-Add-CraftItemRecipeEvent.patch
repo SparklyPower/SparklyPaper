@@ -6,10 +6,10 @@ Subject: [PATCH] Add CraftItemRecipeEvent
 Used when a player OR a crafter block crafts an item, as an alternative to PrepareItemCraftEvent and CraftItemEvent, because both events are not triggered when a item is crafted from a crafter
 
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index b13057c0792067cc6b0abdf0d64a9be2cc9389a4..56911919c531d2a4d5e89fbc628160617295b0bb 100644
+index befeaac4786760f6847a5945da2296a3e68dbb17..d918f1fc104795be2a04c1f57265d27e20e9df09 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -3180,6 +3180,21 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+@@ -3192,6 +3192,21 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                                  } else {
                                      event = new CraftItemEvent(recipe, inventory, type, packet.getSlotNum(), click, action);
                                  }
@@ -50,7 +50,7 @@ index deb5b4fab94618c08a51e432c33e49b1627bd717..703fbeafc78889cbfea292847678207d
                      world.levelEvent(1050, pos, 0);
                  } else {
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index 44bec90466967933b5322a8ca8b5e86e0c96d443..6d166a6662ed2badfdc9cb42ca4374dc8d640404 100644
+index b2760b9a66c1bcb848d43582c3a913c6fb43102b..beddb6a64e0ba5112d369794a066ca6b9f2ac303 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 @@ -1467,6 +1467,24 @@ public class CraftEventFactory {

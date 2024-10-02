@@ -10,10 +10,10 @@ Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies h
 Avoids unnecessary date checks, even tho that this shouldn't really improve performance that much... unless you have a lot of bats/zombies/skeletons spawning.
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 7f2e25b2ebb8fb698a4adb12d77670e126549405..b198e2b7a1a96972ecf761e1713085d618aadead 100644
+index 1a7daaebdfd616e1417eb6aade727ca23fa77b18..3ad7a0a6b698ed2ff040fe1015b59e897a173811 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -324,7 +324,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -323,7 +323,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      public volatile boolean abnormalExit = false; // Paper
      public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
      public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
@@ -89,10 +89,10 @@ index 3b5cf6ffb74d11bea5eb21bd66d679734ff5000c..97bdeb56fee6fb4ae924973730e34dbf
                  this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
              }
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Zombie.java b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-index 2280004638fd19ed018cb3e77d53a018b34ec516..fb15112f920174d7ea6a3bd683418772c0910780 100644
+index 2b43337ac63d051718a2074fcc46e128a1d65129..896e253f349b0cf21fda0d798aca8a70942c8f86 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Zombie.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
-@@ -553,10 +553,11 @@ public class Zombie extends Monster {
+@@ -550,10 +550,11 @@ public class Zombie extends Monster {
  
          if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
              LocalDate localdate = LocalDate.now();

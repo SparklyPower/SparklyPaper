@@ -33,10 +33,10 @@ index be212b4fbeabab32a4dab6ae554768c368efaa88..fc885e551b1e8393569ec1391ee3decd
  
      /**
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 54704da43cf9c429f3914f0580246dde99aa93c0..04ba1fa0eea60a8f01c89942cc8f3f8250192a72 100644
+index de469f32dd9a01e0e2fde016044a783dde0c5b98..ea13aabe6e8cdf07698f96dc5264531e8a254529 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -3676,6 +3676,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3678,6 +3678,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      BIG_DRIPLEAF_STEM(13167, Dripleaf.class),
      POTTED_AZALEA_BUSH(20430),
      POTTED_FLOWERING_AZALEA_BUSH(10609),
