@@ -512,7 +512,7 @@ index cb308808906a8cdb127df8284e106e00553473ca..323d41e2bed5e83a26dfe4c88dfce7ed
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f91374c44c392f9d28799fbf3538f99258d727b4..6b7a6feba1508b9ec192c1eadc753b407f3a10f9 100644
+index f91374c44c392f9d28799fbf3538f99258d727b4..774595417ed7ddf67634cca04c58a6967b685cda 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -324,6 +324,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -631,6 +631,14 @@ index f91374c44c392f9d28799fbf3538f99258d727b4..6b7a6feba1508b9ec192c1eadc753b40
          this.isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
  
          this.profiler.popPush("connection");
+@@ -1932,6 +1948,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         Map<ResourceKey<Level>, ServerLevel> oldLevels = this.levels;
+         Map<ResourceKey<Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
+         newLevels.remove(level.dimension());
++        level.tickExecutor.shutdown(); // SparklyPaper - parallel world ticking (We remove it in here instead of ServerLevel.close() because ServerLevel.close() is never called!)
+         this.levels = Collections.unmodifiableMap(newLevels);
+     }
+     // CraftBukkit end
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 index 1395e8f98bd87a060fb609c65a3311c220f5e9a8..df3270b9c57c96660e8402fcd927e890b50d848a 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
@@ -674,7 +682,7 @@ index dcb5651d1d9b10b40430fb2f713beedf68336704..e395ff78b651f74f1582b8ae581908f5
                              // Paper end - rewrite chunk system
                          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 7d3d46d693a0d0dd1c1932c29b18e98555d4e3da..1b8981f8121389adfb795fef8d70d9577dd9a031 100644
+index 7d3d46d693a0d0dd1c1932c29b18e98555d4e3da..0688f00a7facdc9f93bf9c47c3285826229b7ab4 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -222,6 +222,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
@@ -737,14 +745,6 @@ index 7d3d46d693a0d0dd1c1932c29b18e98555d4e3da..1b8981f8121389adfb795fef8d70d957
          entity.generation = false; // Paper - Don't fire sync event during generation; Reset flag if it was added during a ServerLevel generation process
          // Paper start - extra debug info
          if (entity.valid) {
-@@ -2429,6 +2432,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
-     public void close() throws IOException {
-         super.close();
-         // Paper - rewrite chunk system
-+        tickExecutor.shutdown(); // SparklyPaper - parallel world ticking
-     }
- 
-     @Override
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 index c396580a9cfd86ff261bed439bb4662ae88010b5..d20178a37b0bdd2e8acfa22adf78682e7fd0f6b1 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
@@ -799,7 +799,7 @@ index c396580a9cfd86ff261bed439bb4662ae88010b5..d20178a37b0bdd2e8acfa22adf78682e
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index c13922d2fb1c15f895b14d4cb6d5379b59ea1ef8..3cca73f56dfce320fee56146d7fb91ec0837e9a8 100644
+index 5e2c4969e77c669acbb4a13c07033cb267c3d586..fd9a8dc0e552375802b17b52ae81ffe266d4c322 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -137,7 +137,7 @@ public abstract class PlayerList {
