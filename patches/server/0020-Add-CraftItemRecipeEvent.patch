@@ -6,10 +6,10 @@ Subject: [PATCH] Add CraftItemRecipeEvent
 Used when a player OR a crafter block crafts an item, as an alternative to PrepareItemCraftEvent and CraftItemEvent, because both events are not triggered when a item is crafted from a crafter
 
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index befeaac4786760f6847a5945da2296a3e68dbb17..d918f1fc104795be2a04c1f57265d27e20e9df09 100644
+index b5d5dbc50a7b8c40739a15f164ffd08fdc534f9c..01a67fde6c823cac52a6b09720f09acc825d3f86 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -3192,6 +3192,21 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+@@ -3218,6 +3218,21 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                                  } else {
                                      event = new CraftItemEvent(recipe, inventory, type, packet.getSlotNum(), click, action);
                                  }
@@ -32,10 +32,10 @@ index befeaac4786760f6847a5945da2296a3e68dbb17..d918f1fc104795be2a04c1f57265d27e
                          }
  
 diff --git a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
-index deb5b4fab94618c08a51e432c33e49b1627bd717..703fbeafc78889cbfea292847678207d9d8c5cab 100644
+index 0e609b1e3abd50b415d8376dc550375a8a0251b6..8dbac20e32b70879eeee1c3563948e36c2eae342 100644
 --- a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
-@@ -202,6 +202,13 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -203,6 +203,13 @@ public class CrafterBlock extends BaseEntityBlock {
                  }
                  itemstack = CraftItemStack.asNMSCopy(event.getResult());
                  // CraftBukkit end
@@ -50,10 +50,10 @@ index deb5b4fab94618c08a51e432c33e49b1627bd717..703fbeafc78889cbfea292847678207d
                      world.levelEvent(1050, pos, 0);
                  } else {
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index b2760b9a66c1bcb848d43582c3a913c6fb43102b..beddb6a64e0ba5112d369794a066ca6b9f2ac303 100644
+index a46f0c810ee2b9679c0530e5e6d3505b3d1f661c..85926a55066ac793b2e4cfe3502f9ab201df91a3 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -1467,6 +1467,24 @@ public class CraftEventFactory {
+@@ -1471,6 +1471,24 @@ public class CraftEventFactory {
          Bukkit.getPluginManager().callEvent(crafterCraftEvent);
          return crafterCraftEvent;
      }

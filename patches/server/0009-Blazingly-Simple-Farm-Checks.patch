@@ -5,7 +5,7 @@ Subject: [PATCH] Blazingly Simple Farm Checks
 
 
 diff --git a/src/main/java/net/minecraft/world/level/block/CropBlock.java b/src/main/java/net/minecraft/world/level/block/CropBlock.java
-index 112d2feba5f75a2a873b595617780515945c10e4..d19d6e0082c3dba2581aab4911cfe9d36dc22453 100644
+index 1ada5ed825501666addacf527a513ab7bd4a3a58..1ce3d73753b72a62272c3a9b8d7642bd4ffdf378 100644
 --- a/src/main/java/net/minecraft/world/level/block/CropBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/CropBlock.java
 @@ -81,6 +81,57 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
@@ -76,7 +76,7 @@ index 112d2feba5f75a2a873b595617780515945c10e4..d19d6e0082c3dba2581aab4911cfe9d3
          }
  
 diff --git a/src/main/java/net/minecraft/world/level/block/FarmBlock.java b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
-index d59e33e7326489c6d55d316d0130f22235f4c63c..3a2c875f8131fc4a30807a69f426b6acb5deb557 100644
+index c3dba0c2c94f3804338f86621dc42405e380a6b3..bfa98fe6df8e61512d913f98710d369d18467fed 100644
 --- a/src/main/java/net/minecraft/world/level/block/FarmBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/FarmBlock.java
 @@ -93,6 +93,19 @@ public class FarmBlock extends Block {
@@ -99,7 +99,7 @@ index d59e33e7326489c6d55d316d0130f22235f4c63c..3a2c875f8131fc4a30807a69f426b6ac
          if (i > 0 && world.paperConfig().tickRates.wetFarmland != 1 && (world.paperConfig().tickRates.wetFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % world.paperConfig().tickRates.wetFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
          if (i == 0 && world.paperConfig().tickRates.dryFarmland != 1 && (world.paperConfig().tickRates.dryFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % world.paperConfig().tickRates.dryFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
  
-@@ -151,7 +164,7 @@ public class FarmBlock extends Block {
+@@ -153,7 +166,7 @@ public class FarmBlock extends Block {
          return world.getBlockState(pos.above()).is(BlockTags.MAINTAINS_FARMLAND);
      }
  
@@ -109,7 +109,7 @@ index d59e33e7326489c6d55d316d0130f22235f4c63c..3a2c875f8131fc4a30807a69f426b6ac
          int xOff = pos.getX();
          int yOff = pos.getY();
 diff --git a/src/main/java/net/minecraft/world/level/block/StemBlock.java b/src/main/java/net/minecraft/world/level/block/StemBlock.java
-index 924d80eb41d9a71d1e521c40742557251cf51832..e79ab379ac4ed5cde82a144a83c0326c8b3a6349 100644
+index 76109aceb24a4719d49c1a55e3621cf2a63bbe16..4b46fbb7a03de8f2616a398c6fa3794da60a1eea 100644
 --- a/src/main/java/net/minecraft/world/level/block/StemBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/StemBlock.java
 @@ -73,6 +73,56 @@ public class StemBlock extends BushBlock implements BonemealableBlock {
@@ -144,7 +144,7 @@ index 924d80eb41d9a71d1e521c40742557251cf51832..e79ab379ac4ed5cde82a144a83c0326c
 +                        BlockState iblockdata1 = world.getBlockState(blockposition1.below());
 +
 +                        if (world.getBlockState(blockposition1).isAir() && (iblockdata1.is(Blocks.FARMLAND) || iblockdata1.is(BlockTags.DIRT))) {
-+                            Registry<Block> iregistry = world.registryAccess().registryOrThrow(Registries.BLOCK);
++                            Registry<Block> iregistry = world.registryAccess().get(Registries.BLOCK).get().value();
 +                            Optional<Block> optional = iregistry.getOptional(this.fruit);
 +                            Optional<Block> optional1 = iregistry.getOptional(this.attachedStem);
 +

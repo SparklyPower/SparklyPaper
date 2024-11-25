@@ -6,7 +6,7 @@ Subject: [PATCH] Helpful NMS packet changes
 Some nice changes to the packet internals to make packet sending and manipulation easier for us to avoid Reflection and JVM internals (ooo theUnsafe spooky) usage
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
-index 792b9a72a610cc512a8920d61013b6ba02f71e47..6e273098d9f2c0a78e9e98d7bbd8ed4c8de4ebc1 100644
+index f66e40326c510aa3267542b1a24ed75d1ed6d3f1..797640c4f26abb32a480a611820bbcd72e43d1ac 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
 @@ -22,7 +22,7 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
@@ -19,7 +19,7 @@ index 792b9a72a610cc512a8920d61013b6ba02f71e47..6e273098d9f2c0a78e9e98d7bbd8ed4c
      private final double y;
      private final double z;
 @@ -180,6 +180,32 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
-         return (float)(this.yHeadRot * 360) / 256.0F;
+         return Mth.unpackDegrees(this.yHeadRot);
      }
  
 +    // SparklyPaper - Helpful NMS packet changes: expose raw rotational fields
@@ -78,10 +78,10 @@ index 0a8d07bf68b0ceabd13c70196d357fce79dcc2c3..0b5abaf11508fa6c6809b73f53d6854a
      // Paper start - Handle oversized block entities in chunks
      private final java.util.List<net.minecraft.network.protocol.Packet<?>> extraPackets = new java.util.ArrayList<>();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
-index 9a18277754fc1657e862b2ff4c077a54a4e24977..81bce96598dcfcc919e435ce47b9dc9c195c32fa 100644
+index ab44c24ce5f4570dee9d84b4216299bedfa800d8..99fbb958b82a3398564febb1e87e3ef4efca5b1a 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
-@@ -19,6 +19,13 @@ public class ClientboundRotateHeadPacket implements Packet<ClientGamePacketListe
+@@ -20,6 +20,13 @@ public class ClientboundRotateHeadPacket implements Packet<ClientGamePacketListe
          this.yHeadRot = headYaw;
      }
  

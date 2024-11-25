@@ -6,10 +6,10 @@ Subject: [PATCH] Revert "Fix MC-117075: Block entity unload lag spike"
 This reverts commit f3453b204569ea865cc1d1302edb6d125e7f0cb3.
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index e086114c3d4b1d8ed46eec98e4b66cfc21451139..2d44c17a63b12df0e3c5b39cb9a80924470a8428 100644
+index 8433caa61a973d81a5eedc44428926e999c21a03..db9eb10c33848ca5b342bf00e4a05738210d26b0 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1387,8 +1387,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1458,8 +1458,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
          int tickedEntities = 0; // Paper - rewrite chunk system
  
          int tilesThisCycle = 0;
@@ -18,7 +18,7 @@ index e086114c3d4b1d8ed46eec98e4b66cfc21451139..2d44c17a63b12df0e3c5b39cb9a80924
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
              this.tileTickPosition = (this.tileTickPosition < this.blockEntityTickers.size()) ? this.tileTickPosition : 0;
              TickingBlockEntity tickingblockentity = (TickingBlockEntity) this.blockEntityTickers.get(this.tileTickPosition);
-@@ -1397,7 +1395,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1468,7 +1466,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
              if (tickingblockentity.isRemoved()) {
                  // Spigot start
                  tilesThisCycle--;
@@ -27,11 +27,11 @@ index e086114c3d4b1d8ed46eec98e4b66cfc21451139..2d44c17a63b12df0e3c5b39cb9a80924
                  // Spigot end
              } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) {
                  tickingblockentity.tick();
-@@ -1408,7 +1406,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1479,7 +1477,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
                  // Paper end - rewrite chunk system
              }
          }
 -        this.blockEntityTickers.removeAll(toRemove); // Paper - Fix MC-117075
  
-         this.timings.tileEntityTick.stopTiming(); // Spigot
          this.tickingBlockEntities = false;
+         gameprofilerfiller.pop();

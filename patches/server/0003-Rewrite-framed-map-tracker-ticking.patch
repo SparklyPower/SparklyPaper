@@ -11,10 +11,10 @@ now is just updating dirty map/decoration data.
 When no bukkit renderers are added to the map, we also re-use the same packet for all players who are tracking it which avoids a lot of work.
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 8ea2f24695f5dad55e21f238b69442513e7a90c6..e8781c8857d4b8b241515c811a4686feda437abb 100644
+index 90eb4927fa51ce3df86aa7b6c71f49150a03e337..9938d359de5b179ff486390288d481d6ece1ecf3 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
-@@ -124,27 +124,40 @@ public class ServerEntity {
+@@ -128,27 +128,40 @@ public class ServerEntity {
  
          Entity entity = this.entity;
  
@@ -60,7 +60,7 @@ index 8ea2f24695f5dad55e21f238b69442513e7a90c6..e8781c8857d4b8b241515c811a4686fe
                      }
                  }
  
-@@ -383,6 +396,19 @@ public class ServerEntity {
+@@ -421,6 +434,19 @@ public class ServerEntity {
              }
          }
  
@@ -81,31 +81,31 @@ index 8ea2f24695f5dad55e21f238b69442513e7a90c6..e8781c8857d4b8b241515c811a4686fe
  
      public Vec3 getPositionBase() {
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index 5b7245cd99593ee90e17c97e0104f3aba9ae05ea..03432d084f8ed0cb7716d612b35f740943dcc4c0 100644
+index bbdaaa1cc0b4aed28bc39385508d221055b99d4d..7562147721fc8c6aa6c435f027a1757cf5b61818 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-@@ -419,6 +419,16 @@ public class ItemFrame extends HangingEntity {
-                     }
-                     this.setItem(ItemStack.fromBukkitCopy(event.getItemStack()));
-                     // Paper end - Add PlayerItemFrameChangeEvent
-+                    // Paper start - add decoration and mark everything dirty for other players who are already tracking this frame
-+                    final ItemStack item = this.getItem();
-+                    if (item.is(Items.FILLED_MAP)) {
-+                        final MapItemSavedData data = MapItem.getSavedData(item, this.level());
-+                        if (data != null) {
-+                            data.addFrameDecoration(this);
-+                            data.markAllDirty();
-+                        }
-+                    }
-+                    // Paper end
-                     this.gameEvent(GameEvent.BLOCK_CHANGE, player);
-                     itemstack.consume(1, player);
+@@ -175,6 +175,16 @@ public class ItemFrame extends HangingEntity {
+                     this.setItem(ItemStack.fromBukkitCopy(event.getItemStack()), false);
                  }
+                 // Paper end - Add PlayerItemFrameChangeEvent
++                // Paper start - add decoration and mark everything dirty for other players who are already tracking this frame
++                final ItemStack item = this.getItem();
++                if (item.is(Items.FILLED_MAP)) {
++                    final MapItemSavedData data = MapItem.getSavedData(item, this.level());
++                    if (data != null) {
++                        data.addFrameDecoration(this);
++                        data.markAllDirty();
++                    }
++                }
++                // Paper end
+                 this.dropItem(world, source.getEntity(), false);
+                 this.gameEvent(GameEvent.BLOCK_CHANGE, source.getEntity());
+                 this.playSound(this.getRemoveItemSound(), 1.0F, 1.0F);
 diff --git a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-index 6794466051dd4b725d579b2136c37844995a648e..95b2078d24c83e56760bc8be404df603a15b37c5 100644
+index ae321b3b8d98e42ef07fd1f0f738c1a2b428f6db..3515ce1e69b35cc8072b833e4f95632c7aa53bc1 100644
 --- a/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
 +++ b/src/main/java/net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
-@@ -80,6 +80,16 @@ public class MapItemSavedData extends SavedData {
+@@ -81,6 +81,16 @@ public class MapItemSavedData extends SavedData {
      private final Map<String, MapFrame> frameMarkers = Maps.newHashMap();
      private int trackedDecorationCount;
      private org.bukkit.craftbukkit.map.RenderData vanillaRender = new org.bukkit.craftbukkit.map.RenderData(); // Paper
@@ -122,7 +122,7 @@ index 6794466051dd4b725d579b2136c37844995a648e..95b2078d24c83e56760bc8be404df603
  
      // CraftBukkit start
      public final CraftMapView mapView;
-@@ -351,7 +361,7 @@ public class MapItemSavedData extends SavedData {
+@@ -370,7 +380,7 @@ public class MapItemSavedData extends SavedData {
              --this.trackedDecorationCount;
          }
  
@@ -131,15 +131,15 @@ index 6794466051dd4b725d579b2136c37844995a648e..95b2078d24c83e56760bc8be404df603
      }
  
      public static void addTargetDecoration(ItemStack stack, BlockPos pos, String id, Holder<MapDecorationType> decorationType) {
-@@ -433,6 +443,7 @@ public class MapItemSavedData extends SavedData {
+@@ -407,6 +417,7 @@ public class MapItemSavedData extends SavedData {
+                 }
+ 
+                 this.setDecorationsDirty();
++                if (mapicon.renderOnFrame()) this.dirtyFrameDecorations = true; // Paper
              }
  
-             this.setDecorationsDirty();
-+            if (mapicon.renderOnFrame()) this.dirtyFrameDecorations = true; // Paper
          }
- 
-     }
-@@ -446,6 +457,20 @@ public class MapItemSavedData extends SavedData {
+@@ -478,6 +489,20 @@ public class MapItemSavedData extends SavedData {
  
      public void setColorsDirty(int x, int z) {
          this.setDirty();
@@ -160,15 +160,15 @@ index 6794466051dd4b725d579b2136c37844995a648e..95b2078d24c83e56760bc8be404df603
          Iterator iterator = this.carriedBy.iterator();
  
          while (iterator.hasNext()) {
-@@ -528,6 +553,7 @@ public class MapItemSavedData extends SavedData {
-     public void removedFromFrame(BlockPos pos, int id) {
+@@ -561,6 +586,7 @@ public class MapItemSavedData extends SavedData {
          this.removeDecoration(MapItemSavedData.getFrameKey(id));
          this.frameMarkers.remove(MapFrame.frameId(pos));
+         this.setDirty();
 +        this.dirtyFrameDecorations = true; // Paper
      }
  
      public boolean updateColor(int x, int z, byte color) {
-@@ -589,6 +615,93 @@ public class MapItemSavedData extends SavedData {
+@@ -622,6 +648,93 @@ public class MapItemSavedData extends SavedData {
          return "frame-" + id;
      }
  

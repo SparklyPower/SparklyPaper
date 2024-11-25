@@ -5,7 +5,7 @@ Subject: [PATCH] new fork who dis - Rebrand to SparklyPaper and Build Changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index de0474b8dce58cb419c00b7614d7dd66be832a02..a7482b87f8a015c6eb1cdf52f2b655632fa281d2 100644
+index faf3e3fd72e8c915e7a4803dacbe1bb576c6663e..144c7a15a51f0d22f3c35412fa7aa395d092bebc 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,6 +3,8 @@ import java.time.Instant
@@ -17,8 +17,8 @@ index de0474b8dce58cb419c00b7614d7dd66be832a02..a7482b87f8a015c6eb1cdf52f2b65563
      `maven-publish`
  }
  
-@@ -13,7 +15,12 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
- val alsoShade: Configuration by configurations.creating
+@@ -25,7 +27,12 @@ abstract class MockitoAgentProvider : CommandLineArgumentProvider {
+ // Paper end - configure mockito agent that is needed in newer java versions
  
  dependencies {
 -    implementation(project(":paper-api"))
@@ -29,9 +29,9 @@ index de0474b8dce58cb419c00b7614d7dd66be832a02..a7482b87f8a015c6eb1cdf52f2b65563
 +    implementation("com.charleskorn.kaml:kaml:0.55.0")
 +    // SparklyPaper end
      // Paper start
-     implementation("org.jline:jline-terminal-jansi:3.21.0")
-     implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -80,7 +87,12 @@ tasks.jar {
+     implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
+     implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
+@@ -94,7 +101,12 @@ tasks.jar {
          val mcVersion = rootProject.providers.gradleProperty("mcVersion").get()
          val build = System.getenv("BUILD_NUMBER") ?: null
          val gitHash = git("rev-parse", "--short=7", "HEAD").getText().trim()
@@ -45,7 +45,7 @@ index de0474b8dce58cb419c00b7614d7dd66be832a02..a7482b87f8a015c6eb1cdf52f2b65563
          val date = git("show", "-s", "--format=%ci", gitHash).getText().trim() // Paper
          val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
          attributes(
-@@ -91,8 +103,8 @@ tasks.jar {
+@@ -105,8 +117,8 @@ tasks.jar {
              "Specification-Title" to "Paper",
              "Specification-Version" to project.version,
              "Specification-Vendor" to "Paper Team",

@@ -6,10 +6,10 @@ Subject: [PATCH] Allow item version downgrades
 The server WON'T convert the item data from a newer version to an older version, so proceed with caution
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index d06aab9bd5cd901c8367f9680f5d27ddb17b3dc4..52fd5fdbba10f7b1bb5f77e84f1c50d558de037d 100644
+index 507f908916cbeb592496f963b46e4c2121a7b5e3..d9361a5bb576da7f9ea47236620746f21119ab4d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -75,6 +75,7 @@ import org.bukkit.potion.PotionType;
+@@ -76,6 +76,7 @@ import org.bukkit.potion.PotionType;
  public final class CraftMagicNumbers implements UnsafeValues {
      public static final CraftMagicNumbers INSTANCE = new CraftMagicNumbers();
      public static final boolean DISABLE_OLD_API_SUPPORT = Boolean.getBoolean("paper.disableOldApiSupport"); // Paper
@@ -17,7 +17,7 @@ index d06aab9bd5cd901c8367f9680f5d27ddb17b3dc4..52fd5fdbba10f7b1bb5f77e84f1c50d5
  
      private final Commodore commodore = new Commodore();
  
-@@ -242,7 +243,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -237,7 +238,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
      @Override
      public Material getMaterial(String material, int version) {
          Preconditions.checkArgument(material != null, "material == null");
@@ -26,7 +26,7 @@ index d06aab9bd5cd901c8367f9680f5d27ddb17b3dc4..52fd5fdbba10f7b1bb5f77e84f1c50d5
  
          // Fastpath up to date materials
          if (version == this.getDataVersion()) {
-@@ -594,7 +595,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -610,7 +611,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
              throw new RuntimeException(ex);
          }
          int dataVersion = compound.getInt("DataVersion");

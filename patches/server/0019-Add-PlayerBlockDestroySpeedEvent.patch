@@ -5,10 +5,10 @@ Subject: [PATCH] Add PlayerBlockDestroySpeedEvent
 
 
 diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
-index d0109633e8bdf109cfc9178963d7b6cf92f8b189..b70feb1f18d13207c16cb71c9715c0cf1847227d 100644
+index 99fd67a78539133adf78d65e2c520ff3dd260301..96640ae707c9babe1c4f4895f39d4d7cfc71a765 100644
 --- a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
-@@ -339,6 +339,14 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -336,6 +336,14 @@ public abstract class BlockBehaviour implements FeatureElement {
      protected float getDestroyProgress(BlockState state, Player player, BlockGetter world, BlockPos pos) {
          float f = state.getDestroySpeed(world, pos);
  
@@ -24,10 +24,10 @@ index d0109633e8bdf109cfc9178963d7b6cf92f8b189..b70feb1f18d13207c16cb71c9715c0cf
              return 0.0F;
          } else {
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index 77ef27f9254235180a8596c6c8c4af750dc759d1..44bec90466967933b5322a8ca8b5e86e0c96d443 100644
+index e37aaf77f94b97b736cc20ef070cefdff0400188..a46f0c810ee2b9679c0530e5e6d3505b3d1f661c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -2267,4 +2267,13 @@ public class CraftEventFactory {
+@@ -2271,4 +2271,13 @@ public class CraftEventFactory {
          return event;
      }
      // Paper end - add EntityFertilizeEggEvent

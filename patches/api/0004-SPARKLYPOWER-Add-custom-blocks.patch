@@ -5,7 +5,7 @@ Subject: [PATCH] SPARKLYPOWER Add custom blocks
 
 
 diff --git a/src/main/java/com/destroystokyo/paper/MaterialTags.java b/src/main/java/com/destroystokyo/paper/MaterialTags.java
-index be212b4fbeabab32a4dab6ae554768c368efaa88..fc885e551b1e8393569ec1391ee3decdce8d7efb 100644
+index 41eaa8159f8c028faa118300e95f6a0fb9cfe989..5b5ddb19b39d5201da422f9b10e2491ab9334925 100644
 --- a/src/main/java/com/destroystokyo/paper/MaterialTags.java
 +++ b/src/main/java/com/destroystokyo/paper/MaterialTags.java
 @@ -83,6 +83,7 @@ public class MaterialTags {
@@ -33,10 +33,10 @@ index be212b4fbeabab32a4dab6ae554768c368efaa88..fc885e551b1e8393569ec1391ee3decd
  
      /**
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 77a15a99e441bd81650806142581bd5b24f30e10..d001e142857f2bd1db3c916587f79e872ec53687 100644
+index c7ce8fa1ff9feda66d5a4e497112a24ff51c9d2b..b121cf287460b9256eb6c26fae98d831b9bc7eea 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -3680,6 +3680,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3843,6 +3843,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      BIG_DRIPLEAF_STEM(13167, Dripleaf.class),
      POTTED_AZALEA_BUSH(20430),
      POTTED_FLOWERING_AZALEA_BUSH(10609),

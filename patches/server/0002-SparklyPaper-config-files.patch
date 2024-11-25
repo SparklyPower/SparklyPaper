@@ -5,10 +5,10 @@ Subject: [PATCH] SparklyPaper config files
 
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index dd56c8e041116ef3602a9f89c998c8208ab89b51..b7c39d2e93abbc5f988271d738490de68ce50b3b 100644
+index 17a158ff6ce6520b69a5a0032ba4c05449dd0cf8..bb8975cd3d3b1c57f313ad31b5e767fa93ad8e13 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -238,6 +238,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -235,6 +235,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          io.papermc.paper.command.PaperCommands.registerCommands(this); // Paper - setup /paper command
          this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
@@ -25,19 +25,19 @@ index dd56c8e041116ef3602a9f89c998c8208ab89b51..b7c39d2e93abbc5f988271d738490de6
  
          this.setPvpAllowed(dedicatedserverproperties.pvp);
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 507671476c3d2d92a2fdb05be24443af27d26dcf..350a703f9973c35f8e2af977b87fbfe19ac0b799 100644
+index 2cc264f577fdd81d02783e0d6146bea9728789c7..8433caa61a973d81a5eedc44428926e999c21a03 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -173,6 +173,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -174,6 +174,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
      // Paper end - add paper world config
  
      public final com.destroystokyo.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
 +    public net.sparklypower.sparklypaper.configs.SparklyPaperConfig.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
-     public final co.aikar.timings.WorldTimingsHandler timings; // Paper
      public static BlockPos lastPhysicsProblem; // Spigot
      private org.spigotmc.TickLimiter entityLimiter;
-@@ -687,6 +688,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
-     protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator, java.util.concurrent.Executor executor) { // Paper - create paper world config & Anti-Xray
+     private org.spigotmc.TickLimiter tileLimiter;
+@@ -842,6 +843,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+         // Paper end - getblock optimisations - cache world height/sections
          this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) worlddatamutable).getLevelName()); // Spigot
          this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
 +        this.sparklyPaperConfig = net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getWorldSettings(((net.minecraft.world.level.storage.PrimaryLevelData) worlddatamutable).getLevelName()); // SparklyPaper
@@ -116,7 +116,7 @@ index 0000000000000000000000000000000000000000..bc0ec96f91f7c9ab9f9a865a50f69707
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index c7df339aeb62ee627edaf1bb4c8474b61e357ba6..146f6c79ffbe45e016661d27cd1bf3cf78c92aea 100644
+index cac8592e3a2f438fe9ca167a4fdcd65152bbb2de..e6ee056e828d3ce410db000be160164d1a6f1dc4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -111,6 +111,7 @@ import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -127,15 +127,15 @@ index c7df339aeb62ee627edaf1bb4c8474b61e357ba6..146f6c79ffbe45e016661d27cd1bf3cf
  import org.bukkit.BanList;
  import org.bukkit.Bukkit;
  import org.bukkit.ChatColor;
-@@ -1072,6 +1073,7 @@ public final class CraftServer implements Server {
+@@ -1074,6 +1075,7 @@ public final class CraftServer implements Server {
  
          org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);
 +        net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.init((File) console.options.valueOf("sparklypaper-settings")); // SparklyPaper
          for (ServerLevel world : this.console.getAllLevels()) {
              // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
-             world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters, config.spawnAnimals); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
-@@ -1087,6 +1089,7 @@ public final class CraftServer implements Server {
+             world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
+@@ -1089,6 +1091,7 @@ public final class CraftServer implements Server {
                  }
              }
              world.spigotConfig.init(); // Spigot
@@ -143,7 +143,7 @@ index c7df339aeb62ee627edaf1bb4c8474b61e357ba6..146f6c79ffbe45e016661d27cd1bf3cf
          }
  
          Plugin[] pluginClone = pluginManager.getPlugins().clone(); // Paper
-@@ -1104,6 +1107,7 @@ public final class CraftServer implements Server {
+@@ -1106,6 +1109,7 @@ public final class CraftServer implements Server {
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
          this.spark.registerCommandBeforePlugins(this); // Paper - spark
@@ -152,7 +152,7 @@ index c7df339aeb62ee627edaf1bb4c8474b61e357ba6..146f6c79ffbe45e016661d27cd1bf3cf
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index b3ba6bccdbb08af27916f0c611c60b2595b90164..bbd6e3b1bcec18e653313270136530ed82ea1448 100644
+index be0d38544395a9b3befb898bb961f34e32fe9509..522efbfaedb20fe3650c6ebe3c1678ee5c0f236a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -176,6 +176,14 @@ public class Main {

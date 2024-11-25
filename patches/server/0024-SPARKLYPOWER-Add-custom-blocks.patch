@@ -5,83 +5,78 @@ Subject: [PATCH] SPARKLYPOWER Add custom blocks
 
 
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
-index 223259e7a09ada681b6181c898f6857888594f85..ad5ad428b72f696a68a9ed1436bede7135c534e5 100644
+index 66a07f7cbf1c1d6ecbe055cbf4f63eb07d93e90c..2738ccd47cbb7d26a6c92c2d86b1735003df9e2e 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java
 +++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
-@@ -41,9 +41,9 @@ import net.minecraft.world.level.material.PushReaction;
- 
- public class Blocks {
-     private static final BlockBehaviour.StatePredicate NOT_CLOSED_SHULKER = (state, world, pos) -> !(
--                world.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity
--            )
--            || shulkerBoxBlockEntity.isClosed();
-+        world.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity
-+    )
-+        || shulkerBoxBlockEntity.isClosed();
-     public static final Block AIR = register("air", new AirBlock(BlockBehaviour.Properties.of().replaceable().noCollission().noLootTable().air()));
-     public static final Block STONE = register(
-         "stone",
-@@ -7623,6 +7623,48 @@ public class Blocks {
-                 .explosionResistance(1200.0F)
-         )
+@@ -6725,10 +6725,55 @@ public class Blocks {
+             .pushReaction(PushReaction.DESTROY)
+             .requiredFeatures(FeatureFlags.WINTER_DROP)
      );
 +    // SparklyPaper start - SparklyPower Survival custom blocks
 +    // Blocks' strength should be synced with the replaced block on the client side!
 +    public static final Block SPARKLYPOWER_RAINBOW_WOOL = register(
-+        "sparklypower_rainbow_wool", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS))
++        "sparklypower_rainbow_wool",
++        Block::new,
++        BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS)
 +    );
 +    public static final Block SPARKLYPOWER_RAINBOW_CONCRETE = register(
-+        "sparklypower_rainbow_concrete", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS))
++        "sparklypower_rainbow_concrete",
++        Block::new,
++        BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS)
 +    );
 +    public static final Block SPARKLYPOWER_RAINBOW_TERRACOTTA = register(
-+        "sparklypower_rainbow_terracotta", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS))
++        "sparklypower_rainbow_terracotta",
++        Block::new,
++        BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_RED).strength(0.5F).sound(SoundType.GRASS)
 +    );
 +    public static final Block SPARKLYPOWER_ASPHALT_SERVER = register(
-+        "sparklypower_asphalt_server", new Block(
-+            BlockBehaviour.Properties.of()
-+                .mapColor(MapColor.COLOR_BLACK)
-+                .instrument(NoteBlockInstrument.BASEDRUM)
-+                .requiresCorrectToolForDrops()
-+                .strength(1.5F, 6.0F)
-+        )
++        "sparklypower_asphalt_server",
++        Block::new,
++        BlockBehaviour.Properties.of()
++            .mapColor(MapColor.COLOR_BLACK)
++            .instrument(NoteBlockInstrument.BASEDRUM)
++            .requiresCorrectToolForDrops()
++            .strength(1.5F, 6.0F)
 +    );
 +    public static final Block SPARKLYPOWER_ASPHALT_SERVER_SLAB = register(
 +        "sparklypower_asphalt_server_slab",
-+        new SlabBlock(
-+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)
-+        )
++        SlabBlock::new,
++        BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)
 +    );
 +    public static final Block SPARKLYPOWER_ASPHALT_PLAYER = register(
-+        "sparklypower_asphalt_player", new Block(
-+            BlockBehaviour.Properties.of()
-+                .mapColor(MapColor.COLOR_BLACK)
-+                .instrument(NoteBlockInstrument.BASEDRUM)
-+                .requiresCorrectToolForDrops()
-+                .strength(1.5F, 6.0F)
-+        )
++        "sparklypower_asphalt_player",
++        Block::new,
++        BlockBehaviour.Properties.of()
++            .mapColor(MapColor.COLOR_BLACK)
++            .instrument(NoteBlockInstrument.BASEDRUM)
++            .requiresCorrectToolForDrops()
++            .strength(1.5F, 6.0F)
 +    );
 +    public static final Block SPARKLYPOWER_ASPHALT_PLAYER_SLAB = register(
 +        "sparklypower_asphalt_player_slab",
-+        new SlabBlock(
-+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)
-+        )
++        SlabBlock::new,
++        BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)
 +    );
 +    // SparklyPaper end
  
      private static ToIntFunction<BlockState> litBlockEmission(int litLevel) {
-         return state -> state.getValue(BlockStateProperties.LIT) ? litLevel : 0;
+-        return state -> state.getValue(BlockStateProperties.LIT) ? litLevel : 0;
+-    }
++        return state -> state.getValue(BlockStateProperties.LIT) ? litLevel : 0;    }
+ 
+     private static Function<BlockState, MapColor> waterloggedMapColor(MapColor mapColor) {
+         return state -> state.getValue(BlockStateProperties.WATERLOGGED) ? MapColor.WATER : mapColor;
 diff --git a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
-index b441eac617347131f2c58ae5092428eb0538c839..cb5d89b0fb8d9a579438387d5d317d662d0f1e0c 100644
+index 91926be355af20bba86be4c569cf7f972c79fbb5..26aa9cf0288055d5c8d9165ddc2ad3707b950ea4 100644
 --- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
 +++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
-@@ -126,7 +126,9 @@ public class LegacyTest {
-             Material.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE, Material.BOLT_ARMOR_TRIM_SMITHING_TEMPLATE, Material.FLOW_POTTERY_SHERD, Material.GUSTER_POTTERY_SHERD, Material.SCRAPE_POTTERY_SHERD, Material.BREEZE_ROD, Material.OMINOUS_TRIAL_KEY, Material.OMINOUS_BOTTLE,
-             // 1.21
-             Material.MUSIC_DISC_CREATOR, Material.MUSIC_DISC_CREATOR_MUSIC_BOX, Material.MUSIC_DISC_PRECIPICE,
--            //
-+            // SparklyPaper start - custom blocks
-+            Material.SPARKLYPOWER_RAINBOW_WOOL, Material.SPARKLYPOWER_RAINBOW_CONCRETE, Material.SPARKLYPOWER_RAINBOW_TERRACOTTA, Material.SPARKLYPOWER_ASPHALT_SERVER, Material.SPARKLYPOWER_ASPHALT_SERVER_SLAB, Material.SPARKLYPOWER_ASPHALT_PLAYER, Material.SPARKLYPOWER_ASPHALT_PLAYER_SLAB,
-+            // SparklyPaper end
+@@ -132,6 +132,9 @@ public class LegacyTest {
+             Material.CREAKING_SPAWN_EGG, Material.PALE_HANGING_MOSS, Material.PALE_MOSS_BLOCK, Material.PALE_MOSS_CARPET, Material.PALE_OAK_BOAT, Material.PALE_OAK_BUTTON, Material.PALE_OAK_CHEST_BOAT, Material.PALE_OAK_DOOR, Material.PALE_OAK_FENCE,
+             Material.PALE_OAK_FENCE_GATE, Material.PALE_OAK_HANGING_SIGN, Material.PALE_OAK_LEAVES, Material.PALE_OAK_LOG, Material.PALE_OAK_PLANKS, Material.PALE_OAK_PRESSURE_PLATE, Material.PALE_OAK_SAPLING, Material.PALE_OAK_SIGN, Material.PALE_OAK_SLAB,
+             Material.PALE_OAK_STAIRS, Material.PALE_OAK_TRAPDOOR, Material.PALE_OAK_WALL_SIGN, Material.PALE_OAK_WALL_HANGING_SIGN, Material.PALE_OAK_WOOD, Material.POTTED_PALE_OAK_SAPLING, Material.STRIPPED_PALE_OAK_LOG, Material.STRIPPED_PALE_OAK_WOOD,
++            // SparklyPower custom blocks
++            Material.SPARKLYPOWER_RAINBOW_WOOL, Material.SPARKLYPOWER_RAINBOW_CONCRETE, Material.SPARKLYPOWER_RAINBOW_TERRACOTTA, Material.SPARKLYPOWER_ASPHALT_PLAYER, Material.SPARKLYPOWER_ASPHALT_SERVER, Material.SPARKLYPOWER_ASPHALT_PLAYER_SLAB,
++            Material.SPARKLYPOWER_ASPHALT_SERVER_SLAB,
+             //
              Material.LEGACY_AIR, Material.LEGACY_DEAD_BUSH, Material.LEGACY_BURNING_FURNACE, Material.LEGACY_WALL_SIGN, Material.LEGACY_REDSTONE_TORCH_OFF, Material.LEGACY_SKULL, Material.LEGACY_REDSTONE_COMPARATOR_ON, Material.LEGACY_WALL_BANNER, Material.LEGACY_MONSTER_EGG));
  
-     private final Set<Material> INVERSION_FAILS = new HashSet<>(Arrays.asList(Material.LEGACY_DOUBLE_STEP, Material.LEGACY_GLOWING_REDSTONE_ORE, Material.LEGACY_DIODE_BLOCK_ON, Material.LEGACY_REDSTONE_LAMP_ON, Material.LEGACY_WOOD_DOUBLE_STEP,

@@ -56,13 +56,13 @@ index 8b5293b0c696ef21d0101493ffa41b60bf0bc86b..601198a33adb29316b0617d5390d1620
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 3ad7a0a6b698ed2ff040fe1015b59e897a173811..f91374c44c392f9d28799fbf3538f99258d727b4 100644
+index ae085afa4d532c13a02321407d9f5059e4a3e567..712ca8371188fceb99e1e3a898e5f8067e5a8a5a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1817,7 +1817,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1888,7 +1888,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             gameprofilerfiller.push("tick");
  
              try {
-                 worldserver.timings.doTick.startTiming(); // Spigot
 +                long i = Util.getNanos(); // SparklyPaper - track world's MSPT
                  worldserver.tick(shouldKeepTicking);
 +                // SparklyPaper start - track world's MSPT
@@ -73,14 +73,14 @@ index 3ad7a0a6b698ed2ff040fe1015b59e897a173811..f91374c44c392f9d28799fbf3538f992
 +                worldserver.tickTimes10s.add(this.tickCount, j);
 +                worldserver.tickTimes60s.add(this.tickCount, j);
 +                // SparklyPaper end
-                 worldserver.timings.doTick.stopTiming(); // Spigot
              } catch (Throwable throwable) {
                  CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
+ 
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index f9abf63e12ea930275121b470e4e4906cff0fc12..7d3d46d693a0d0dd1c1932c29b18e98555d4e3da 100644
+index 957cae6ddeba9efe3b55588567ae51e8b86b6a42..be488eb582f15996921eab5d63bcc73655e61a0b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -497,6 +497,12 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -595,6 +595,12 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
      }
      // Paper end - lag compensation
  
@@ -92,4 +92,4 @@ index f9abf63e12ea930275121b470e4e4906cff0fc12..7d3d46d693a0d0dd1c1932c29b18e985
 +
      // Add env and gen to constructor, IWorldDataServer -> WorldDataServer
      public ServerLevel(MinecraftServer minecraftserver, Executor executor, LevelStorageSource.LevelStorageAccess convertable_conversionsession, PrimaryLevelData iworlddataserver, ResourceKey<Level> resourcekey, LevelStem worlddimension, ChunkProgressListener worldloadlistener, boolean flag, long i, List<CustomSpawner> list, boolean flag1, @Nullable RandomSequences randomsequences, org.bukkit.World.Environment env, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider) {
-         // IRegistryCustom.Dimension iregistrycustom_dimension = minecraftserver.registryAccess(); // CraftBukkit - decompile error
+         super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess(), iworlddataserver.getGameRules())), executor); // Paper - create paper world configs; Async-Anti-Xray: Pass executor
