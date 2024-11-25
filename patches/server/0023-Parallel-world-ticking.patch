@@ -529,7 +529,7 @@ index 8f9fde5489c0e1d0a91203536caddec5a9c96f6c..84617a7d6fae4a67f07d50a8e9410e35
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 712ca8371188fceb99e1e3a898e5f8067e5a8a5a..6a477b1fe16c0ee0f560027f72404a6ae2d75ec3 100644
+index 712ca8371188fceb99e1e3a898e5f8067e5a8a5a..586ac9c5279663e2d5ea6154a710f81a5e83d400 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,9 +3,6 @@ package net.minecraft.server;
@@ -805,11 +805,6 @@ index 712ca8371188fceb99e1e3a898e5f8067e5a8a5a..6a477b1fe16c0ee0f560027f72404a6a
 -            if (this.tickCount % 20 == 0) {
 -                gameprofilerfiller.push("timeSync");
 -                this.synchronizeTime(worldserver);
--                gameprofilerfiller.pop();
--            }
--            // CraftBukkit end */
--
--            gameprofilerfiller.push("tick");
 +                    return s + " " + String.valueOf(worldserver.dimension().location());
 +                });
 +                /* Drop global time updates
@@ -849,6 +844,14 @@ index 712ca8371188fceb99e1e3a898e5f8067e5a8a5a..6a477b1fe16c0ee0f560027f72404a6a
 +                        }
 +                    }, worldserver)
 +                );
++
++                gameprofilerfiller.pop();
+                 gameprofilerfiller.pop();
++                worldserver.explosionDensityCache.clear(); // Paper - Optimize explosions
+             }
+-            // CraftBukkit end */
+-
+-            gameprofilerfiller.push("tick");
  
 -            try {
 -                long i = Util.getNanos(); // SparklyPaper - track world's MSPT
@@ -863,15 +866,11 @@ index 712ca8371188fceb99e1e3a898e5f8067e5a8a5a..6a477b1fe16c0ee0f560027f72404a6a
 -                // SparklyPaper end
 -            } catch (Throwable throwable) {
 -                CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
-+                while (!tasks.isEmpty()) {
-+                    tasks.pop().get();
-+                }
- 
+-
 -                worldserver.fillReportDetails(crashreport);
 -                throw new ReportedException(crashreport);
-+                gameprofilerfiller.pop();
-+                gameprofilerfiller.pop();
-+                worldserver.explosionDensityCache.clear(); // Paper - Optimize explosions
++            while (!tasks.isEmpty()) {
++                tasks.pop().get();
              }
 -
 -            gameprofilerfiller.pop();
