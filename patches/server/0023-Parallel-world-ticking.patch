@@ -529,7 +529,7 @@ index 8f9fde5489c0e1d0a91203536caddec5a9c96f6c..84617a7d6fae4a67f07d50a8e9410e35
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 712ca8371188fceb99e1e3a898e5f8067e5a8a5a..586ac9c5279663e2d5ea6154a710f81a5e83d400 100644
+index 5568bf6dabc01ca551eeae3305d67fc7554f5bc8..8d13504d3f93f724d0dc52db3fa27ce6a1479665 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,9 +3,6 @@ package net.minecraft.server;
@@ -765,7 +765,7 @@ index 712ca8371188fceb99e1e3a898e5f8067e5a8a5a..586ac9c5279663e2d5ea6154a710f81a
  
  
 @@ -335,6 +266,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-     private List<String> pluginsBlockingSleep = new ArrayList<>(); // Paper - API to allow/disallow tick sleeping
+     private final Set<String> pluginsBlockingSleep = new java.util.HashSet<>(); // Paper - API to allow/disallow tick sleeping
      public final Set<Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
      public net.sparklypower.sparklypaper.HalloweenManager halloweenManager = new net.sparklypower.sparklypaper.HalloweenManager(); // SparklyPaper - Spooky month optimizations
 +    // SparklyPaper - parallel world ticking
@@ -969,7 +969,7 @@ index be488eb582f15996921eab5d63bcc73655e61a0b..7bed72ff80fbb088edaf790419bce392
          // Paper start - extra debug info
          if (entity.valid) {
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 2e8ecf3bbb9f9ceba6f896738fa1ab8e2bd0fed6..020545ee8a73dcb4682067467f3dad425e2a01b3 100644
+index 5a8f396d47577f087abb415c972fd4f51e50faba..f58331b6be3a26e76082d16894d3eb4d5982f318 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -359,6 +359,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
