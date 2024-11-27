@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Wed, 27 Nov 2024 02:26:32 -0300
+Subject: [PATCH] Fix getMaxHeight to be exclusive instead of inclusive to
+ match docs
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+index 12f780b349e825747c2441d9636ae1dc667312e5..41df2df1be37af38d96ee6d26bdb7a10efaf9681 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+@@ -1544,7 +1544,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+ 
+     @Override
+     public int getMaxHeight() {
+-        return this.world.getMaxY();
++        return this.world.getMaxY() + 1; // Paper - Fix getMaxHeight to be exclusive instead of inclusive
+     }
+ 
+     @Override
