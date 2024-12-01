@@ -529,7 +529,7 @@ index 8f9fde5489c0e1d0a91203536caddec5a9c96f6c..84617a7d6fae4a67f07d50a8e9410e35
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index fd5a0b0eaece1fcee3513df52f0c1ad420832af8..c9149c3b3da4589844ef721a62210b8b47227654 100644
+index 5568bf6dabc01ca551eeae3305d67fc7554f5bc8..8d13504d3f93f724d0dc52db3fa27ce6a1479665 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,9 +3,6 @@ package net.minecraft.server;
@@ -905,7 +905,7 @@ index e49e8e98ebbd3c8ba8a784f1626132699209b4e3..d952d42b8faee38f9d55fe578c030891
          // SparklyPaper start - Spooky month optimizations
          halloweenManager.startHalloweenEpochTask();
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 8de30b5dff3dc0e30f1a56303abcb31df8f85c9f..b3917c319c32eb9926418f788faf4adecf40a09a 100644
+index be488eb582f15996921eab5d63bcc73655e61a0b..7bed72ff80fbb088edaf790419bce3929568b5b0 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -200,7 +200,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -1074,10 +1074,10 @@ index 30de3d1a7792c38ae946f19cb0e14637919b5001..0ea2d2b32aacdbfca80c0c626520bd86
  
          entityplayer1.connection = entityplayer.connection;
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index a15546e433ebba6c0de01bdaaef201a3d99a87b5..3e440c7ce88d7ebd50eba488c629bfa0bd0d242f 100644
+index ed5b00620527c1776722d25b1b45f1544802a341..8ef7f08488413737f8dbc9048d9aec57bb14fe99 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -882,7 +882,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -926,7 +926,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      // CraftBukkit start
      public void postTick() {
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
@@ -1086,7 +1086,7 @@ index a15546e433ebba6c0de01bdaaef201a3d99a87b5..3e440c7ce88d7ebd50eba488c629bfa0
              this.handlePortal();
          }
      }
-@@ -3986,6 +3986,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4030,6 +4030,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      private Entity teleportCrossDimension(ServerLevel world, TeleportTransition teleportTarget) {
@@ -1129,7 +1129,7 @@ index 33e7d2884195677c4d6340d8b84c1dd85c636ec1..02a719aaf7c860efbb51aed7d21cc83e
                  world.capturedBlockStates.clear();
                  StructureGrowEvent structureEvent = null;
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 39d5633ae7cdb8609f5840de5ba26237d501d8a2..856aab98edbd67c68d33e529d0199c0506b11da8 100644
+index 97b31dffbaf965e86ad706a1bba7586cd3514ead..43ae7091a3603908eb6c68c8b10c72b0bbb99428 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -175,6 +175,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
