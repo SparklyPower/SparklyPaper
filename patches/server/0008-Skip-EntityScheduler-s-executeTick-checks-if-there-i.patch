@@ -73,7 +73,7 @@ index c03608fec96b51e1867f43d8f42e5aefb1520e46..15b21fa3907db1b77ed5b5d1050a37f4
                  throw new IllegalStateException("Ticking retired scheduler");
              }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index c26e3a239441376f2694782d4f07943538677c71..114b379bb3a56099dbd4e4bf11f6a1b7ddc488f7 100644
+index 4158473fd553a16fec23bcbcf9a278d413120600..8cc953b72a7132a92390ab1f5e62b267d08e706a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -333,7 +333,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -86,7 +86,7 @@ index c26e3a239441376f2694782d4f07943538677c71..114b379bb3a56099dbd4e4bf11f6a1b7
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
          Thread thread = new ca.spottedleaf.moonrise.common.util.TickThread(() -> { // Paper - rewrite chunk system
-@@ -1803,6 +1804,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1804,6 +1805,18 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          this.server.getScheduler().mainThreadHeartbeat(); // CraftBukkit
          // Paper start - Folia scheduler API
          ((io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler) Bukkit.getGlobalRegionScheduler()).tick();
@@ -105,7 +105,7 @@ index c26e3a239441376f2694782d4f07943538677c71..114b379bb3a56099dbd4e4bf11f6a1b7
          getAllLevels().forEach(level -> {
              for (final Entity entity : level.getEntities().getAll()) {
                  if (entity.isRemoved()) {
-@@ -1814,6 +1827,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1815,6 +1828,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  }
              }
          });

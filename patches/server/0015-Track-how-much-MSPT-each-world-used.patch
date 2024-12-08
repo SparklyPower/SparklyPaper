@@ -56,10 +56,10 @@ index 8b5293b0c696ef21d0101493ffa41b60bf0bc86b..601198a33adb29316b0617d5390d1620
      }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index ae085afa4d532c13a02321407d9f5059e4a3e567..712ca8371188fceb99e1e3a898e5f8067e5a8a5a 100644
+index 9fd2bb0441b614d0a1abf8a8000eece14dcd6bbe..e168e5f433da40f3bdd5821451c3f3572b69a48c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1888,7 +1888,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1889,7 +1889,16 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              gameprofilerfiller.push("tick");
  
              try {
@@ -77,7 +77,7 @@ index ae085afa4d532c13a02321407d9f5059e4a3e567..712ca8371188fceb99e1e3a898e5f806
                  CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 957cae6ddeba9efe3b55588567ae51e8b86b6a42..be488eb582f15996921eab5d63bcc73655e61a0b 100644
+index 585e2b43a0326f0b81597fa1234d3c67c76af550..ba899bcf05b967db784b7435895d6ff7b72b40f2 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -595,6 +595,12 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe

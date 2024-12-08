@@ -33,7 +33,7 @@ index 41eaa8159f8c028faa118300e95f6a0fb9cfe989..5b5ddb19b39d5201da422f9b10e2491a
  
      /**
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index c7ce8fa1ff9feda66d5a4e497112a24ff51c9d2b..b121cf287460b9256eb6c26fae98d831b9bc7eea 100644
+index 028ac35df6c4d044d07b3869751736d418c1eb0e..dd9795e0725275b0fe5a3f4ecfd4d587a23f963f 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -3843,6 +3843,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -57,5 +57,5 @@ index c7ce8fa1ff9feda66d5a4e497112a24ff51c9d2b..b121cf287460b9256eb6c26fae98d831
 +    SPARKLYPOWER_ASPHALT_PLAYER_SLAB(13009, Slab.class),
 +    // SparklyPaper end
      // ----- Legacy Separator -----
-     @Deprecated
+     @Deprecated(since = "1.13")
      LEGACY_AIR(0, 0),

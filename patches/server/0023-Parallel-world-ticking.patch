@@ -529,7 +529,7 @@ index 8f9fde5489c0e1d0a91203536caddec5a9c96f6c..84617a7d6fae4a67f07d50a8e9410e35
              }
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index fd5a0b0eaece1fcee3513df52f0c1ad420832af8..c9149c3b3da4589844ef721a62210b8b47227654 100644
+index e168e5f433da40f3bdd5821451c3f3572b69a48c..2a9f9e37fcaf70bff89f5adfbf54a0d95a14bb3a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,9 +3,6 @@ package net.minecraft.server;
@@ -774,7 +774,7 @@ index fd5a0b0eaece1fcee3513df52f0c1ad420832af8..c9149c3b3da4589844ef721a62210b8b
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-@@ -1865,50 +1799,71 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1866,50 +1800,71 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.isIteratingOverLevels = true; // Paper - Throw exception on world create while being ticked
          Iterator iterator = this.getAllLevels().iterator(); // Paper - Throw exception on world create while being ticked; move down
@@ -883,7 +883,7 @@ index fd5a0b0eaece1fcee3513df52f0c1ad420832af8..c9149c3b3da4589844ef721a62210b8b
          this.isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
  
          gameprofilerfiller.popPush("connection");
-@@ -2002,6 +1957,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2003,6 +1958,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          Map<ResourceKey<Level>, ServerLevel> oldLevels = this.levels;
          Map<ResourceKey<Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
          newLevels.remove(level.dimension());
@@ -905,7 +905,7 @@ index e49e8e98ebbd3c8ba8a784f1626132699209b4e3..d952d42b8faee38f9d55fe578c030891
          // SparklyPaper start - Spooky month optimizations
          halloweenManager.startHalloweenEpochTask();
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 8de30b5dff3dc0e30f1a56303abcb31df8f85c9f..b3917c319c32eb9926418f788faf4adecf40a09a 100644
+index ba899bcf05b967db784b7435895d6ff7b72b40f2..f750d015bf8ffb533713f298a9d1df13de60693e 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -200,7 +200,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -1022,7 +1022,7 @@ index 5a8f396d47577f087abb415c972fd4f51e50faba..f58331b6be3a26e76082d16894d3eb4d
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 30de3d1a7792c38ae946f19cb0e14637919b5001..0ea2d2b32aacdbfca80c0c626520bd863601bbd2 100644
+index 1a956249828156fdc273888de59128c3d1a0b898..6484a87853eb2a907f729365edadc39e87e395bb 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -137,7 +137,7 @@ public abstract class PlayerList {
@@ -1505,10 +1505,10 @@ index 84f4664950e0cef7bd823bfc74f37cefce620d9e..b0c3b64da7aed676a5614c442948bbe9
      }
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc667312e5 100644
+index 57da11c0da7322e74810e7108e9c8000b0c36520..71709c8a8c5cec6403ec92badde412427c8f276b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -458,7 +458,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -459,7 +459,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
  
      private boolean unloadChunk0(int x, int z, boolean save) {
@@ -1517,7 +1517,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          if (!this.isChunkLoaded(x, z)) {
              return true;
          }
-@@ -481,6 +481,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -482,6 +482,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
          if (!unloadChunk0(x, z, false)) {
              return false;
          }
@@ -1525,7 +1525,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          warnUnsafeChunk("regenerating a faraway chunk", x, z); // Paper
  
          final long chunkKey = ChunkCoordIntPair.pair(x, z);
-@@ -502,6 +503,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -503,6 +504,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean refreshChunk(int x, int z) {
@@ -1533,7 +1533,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          ChunkHolder playerChunk = this.world.getChunkSource().chunkMap.getVisibleChunkIfPresent(ChunkPos.asLong(x, z));
          if (playerChunk == null) return false;
  
-@@ -562,7 +564,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -563,7 +565,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean loadChunk(int x, int z, boolean generate) {
@@ -1542,7 +1542,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          warnUnsafeChunk("loading a faraway chunk", x, z); // Paper
          ChunkAccess chunk = this.world.getChunkSource().getChunk(x, z, generate || isChunkGenerated(x, z) ? ChunkStatus.FULL : ChunkStatus.EMPTY, true); // Paper
  
-@@ -814,6 +816,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -815,6 +817,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean generateTree(Location loc, TreeType type, BlockChangeDelegate delegate) {
@@ -1550,7 +1550,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          this.world.captureTreeGeneration = true;
          this.world.captureBlockStates = true;
          boolean grownTree = this.generateTree(loc, type);
-@@ -929,6 +932,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -930,6 +933,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
      public boolean createExplosion(double x, double y, double z, float power, boolean setFire, boolean breakBlocks, Entity source, Consumer<net.minecraft.world.level.ServerExplosion> configurator) {
      // Paper end - expand explosion API
@@ -1558,7 +1558,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          net.minecraft.world.level.Level.ExplosionInteraction explosionType;
          if (!breakBlocks) {
              explosionType = net.minecraft.world.level.Level.ExplosionInteraction.NONE; // Don't break blocks
-@@ -1020,6 +1024,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1021,6 +1025,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public int getHighestBlockYAt(int x, int z, org.bukkit.HeightMap heightMap) {
@@ -1566,7 +1566,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          warnUnsafeChunk("getting a faraway chunk", x >> 4, z >> 4); // Paper
          // Transient load for this tick
          return this.world.getChunk(x >> 4, z >> 4).getHeight(CraftHeightMap.toNMS(heightMap), x, z);
-@@ -1050,6 +1055,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1051,6 +1056,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      @Override
      public void setBiome(int x, int y, int z, Holder<net.minecraft.world.level.biome.Biome> bb) {
          BlockPos pos = new BlockPos(x, 0, z);
@@ -1574,7 +1574,7 @@ index 8f234b46c24a0ae08aa5f8190c5b27e1f62dfbab..12f780b349e825747c2441d9636ae1dc
          if (this.world.hasChunkAt(pos)) {
              net.minecraft.world.level.chunk.LevelChunk chunk = this.world.getChunkAt(pos);
  
-@@ -2322,6 +2328,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -2327,6 +2333,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public void sendGameEvent(Entity sourceEntity, org.bukkit.GameEvent gameEvent, Vector position) {

@@ -1,8 +1,9 @@
 name: Automatically update Paper commit hash
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: "0 0 * * *"
+  # Paper did not release a ver/1.21.3 branch, so we need to disable it manually
+  # schedule:
+  #   - cron: "0 0 * * *"
 jobs:
   build:
     runs-on: ubuntu-latest
