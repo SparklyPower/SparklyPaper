@@ -112,3 +112,33 @@ index 1a37654aff9a9c86c9f7af10a1cf721371f0c5ec..e69ff4e6bb3919340a93ed4c68bdd6c4
  
      public ClientboundSectionBlocksUpdatePacket(SectionPos sectionPos, ShortSet positions, LevelChunkSection section) {
          this.sectionPos = sectionPos;
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
+index 799f5a8c69f295216997d52fb4bc6c56d3a18115..633f10f17eebd43e8dc7c878b9101decf31190a9 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
+@@ -18,6 +18,12 @@ public class ClientboundSetCameraPacket implements Packet<ClientGamePacketListen
+         this.cameraId = entity.getId();
+     }
+ 
++    // SparklyPaper - Helpful NMS packet changes: add direct entityId constructor
++    public ClientboundSetCameraPacket(int entityId) {
++        this.cameraId = entityId;
++    }
++    // SparklyPaper end
++
+     private ClientboundSetCameraPacket(FriendlyByteBuf buf) {
+         this.cameraId = buf.readVarInt();
+     }
+diff --git a/src/main/java/net/minecraft/world/entity/Display.java b/src/main/java/net/minecraft/world/entity/Display.java
+index e6cbf4506c75046a89fad778e138b448fb4a29a9..3b705c75b840dbb0e741f46aaa3b98180a27ecf5 100644
+--- a/src/main/java/net/minecraft/world/entity/Display.java
++++ b/src/main/java/net/minecraft/world/entity/Display.java
+@@ -802,7 +802,7 @@ public abstract class Display extends Entity {
+         public static final byte FLAG_ALIGN_RIGHT = 16;
+         private static final byte INITIAL_TEXT_OPACITY = -1;
+         public static final int INITIAL_BACKGROUND = 1073741824;
+-        private static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT);
++        public static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT); // SparklyPaper - Helpful NMS packet changes: make public
+         public static final EntityDataAccessor<Integer> DATA_LINE_WIDTH_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.INT);
+         public static final EntityDataAccessor<Integer> DATA_BACKGROUND_COLOR_ID = SynchedEntityData.defineId(
+             Display.TextDisplay.class, EntityDataSerializers.INT
