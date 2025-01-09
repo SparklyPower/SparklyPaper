@@ -80,9 +80,20 @@ SparklyPaper's config file is `sparklypaper.yml`, the file is, by default, place
 * Reset dirty flag when loading maps from the disk
   * By default, the server will start rewriting all map datas to the disk after loading it, even if the map didn't have any changes
   * This also slows down world saving a lot if you have a lot of maps if you have an "image on map" plugin that preloads all maps during server startup
+* Add `CraftItemRecipeEvent`
+  * Used when a player OR a crafter block crafts an item, as an alternative to `PrepareItemCraftEvent` and `CraftItemEvent`, because both events are not triggered when an item is crafted from a crafter.
+* Allow item version downgrades
+  * If you have downgraded Minecraft versions, you may notice that the server will throw an error when attempting to deserialize a ItemStack serialized on a newer version. You can bypass the item version check with the `-Dsparklypaper.ignoreItemDataVersion-true` system property.
+  * To learn more about server version downgrades, read [this blog post](https://mrpowergamerbr.com/en/blog/2024-06-21-downgrading-paper-1-21-to-1-20-6/)!
 * Allow throttling hopper checks if the target container is full
   * If a hopper has items in it, it will try to eject the items to a container (chest, another hopper, etc). However, if the target container is full, the hopper won't be on the default transfer cooldown (vanilla 8 ticks), this can cause TPS drops due to the `ejectItems`, especially due to the hopper checking if the target container `isFullContainer`.
   * By throttling hopper checks when the target container is full, you can avoid hoppers causing lag when the players aren't emptying the target containers, with the only disadvantage that the hopper may take longer to "get running" again after the target container is not full anymore.
+* Add `PlayerMoveControllableVehicleEvent`
+  * Raised when a player moves a controllable vehicle. Controllable vehicles are vehicles that the client can control, such as boats, horses, striders, pigs, etc. (Minecarts are NOT affected by this event!)
+  * Useful if you want to actually control what the player is moving, because `VehicleMoveEvent` does not let you cancel nor change the location. Also useful to detect BoatFly hacks.
+* Add `PlayerPreMoveEvent`
+  * Called after the server attempts to move the player, but before the `PlayerMoveEvent` is called.  In contrast to `PlayerMoveEvent`, this event happens on every movement instead of being throttled like `PlayerMoveEvent`, and this event exposes the player's onGround/horizontalCollision status, allowing plugins to manipulate it.
+  * Useful if you want to change the `onGround` status to be server authorative instead of letting the client spoof it.
 * Check how much MSPT (milliseconds per tick) each world is using in `/mspt`
   * Useful to figure out which worlds are lagging your server.
 ![Per World MSPT](docs/per-world-mspt.png)
