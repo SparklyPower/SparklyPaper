@@ -71,8 +71,8 @@ index ac0af5da6646df1cfe66aead3f945a9f77efa5de..3a74c35da37326ee52bc7ccee7979173
  
 -                                this.player.setOnGroundWithMovement(packet.isOnGround(), packet.horizontalCollision(), vec3d);
 -                                this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, packet.isOnGround());
-+                                this.player.setOnGroundWithMovement(isOnGround, horizontalCollision, vec3d); // SparklyPaper start - PlayerPreMoveEvent
-+                                this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, isOnGround); // SparklyPaper - PlayerPreMoveEvent
++                                this.player.setOnGroundWithMovement(isOnGround, horizontalCollision, vec3d); // SparklyPaper - Add PlayerPreMoveEvent
++                                this.player.doCheckFallDamage(this.player.getX() - d3, this.player.getY() - d4, this.player.getZ() - d5, isOnGround); // SparklyPaper - Add PlayerPreMoveEvent
                                  this.player.recordMovementThroughBlocks(new Vec3(d3, d4, d5), this.player.position());
                                  this.handlePlayerKnownMovement(vec3d);
                                  if (flag1) {
@@ -80,7 +80,7 @@ index ac0af5da6646df1cfe66aead3f945a9f77efa5de..3a74c35da37326ee52bc7ccee7979173
                                  }
  
 -                                if (packet.isOnGround() || this.player.hasLandedInLiquid() || this.player.onClimbable() || this.player.isSpectator() || flag || flag4) {
-+                                if (isOnGround || this.player.hasLandedInLiquid() || this.player.onClimbable() || this.player.isSpectator() || flag || flag4) { // SparklyPaper - PlayerPreMoveEvent
++                                if (isOnGround || this.player.hasLandedInLiquid() || this.player.onClimbable() || this.player.isSpectator() || flag || flag4) { // SparklyPaper - Add PlayerPreMoveEvent
                                      this.player.tryResetCurrentImpulseContext();
                                  }
  
