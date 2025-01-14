@@ -1,9 +1,8 @@
 name: Automatically update Paper commit hash
 on:
   workflow_dispatch: {}
-  # Paper did not release a ver/1.21.3 branch, so we need to disable it manually
-  # schedule:
-  #   - cron: "0 0 * * *"
+  schedule:
+    - cron: "0 0 * * *"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,7 +11,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: 'SparklyPaper'
-          ref: 'ver/1.21.3'
+          ref: 'ver/1.21.4'
           token: ${{ secrets.LORITTA_PAT }}
         
       - name: Checkout Paper Repository
