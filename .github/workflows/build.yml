@@ -41,4 +41,4 @@ jobs:
         name: "Upload Mojang Mappings Paperclip JAR"
         with:
           name: SparklyPaper Paperclip (Mojang Mappings - mojmap)
-          path: "sparklypaper-server/build/libs/SparklyPaper-paperclip-*-mojmap.jar"
+          path: "sparklypaper-server/build/libs/sparklypaper-paperclip-*-mojmap.jar"
