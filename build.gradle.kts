@@ -75,21 +75,8 @@ subprojects {
     }
 
     extensions.configure<PublishingExtension> {
-        repositories {
-            /*
-            maven("https://repo.papermc.io/repository/maven-snapshots/") {
-                name = "paperSnapshots"
-                credentials(PasswordCredentials::class)
-            }
-             */
-        }
-    }
-}
-
-allprojects {
-    // Publishing API:
-    // ./gradlew :SparklyPaper-API:publish[ToMavenLocal]
-    publishing {
+        // Publishing API:
+        // ./gradlew :sparklypaper-api:publish[ToMavenLocal]
         repositories {
             maven {
                 name = "PerfectDreams"
@@ -97,18 +84,6 @@ allprojects {
                 // See Gradle docs for how to provide credentials to PasswordCredentials
                 // https://docs.gradle.org/current/samples/sample_publishing_credentials.html
                 credentials(PasswordCredentials::class)
-            }
-        }
-    }
-}
-
-publishing {
-    // Publishing dev bundle:
-    // ./gradlew publishDevBundlePublicationTo(MavenLocal|MyRepoSnapshotsRepository) -PpublishDevBundle
-    if (project.hasProperty("publishDevBundle")) {
-        publications.create<MavenPublication>("devBundle") {
-            artifact(tasks.generateDevelopmentBundle) {
-                artifactId = "dev-bundle"
             }
         }
     }
