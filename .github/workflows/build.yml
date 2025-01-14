@@ -36,14 +36,9 @@ jobs:
           ORG_GRADLE_PROJECT_PerfectDreamsUsername: ${{ secrets.PERFECTDREAMS_REPO_USERNAME }}
           ORG_GRADLE_PROJECT_PerfectDreamsPassword: ${{ secrets.PERFECTDREAMS_REPO_PASSWORD }}
       - name: Create Paperclip JAR
-        run: ./gradlew createMojmapPaperclipJar createReobfPaperclipJar
+        run: ./gradlew createMojmapPaperclipJar
       - uses: actions/upload-artifact@v4
         name: "Upload Mojang Mappings Paperclip JAR"
         with:
           name: SparklyPaper Paperclip (Mojang Mappings - mojmap)
           path: "sparklypaper-server/build/libs/SparklyPaper-paperclip-*-mojmap.jar"
-      - uses: actions/upload-artifact@v4
-        name: "Upload Spigot Mappings (reobf) Paperclip JAR"
-        with:
-          name: SparklyPaper Paperclip (Spigot Mappings - reobf)
-          path: "sparklypaper-server/build/libs/SparklyPaper-paperclip-*-reobf.jar"
