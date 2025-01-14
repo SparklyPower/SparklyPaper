@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Sat, 4 Jan 2025 23:58:55 -0300
+Subject: [PATCH] Add PlayerMoveControllableVehicleEvent
+
+
+diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index 7f9ed94576c94161070fd1be1544aaed9aac0c6b..da190c2ab2080344dc11903aec51598af18d7556 100644
+--- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -587,6 +587,31 @@ public class ServerGamePacketListenerImpl
+                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getName().getString(), this.player.getName().getString(), Math.sqrt(d7));
+                 }
+ 
++                // SparklyPaper start - Add PlayerMoveControllableVehicleEvent
++                org.bukkit.entity.Player craftPlayer = this.getCraftPlayer();
++                org.bukkit.entity.Entity bukkitVehicle = rootVehicle.getBukkitEntity();
++                if (bukkitVehicle instanceof org.bukkit.entity.Vehicle) {
++                    net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent playerMoveControllableVehicleEvent = new net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent(
++                            craftPlayer,
++                            (org.bukkit.entity.Vehicle) bukkitVehicle,
++                            new org.bukkit.Location(craftPlayer.getWorld(), x, y, z, f, f1),
++                            new org.bukkit.Location(craftPlayer.getWorld(), d, d1, d2, f, f1)
++                    );
++                    if (!playerMoveControllableVehicleEvent.callEvent()) {
++                        // Cancelled, move back!
++                        rootVehicle.absMoveTo(x, y, z, f, f1);
++                        this.player.absMoveTo(x, y, z, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
++                        this.send(ClientboundMoveVehiclePacket.fromEntity(rootVehicle));
++                        return;
++                    }
++                    d = playerMoveControllableVehicleEvent.getTo().x();
++                    d1 = playerMoveControllableVehicleEvent.getTo().y();
++                    d2 = playerMoveControllableVehicleEvent.getTo().z();
++                    f = playerMoveControllableVehicleEvent.getTo().getYaw();
++                    f1 = playerMoveControllableVehicleEvent.getTo().getPitch();
++                }
++                // SparklyPaper end
++
+                 rootVehicle.absMoveTo(d, d1, d2, f, f1);
+                 this.player.absMoveTo(d, d1, d2, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
+                 // Paper start - optimise out extra getCubes

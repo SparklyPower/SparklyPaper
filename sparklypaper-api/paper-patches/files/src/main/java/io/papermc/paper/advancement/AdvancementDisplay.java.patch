@@ -1,0 +1,11 @@
+--- a/src/main/java/io/papermc/paper/advancement/AdvancementDisplay.java
++++ b/src/main/java/io/papermc/paper/advancement/AdvancementDisplay.java
+@@ -27,7 +_,7 @@
+      *
+      * @return the frame type
+      */
+-    Frame frame();
++    Frame frame(); // patch
+ 
+     /**
+      * Gets the advancement title.

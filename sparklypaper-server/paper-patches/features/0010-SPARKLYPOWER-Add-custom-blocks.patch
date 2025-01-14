@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Wed, 12 Jun 2024 11:53:09 -0300
+Subject: [PATCH] SPARKLYPOWER Add custom blocks
+
+
+diff --git a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+index 002e635137a8b015af9799d6a8854ebc6330bfb4..0f02a9793937a492003bbfff827ac6483c1baa14 100644
+--- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
++++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+@@ -135,6 +135,9 @@ public class LegacyTest {
+             // 1.21.4
+             Material.OPEN_EYEBLOSSOM, Material.CLOSED_EYEBLOSSOM, Material.RESIN_CLUMP, Material.RESIN_BLOCK, Material.RESIN_BRICKS, Material.RESIN_BRICK_STAIRS, Material.RESIN_BRICK_SLAB, Material.RESIN_BRICK_WALL, Material.CHISELED_RESIN_BRICKS,
+             Material.RESIN_BRICK, Material.POTTED_OPEN_EYEBLOSSOM, Material.POTTED_CLOSED_EYEBLOSSOM,
++            // SparklyPower custom blocks
++            Material.SPARKLYPOWER_RAINBOW_WOOL, Material.SPARKLYPOWER_RAINBOW_CONCRETE, Material.SPARKLYPOWER_RAINBOW_TERRACOTTA, Material.SPARKLYPOWER_ASPHALT_PLAYER, Material.SPARKLYPOWER_ASPHALT_SERVER, Material.SPARKLYPOWER_ASPHALT_PLAYER_SLAB,
++            Material.SPARKLYPOWER_ASPHALT_SERVER_SLAB,
+             //
+             Material.LEGACY_AIR, Material.LEGACY_DEAD_BUSH, Material.LEGACY_BURNING_FURNACE, Material.LEGACY_WALL_SIGN, Material.LEGACY_REDSTONE_TORCH_OFF, Material.LEGACY_SKULL, Material.LEGACY_REDSTONE_COMPARATOR_ON, Material.LEGACY_WALL_BANNER, Material.LEGACY_MONSTER_EGG));
+ 

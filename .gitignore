@@ -13,13 +13,6 @@ build/
 nbproject/
 nbactions.xml
 
-# we use maven!
-build.xml
-
-# maven
-target/
-dependency-reduced-pom.xml
-
 # vim
 .*.sw[a-p]
 
@@ -46,7 +39,22 @@ out/
 # other stuff
 run/
 
-forktest-server
-forktest-api
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+/run
+
+/sparklypaper-server/build.gradle.kts
+/sparklypaper-server/src/minecraft
+/sparklypaper-server/build
+/paper-server
+/sparklypaper-api/build
+/sparklypaper-api/build.gradle.kts
+/paper-api
+/paper-api-generator
+
 
 !gradle/wrapper/gradle-wrapper.jar
