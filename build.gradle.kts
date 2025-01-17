@@ -26,11 +26,6 @@ paperweight {
             patchesDir = file("sparklypaper-api/paper-patches")
             outputDir = file("paper-api")
         }
-        patchDir("paperApiGenerator") {
-            upstreamPath = "paper-api-generator"
-            patchesDir = file("sparklypaper-api-generator/paper-patches")
-            outputDir = file("paper-api-generator")
-        }
     }
 }
 
