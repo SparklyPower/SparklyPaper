@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 17 Jan 2025 12:37:40 -0300
+Subject: [PATCH] Add EntityGetProjectileForWeaponEvent
+
+
+diff --git a/net/minecraft/world/entity/monster/Monster.java b/net/minecraft/world/entity/monster/Monster.java
+index d0d3c825cf8088df4794cf5bfde12a69f4d71754..4cad07ae00eb34b51b8ef3f25f0abf8ed0d267c5 100644
+--- a/net/minecraft/world/entity/monster/Monster.java
++++ b/net/minecraft/world/entity/monster/Monster.java
+@@ -137,6 +137,12 @@ public abstract class Monster extends PathfinderMob implements Enemy {
+     @Override
+     public ItemStack getProjectile(ItemStack shootable) {
+         if (shootable.getItem() instanceof ProjectileWeaponItem) {
++            // SparklyPaper start - Add EntityGetProjectileForWeaponEvent
++            net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(shootable));
++            event.callEvent();
++            if (event.getArrow() != null)
++                return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());
++            // SparklyPaper end
+             Predicate<ItemStack> supportedHeldProjectiles = ((ProjectileWeaponItem)shootable.getItem()).getSupportedHeldProjectiles();
+             ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedHeldProjectiles);
+             return heldProjectile.isEmpty() ? new ItemStack(Items.ARROW) : heldProjectile;
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index 3ae542153bf1538d17e7c0fe6acc9e7f8605750c..266a91a6d0300ce8f78bf3e1a8998a97a65c9deb 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -2234,6 +2234,12 @@ public abstract class Player extends LivingEntity {
+         if (!(shootable.getItem() instanceof ProjectileWeaponItem)) {
+             return ItemStack.EMPTY;
+         } else {
++            // SparklyPaper start - Add EntityGetProjectileForWeaponEvent
++            net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(shootable));
++            event.callEvent();
++            if (event.getArrow() != null)
++                return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());
++            // SparklyPaper end
+             Predicate<ItemStack> supportedHeldProjectiles = ((ProjectileWeaponItem)shootable.getItem()).getSupportedHeldProjectiles().and(item -> this.tryReadyArrow(shootable, item)); // Paper - PlayerReadyArrowEvent
+             ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedHeldProjectiles);
+             if (!heldProjectile.isEmpty()) {
