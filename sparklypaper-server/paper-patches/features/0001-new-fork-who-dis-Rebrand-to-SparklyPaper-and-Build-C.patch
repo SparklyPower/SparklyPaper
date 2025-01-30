@@ -18,10 +18,10 @@ index 774556a62eb240da42e84db4502e2ed43495be17..9bc7b99b5b39a8ffe4118b8d86f5b806
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index a9339f59f81dff307317ae4afdff0dc296febcc9..2ce97bee092dd7a6d898836376c442b114d54003 100644
+index dced8899be0bb8d562093dc3a7673ed8185b85a6..1498c691d3f9b633494750ba4f5cb704468dfeb9 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
-@@ -77,14 +77,14 @@ public class WatchdogThread extends Thread {
+@@ -77,14 +77,14 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
                  if (isLongTimeout) {
                      // Paper end
                      logger.log(Level.SEVERE, "------------------------------");
@@ -39,7 +39,7 @@ index a9339f59f81dff307317ae4afdff0dc296febcc9..2ce97bee092dd7a6d898836376c442b1
  
                      if (net.minecraft.world.level.Level.lastPhysicsProblem != null) {
                          logger.log(Level.SEVERE, "------------------------------");
-@@ -109,7 +109,7 @@ public class WatchdogThread extends Thread {
+@@ -109,7 +109,7 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
                  }
                  // Paper end - Different message for short timeout
                  logger.log(Level.SEVERE, "------------------------------");

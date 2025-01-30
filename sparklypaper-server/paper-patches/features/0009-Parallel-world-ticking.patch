@@ -6,7 +6,7 @@ Subject: [PATCH] Parallel world ticking
 "mom can we have folia?" "we already have folia at home" folia at home:
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java b/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
-index 157e5edb507d6d2a922833c70a1c27abc93c9c34..f47b49b02f664725d310887e65477deb07414bde 100644
+index 69cdd304d255d52c9b7dc9b6a33ffdb630b79abe..d8314bae08146f75442c342275d2e94b316829bd 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/common/util/TickThread.java
 @@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
@@ -15,12 +15,12 @@ index 157e5edb507d6d2a922833c70a1c27abc93c9c34..f47b49b02f664725d310887e65477deb
      private static final Logger LOGGER = LoggerFactory.getLogger(TickThread.class);
 +    public static final boolean HARD_THROW = !Boolean.getBoolean("sparklypaper.disableHardThrow"); // SparklyPaper - parallel world ticking - THIS SHOULD NOT BE DISABLED SINCE IT CAN CAUSE DATA CORRUPTION!!! Anyhow, for production servers, if you want to make a test run to see if the server could crash, you can test it with this disabled
  
-     /**
-      * @deprecated
-@@ -22,14 +23,15 @@ public class TickThread extends Thread {
+     private static String getThreadContext() {
+         return "thread=" + Thread.currentThread().getName();
+@@ -26,14 +27,15 @@ public class TickThread extends Thread {
      public static void ensureTickThread(final String reason) {
          if (!isTickThread()) {
-             LOGGER.error("Thread " + Thread.currentThread().getName() + " failed main thread check: " + reason, new Throwable());
+             LOGGER.error("Thread failed main thread check: " + reason + ", context=" + getThreadContext(), new Throwable());
 -            throw new IllegalStateException(reason);
 +            if (HARD_THROW)
 +                throw new IllegalStateException(reason);
@@ -29,54 +29,63 @@ index 157e5edb507d6d2a922833c70a1c27abc93c9c34..f47b49b02f664725d310887e65477deb
  
      public static void ensureTickThread(final Level world, final BlockPos pos, final String reason) {
          if (!isTickThreadFor(world, pos)) {
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
--                               reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos;
-+                               reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos + " - " + getTickThreadInformation(world.getServer());
+             final String ex = "Thread failed main thread check: " +
+-                               reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos;
++                               reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos + " - " + getTickThreadInformation(world.getServer());
              LOGGER.error(ex, new Throwable());
              throw new IllegalStateException(ex);
          }
-@@ -38,7 +40,7 @@ public class TickThread extends Thread {
+@@ -42,7 +44,7 @@ public class TickThread extends Thread {
      public static void ensureTickThread(final Level world, final BlockPos pos, final int blockRadius, final String reason) {
          if (!isTickThreadFor(world, pos, blockRadius)) {
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
--                reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos + ", block_radius=" + blockRadius;
-+                reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos + ", block_radius=" + blockRadius + " - " + getTickThreadInformation(world.getServer());
+             final String ex = "Thread failed main thread check: " +
+-                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos + ", block_radius=" + blockRadius;
++                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + pos + ", block_radius=" + blockRadius + " - " + getTickThreadInformation(world.getServer());
              LOGGER.error(ex, new Throwable());
              throw new IllegalStateException(ex);
          }
-@@ -56,7 +58,7 @@ public class TickThread extends Thread {
+@@ -51,7 +53,7 @@ public class TickThread extends Thread {
+     public static void ensureTickThread(final Level world, final ChunkPos pos, final String reason) {
+         if (!isTickThreadFor(world, pos)) {
+             final String ex = "Thread failed main thread check: " +
+-                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + pos;
++                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + pos + " - " + getTickThreadInformation(world.getServer());
+             LOGGER.error(ex, new Throwable());
+             throw new IllegalStateException(ex);
+         }
+@@ -60,7 +62,7 @@ public class TickThread extends Thread {
      public static void ensureTickThread(final Level world, final int chunkX, final int chunkZ, final String reason) {
          if (!isTickThreadFor(world, chunkX, chunkZ)) {
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
--                reason + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + new ChunkPos(chunkX, chunkZ);
-+                reason + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + new ChunkPos(chunkX, chunkZ) + " - " + getTickThreadInformation(world.getServer());
+             final String ex = "Thread failed main thread check: " +
+-                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + new ChunkPos(chunkX, chunkZ);
++                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", chunk_pos=" + new ChunkPos(chunkX, chunkZ) + " - " + getTickThreadInformation(world.getServer());
              LOGGER.error(ex, new Throwable());
              throw new IllegalStateException(ex);
          }
-@@ -65,7 +67,7 @@ public class TickThread extends Thread {
+@@ -69,7 +71,7 @@ public class TickThread extends Thread {
      public static void ensureTickThread(final Entity entity, final String reason) {
          if (!isTickThreadFor(entity)) {
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
--                reason + ", entity=" + entity;
-+                reason + ", entity=" + entity + " - " + getTickThreadInformation(entity.getServer());
+             final String ex = "Thread failed main thread check: " +
+-                reason + ", context=" + getThreadContext() + ", entity=" + EntityUtil.dumpEntity(entity);
++                reason + ", context=" + getThreadContext() + ", entity=" + EntityUtil.dumpEntity(entity) + " - " + getTickThreadInformation(entity.getServer());
              LOGGER.error(ex, new Throwable());
              throw new IllegalStateException(ex);
          }
-@@ -74,7 +76,7 @@ public class TickThread extends Thread {
+@@ -78,7 +80,7 @@ public class TickThread extends Thread {
      public static void ensureTickThread(final Level world, final AABB aabb, final String reason) {
          if (!isTickThreadFor(world, aabb)) {
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
--                reason + ", world=" + WorldUtil.getWorldName(world) + ", aabb=" + aabb;
-+                reason + ", world=" + WorldUtil.getWorldName(world) + ", aabb=" + aabb + " - " + getTickThreadInformation(world.getServer());
+             final String ex = "Thread failed main thread check: " +
+-                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", aabb=" + aabb;
++                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", aabb=" + aabb + " - " + getTickThreadInformation(world.getServer());
              LOGGER.error(ex, new Throwable());
              throw new IllegalStateException(ex);
          }
-@@ -83,12 +85,74 @@ public class TickThread extends Thread {
+@@ -87,12 +89,74 @@ public class TickThread extends Thread {
      public static void ensureTickThread(final Level world, final double blockX, final double blockZ, final String reason) {
          if (!isTickThreadFor(world, blockX, blockZ)) {
-             final String ex = "Thread " + Thread.currentThread().getName() + " failed main thread check: " +
--                reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + new Vec3(blockX, 0.0, blockZ);
-+                reason + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + new Vec3(blockX, 0.0, blockZ) + " - " + getTickThreadInformation(world.getServer());
+             final String ex = "Thread failed main thread check: " +
+-                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + new Vec3(blockX, 0.0, blockZ);
++                reason + ", context=" + getThreadContext() + ", world=" + WorldUtil.getWorldName(world) + ", block_pos=" + new Vec3(blockX, 0.0, blockZ) + " - " + getTickThreadInformation(world.getServer());
              LOGGER.error(ex, new Throwable());
              throw new IllegalStateException(ex);
          }
@@ -147,7 +156,7 @@ index 157e5edb507d6d2a922833c70a1c27abc93c9c34..f47b49b02f664725d310887e65477deb
      public final int id; /* We don't override getId as the spec requires that it be unique (with respect to all other threads) */
  
      private static final AtomicInteger ID_GENERATOR = new AtomicInteger();
-@@ -123,7 +187,11 @@ public class TickThread extends Thread {
+@@ -127,7 +191,11 @@ public class TickThread extends Thread {
      }
  
      public static boolean isTickThreadFor(final Level world, final BlockPos pos) {
@@ -160,7 +169,7 @@ index 157e5edb507d6d2a922833c70a1c27abc93c9c34..f47b49b02f664725d310887e65477deb
      }
  
      public static boolean isTickThreadFor(final Level world, final BlockPos pos, final int blockRadius) {
-@@ -131,38 +199,103 @@ public class TickThread extends Thread {
+@@ -135,38 +203,103 @@ public class TickThread extends Thread {
      }
  
      public static boolean isTickThreadFor(final Level world, final ChunkPos pos) {
@@ -274,10 +283,10 @@ index 157e5edb507d6d2a922833c70a1c27abc93c9c34..f47b49b02f664725d310887e65477deb
 +    // SparklyPaper end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b3207f8191b8 100644
+index 284b58ece65d9cf6411a79abb748f1dfa52edc92..d5d01a87453978880f180b9bb65f84c9dbe0968f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -457,7 +457,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -461,7 +461,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
  
      private boolean unloadChunk0(int x, int z, boolean save) {
@@ -286,7 +295,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          if (!this.isChunkLoaded(x, z)) {
              return true;
          }
-@@ -480,6 +480,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -484,6 +484,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
          if (!unloadChunk0(x, z, false)) {
              return false;
          }
@@ -294,7 +303,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          warnUnsafeChunk("regenerating a faraway chunk", x, z); // Paper
  
          final long chunkKey = ChunkCoordIntPair.pair(x, z);
-@@ -501,6 +502,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -505,6 +506,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean refreshChunk(int x, int z) {
@@ -302,7 +311,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          ChunkHolder playerChunk = this.world.getChunkSource().chunkMap.getVisibleChunkIfPresent(ChunkPos.asLong(x, z));
          if (playerChunk == null) return false;
  
-@@ -551,7 +553,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -555,7 +557,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean loadChunk(int x, int z, boolean generate) {
@@ -311,7 +320,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          warnUnsafeChunk("loading a faraway chunk", x, z); // Paper
          ChunkAccess chunk = this.world.getChunkSource().getChunk(x, z, generate || isChunkGenerated(x, z) ? ChunkStatus.FULL : ChunkStatus.EMPTY, true); // Paper
  
-@@ -779,6 +781,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -783,6 +785,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean generateTree(Location loc, TreeType type, BlockChangeDelegate delegate) {
@@ -319,7 +328,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          this.world.captureTreeGeneration = true;
          this.world.captureBlockStates = true;
          boolean grownTree = this.generateTree(loc, type);
-@@ -894,6 +897,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -898,6 +901,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
      public boolean createExplosion(double x, double y, double z, float power, boolean setFire, boolean breakBlocks, Entity source, Consumer<net.minecraft.world.level.ServerExplosion> configurator) {
      // Paper end - expand explosion API
@@ -327,7 +336,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          net.minecraft.world.level.Level.ExplosionInteraction explosionType;
          if (!breakBlocks) {
              explosionType = net.minecraft.world.level.Level.ExplosionInteraction.NONE; // Don't break blocks
-@@ -985,6 +989,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -989,6 +993,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public int getHighestBlockYAt(int x, int z, org.bukkit.HeightMap heightMap) {
@@ -335,7 +344,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          warnUnsafeChunk("getting a faraway chunk", x >> 4, z >> 4); // Paper
          // Transient load for this tick
          return this.world.getChunk(x >> 4, z >> 4).getHeight(CraftHeightMap.toNMS(heightMap), x, z);
-@@ -1015,6 +1020,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1019,6 +1024,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      @Override
      public void setBiome(int x, int y, int z, Holder<net.minecraft.world.level.biome.Biome> bb) {
          BlockPos pos = new BlockPos(x, 0, z);
@@ -343,7 +352,7 @@ index ba32db69c95b325a781cb2dff4200e4464a11baf..219a87300838cb4d078553dda666b320
          if (this.world.hasChunkAt(pos)) {
              net.minecraft.world.level.chunk.LevelChunk chunk = this.world.getChunkAt(pos);
  
-@@ -2292,6 +2298,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -2316,6 +2322,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public void sendGameEvent(Entity sourceEntity, org.bukkit.GameEvent gameEvent, Vector position) {
