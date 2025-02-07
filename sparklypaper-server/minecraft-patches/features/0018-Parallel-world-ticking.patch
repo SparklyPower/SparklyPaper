@@ -366,7 +366,7 @@ index 6ac73610f6039290c4ef3dde2206b6863d2b5067..0c5dbfe1d7e17796c1a60bcb1f97673d
          halloweenManager.startHalloweenEpochTask();
          halloweenManager.waitUntilEpochHasBeenUpdated();
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 59465ab6d7723d27b1597cc7094b5044a3f24250..7d0e5184289b37c6c9acc34341b8d84399ba653f 100644
+index 229dc5bf756b04896ab6567e79811ef81e416eb8..f26751633b809cdf86f512529ebf8b0a2ba66b46 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -184,7 +184,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -430,7 +430,7 @@ index 59465ab6d7723d27b1597cc7094b5044a3f24250..7d0e5184289b37c6c9acc34341b8d843
          // Paper start - extra debug info
          if (entity.valid) {
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index f347ff8d863f4bcef46604c757de112cb3fe445c..532df406e9fb41ab2ccfd59bcc7a614d6ada6548 100644
+index 57d432dc9e8d8e9a3e088e7c40b35178c30fe786..8a6be70e40367a94ed7ba2947426cd4a40fe7d33 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -423,6 +423,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -483,7 +483,7 @@ index f347ff8d863f4bcef46604c757de112cb3fe445c..532df406e9fb41ab2ccfd59bcc7a614d
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 03feaf0adb8ee87e33744a4615dc2507a02f92d7..d6e13845fce443ae9b8f2c9a4ee5b00c4c5cc831 100644
+index 5a4960fdbd97d830ac79845697eea9372c48a13b..76c17bc3425a081a0d691a10525f91b3b930ebd0 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -113,7 +113,7 @@ public abstract class PlayerList {
@@ -535,10 +535,10 @@ index 03feaf0adb8ee87e33744a4615dc2507a02f92d7..d6e13845fce443ae9b8f2c9a4ee5b00c
          serverPlayer.connection = player.connection;
          serverPlayer.restoreFrom(player, keepInventory);
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 1d0151a042ed5de4e235ef0bdac1a0e8240e85e7..731aecb84f87b6de41029b88e0c5c7ce2bab20cb 100644
+index b268b428ec8f2e50737e1dd5cc705c537322433c..d1109555e6cdd9cf9214df90c31c3a8497a253c2 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -822,7 +822,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -818,7 +818,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      // CraftBukkit start
      public void postTick() {
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
@@ -547,7 +547,7 @@ index 1d0151a042ed5de4e235ef0bdac1a0e8240e85e7..731aecb84f87b6de41029b88e0c5c7ce
              this.handlePortal();
          }
      }
-@@ -3808,6 +3808,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -3804,6 +3804,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      private Entity teleportCrossDimension(ServerLevel level, TeleportTransition teleportTransition) {
@@ -590,7 +590,7 @@ index 76f50437396f8f856381d0fbef52953ef7c263f6..199fec37b2c2b2ea6a55700cb8f4ec98
                  serverLevel.capturedBlockStates.clear();
                  org.bukkit.event.world.StructureGrowEvent structureEvent = null;
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 644ab8b2c797f0675530a3efe23a878899689d66..b43cc51c23da0228aafd99d56e2a6e5cc05496ed 100644
+index 9fcf29108234cc0d233b18b0b1a5631da7e3f382..61c56c58841f936c6bfabe6de493f7dcfdcee94a 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
 @@ -171,6 +171,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl

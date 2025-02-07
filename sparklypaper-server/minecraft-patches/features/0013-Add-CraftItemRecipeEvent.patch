@@ -6,10 +6,10 @@ Subject: [PATCH] Add CraftItemRecipeEvent
 Used when a player OR a crafter block crafts an item, as an alternative to PrepareItemCraftEvent and CraftItemEvent, because both events are not triggered when a item is crafted from a crafter
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 27ef385a85b13ceb58e8d149849983107c539b31..7f9ed94576c94161070fd1be1544aaed9aac0c6b 100644
+index 882dbb1276c548316938bbc50f5f7e01f8547ff8..01d526cef9c0aa2d5b6b1ea1c93f8a277bfac8c2 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -3156,6 +3156,21 @@ public class ServerGamePacketListenerImpl
+@@ -3163,6 +3163,21 @@ public class ServerGamePacketListenerImpl
                                  } else {
                                      event = new CraftItemEvent(recipe, inventory, type, slotNum, click, action);
                                  }
