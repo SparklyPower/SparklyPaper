@@ -366,7 +366,7 @@ index 6ac73610f6039290c4ef3dde2206b6863d2b5067..0c5dbfe1d7e17796c1a60bcb1f97673d
          halloweenManager.startHalloweenEpochTask();
          halloweenManager.waitUntilEpochHasBeenUpdated();
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 229dc5bf756b04896ab6567e79811ef81e416eb8..f26751633b809cdf86f512529ebf8b0a2ba66b46 100644
+index 3bdd68f6fd3f6558276774064f021936fa00729e..0ee5bb3665ba097acd08386e1b0c4cdbdbd02bc2 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -184,7 +184,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -412,7 +412,7 @@ index 229dc5bf756b04896ab6567e79811ef81e416eb8..f26751633b809cdf86f512529ebf8b0a
          }
          // Paper end - rewrite chunk system
  
-@@ -1497,6 +1499,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1499,6 +1501,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
      }
  
      private void addPlayer(ServerPlayer player) {
@@ -420,7 +420,7 @@ index 229dc5bf756b04896ab6567e79811ef81e416eb8..f26751633b809cdf86f512529ebf8b0a
          Entity entity = this.getEntities().get(player.getUUID());
          if (entity != null) {
              LOGGER.warn("Force-added player with duplicate UUID {}", player.getUUID());
-@@ -1509,7 +1512,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1511,7 +1514,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
  
      // CraftBukkit start
      private boolean addEntity(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason spawnReason) {
@@ -535,10 +535,10 @@ index 5a4960fdbd97d830ac79845697eea9372c48a13b..76c17bc3425a081a0d691a10525f91b3
          serverPlayer.connection = player.connection;
          serverPlayer.restoreFrom(player, keepInventory);
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index b268b428ec8f2e50737e1dd5cc705c537322433c..d1109555e6cdd9cf9214df90c31c3a8497a253c2 100644
+index 1b54cf07616a10d93e9336dbd299ba5f09678a28..9548ccc63eebaca1a9ccdd504bdfb4f04e024544 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -818,7 +818,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -819,7 +819,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      // CraftBukkit start
      public void postTick() {
          // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
@@ -547,7 +547,7 @@ index b268b428ec8f2e50737e1dd5cc705c537322433c..d1109555e6cdd9cf9214df90c31c3a84
              this.handlePortal();
          }
      }
-@@ -3804,6 +3804,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -3805,6 +3805,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      private Entity teleportCrossDimension(ServerLevel level, TeleportTransition teleportTransition) {

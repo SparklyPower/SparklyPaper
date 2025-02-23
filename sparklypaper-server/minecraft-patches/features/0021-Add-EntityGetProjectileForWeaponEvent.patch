@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: MrPowerGamerBR <git@mrpowergamerbr.com>
-Date: Fri, 17 Jan 2025 12:37:40 -0300
+Date: Sun, 23 Feb 2025 18:53:43 -0300
 Subject: [PATCH] Add EntityGetProjectileForWeaponEvent
 
 
@@ -22,10 +22,10 @@ index d0d3c825cf8088df4794cf5bfde12a69f4d71754..4cad07ae00eb34b51b8ef3f25f0abf8e
              ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedHeldProjectiles);
              return heldProjectile.isEmpty() ? new ItemStack(Items.ARROW) : heldProjectile;
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 3ae542153bf1538d17e7c0fe6acc9e7f8605750c..266a91a6d0300ce8f78bf3e1a8998a97a65c9deb 100644
+index a0813aa9ebf5b32375b1bc9f294d8fc34cc867fe..3e89356b177b5033fb58de314b0cb0f591ec4e5b 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2234,6 +2234,12 @@ public abstract class Player extends LivingEntity {
+@@ -2239,6 +2239,12 @@ public abstract class Player extends LivingEntity {
          if (!(shootable.getItem() instanceof ProjectileWeaponItem)) {
              return ItemStack.EMPTY;
          } else {
@@ -35,6 +35,6 @@ index 3ae542153bf1538d17e7c0fe6acc9e7f8605750c..266a91a6d0300ce8f78bf3e1a8998a97
 +            if (event.getArrow() != null)
 +                return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());
 +            // SparklyPaper end
-             Predicate<ItemStack> supportedHeldProjectiles = ((ProjectileWeaponItem)shootable.getItem()).getSupportedHeldProjectiles().and(item -> this.tryReadyArrow(shootable, item)); // Paper - PlayerReadyArrowEvent
+             final org.apache.commons.lang3.mutable.MutableBoolean anyEventCancelled = new org.apache.commons.lang3.mutable.MutableBoolean(); // Paper - PlayerReadyArrowEvent
+             Predicate<ItemStack> supportedHeldProjectiles = ((ProjectileWeaponItem)shootable.getItem()).getSupportedHeldProjectiles().and(item -> this.tryReadyArrow(shootable, item, anyEventCancelled)); // Paper - PlayerReadyArrowEvent
              ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedHeldProjectiles);
-             if (!heldProjectile.isEmpty()) {

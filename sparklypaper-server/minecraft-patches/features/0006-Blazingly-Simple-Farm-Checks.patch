@@ -76,7 +76,7 @@ index bc0969f40814094e42a860a72314fccd1a66fabe..c14de811ae7cead820a00a87b9d2ce8c
          }
      }
 diff --git a/net/minecraft/world/level/block/FarmBlock.java b/net/minecraft/world/level/block/FarmBlock.java
-index 47c9b32c89e7e6f84a279c2f6098ada77dc58b6b..06a33e6f6118c2f2dce567efc2e23cbf877b7a9c 100644
+index 1fdede769b67cb5d2f9159c779f19e3639bb6ff5..1de42b2be50a5704a80c6cacc9e2cd82d0959bd6 100644
 --- a/net/minecraft/world/level/block/FarmBlock.java
 +++ b/net/minecraft/world/level/block/FarmBlock.java
 @@ -95,6 +95,19 @@ public class FarmBlock extends Block {
@@ -99,7 +99,7 @@ index 47c9b32c89e7e6f84a279c2f6098ada77dc58b6b..06a33e6f6118c2f2dce567efc2e23cbf
          if (moistureValue > 0 && level.paperConfig().tickRates.wetFarmland != 1 && (level.paperConfig().tickRates.wetFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % level.paperConfig().tickRates.wetFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
          if (moistureValue == 0 && level.paperConfig().tickRates.dryFarmland != 1 && (level.paperConfig().tickRates.dryFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % level.paperConfig().tickRates.dryFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
          if (!isNearWater(level, pos) && !level.isRainingAt(pos.above())) {
-@@ -154,7 +167,7 @@ public class FarmBlock extends Block {
+@@ -157,7 +170,7 @@ public class FarmBlock extends Block {
          return level.getBlockState(pos.above()).is(BlockTags.MAINTAINS_FARMLAND);
      }
  
