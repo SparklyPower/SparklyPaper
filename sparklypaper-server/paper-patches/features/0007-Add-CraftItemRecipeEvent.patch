@@ -6,10 +6,10 @@ Subject: [PATCH] Add CraftItemRecipeEvent
 Used when a player OR a crafter block crafts an item, as an alternative to PrepareItemCraftEvent and CraftItemEvent, because both events are not triggered when a item is crafted from a crafter
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index d7a52220e9525502163f5ee6afbadf2baaae6190..bbd000e3a3e9112e10a09e5d3ef6851b28e900fa 100644
+index 57c3f8531bf85b53af3a4aad6e9e369d5cff0ce3..80bb0371eed48dbcb0e4e62dfc7f23f8514bdf77 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -1472,6 +1472,24 @@ public class CraftEventFactory {
+@@ -1474,6 +1474,24 @@ public class CraftEventFactory {
          Bukkit.getPluginManager().callEvent(crafterCraftEvent);
          return crafterCraftEvent;
      }
