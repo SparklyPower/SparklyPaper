@@ -63,21 +63,23 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.3")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -183,7 +_,12 @@
+@@ -184,9 +_,14 @@
          val build = System.getenv("BUILD_NUMBER") ?: null
          val buildTime = if (build != null) Instant.now() else Instant.EPOCH
          val gitHash = git.exec(providers, "rev-parse", "--short=7", "HEAD").get().trim()
 -        val implementationVersion = "$mcVersion-${build ?: "DEV"}-$gitHash"
++        var implementationVersion = "$mcVersion-${build ?: "DEV"}-$gitHash" // SparklyPaper
+         val date = git.exec(providers, "show", "-s", "--format=%ci", gitHash).get().trim()
+         val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
 +        // SparklyPaper start
-+        var implementationVersion = "$mcVersion-${build ?: "DEV"}-$gitHash"
 +        if (project.hasProperty("sparklypaperImplementationVersionSuffix")) {
 +            implementationVersion += "/${project.property("sparklypaperImplementationVersionSuffix")}"
 +        }
 +        // SparklyPaper end
-         val date = git.exec(providers, "show", "-s", "--format=%ci", gitHash).get().trim()
-         val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
          attributes(
-@@ -194,8 +_,8 @@
+             "Main-Class" to "org.bukkit.craftbukkit.Main",
+             "Implementation-Title" to "Paper",
+@@ -195,8 +_,8 @@
              "Specification-Title" to "Paper",
              "Specification-Version" to project.version,
              "Specification-Vendor" to "Paper Team",

@@ -5,7 +5,7 @@ Subject: [PATCH] Add PlayerPreMoveEvent
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index ddcd612d10be42b4e85b2d0d60b83f15177fcac0..ba19ce959a81eac0c16643fb346d8d3614188fee 100644
+index 4b8f847e6a7437152fe3409f9f6bc800ca0be93b..9b3dc8de35cf3ab55e9eb9dc5849d6205a52dde5 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -1429,7 +1429,7 @@ public class ServerGamePacketListenerImpl
@@ -64,7 +64,7 @@ index ddcd612d10be42b4e85b2d0d60b83f15177fcac0..ba19ce959a81eac0c16643fb346d8d36
 -                                this.player.doCheckFallDamage(vec3.x, vec3.y, vec3.z, packet.isOnGround());
 +                                this.player.setOnGroundWithMovement(isOnGround, horizontalCollision, vec3); // SparklyPaper - Add PlayerPreMoveEvent
 +                                this.player.doCheckFallDamage(vec3.x, vec3.y, vec3.z, isOnGround); // SparklyPaper - Add PlayerPreMoveEvent
-                                 if (!this.player.isSpectator() && this.player.isAffectedByBlocks()) this.player.recordMovementThroughBlocks(new Vec3(x, y, z), this.player.position());
+                                 if (!this.player.isSpectator() && this.player.isAffectedByBlocks()) this.player.recordMovementThroughBlocks(new Vec3(x, y, z), this.player.position()); // Paper - Do not record movement for vehicles/players unaffected by blocks
                                  this.handlePlayerKnownMovement(vec3);
                                  if (flag) {
                                      this.player.resetFallDistance();
