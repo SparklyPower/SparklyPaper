@@ -19,7 +19,7 @@ jobs:
         with:
           path: 'Paper'
           repository: "PaperMC/Paper"
-          ref: 'main'
+          ref: 'ver/1.21.4'
           token: ${{ secrets.LORITTA_PAT }}
       
       - name: Get Paper Latest Commit Hash
