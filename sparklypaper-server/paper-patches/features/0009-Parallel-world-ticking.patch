@@ -353,7 +353,7 @@ index 4a405744061b2689a207aa085bec9a6a223342f2..9670ebd485f065dff742e21c622b240a
      }
      // Paper end
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
-index e9ca19c8668d3028f9453f478b1853baa24b47b4..d77a39fcc0118d0da4310e7ba843d253571ab313 100644
+index e9ca19c8668d3028f9453f478b1853baa24b47b4..2ac09f2efff27de7619f8a6102e27ec8bffe2d5a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 @@ -75,6 +75,11 @@ public class CraftBlock implements Block {
@@ -474,6 +474,17 @@ index e9ca19c8668d3028f9453f478b1853baa24b47b4..d77a39fcc0118d0da4310e7ba843d253
          Direction direction = CraftBlock.blockFaceToNotch(face);
          BlockFertilizeEvent event = null;
          ServerLevel world = this.getCraftWorld().getHandle();
+@@ -553,8 +603,8 @@ public class CraftBlock implements Block {
+         world.captureTreeGeneration = false;
+ 
+         if (!world.capturedBlockStates.isEmpty()) {
+-            TreeType treeType = SaplingBlock.treeType;
+-            SaplingBlock.treeType = null;
++            TreeType treeType = SaplingBlock.treeTypeRT.get(); // SparklyPaper - parallel world ticking
++            SaplingBlock.treeTypeRT.set(null); // SparklyPaper - parallel world ticking
+             List<BlockState> states = new ArrayList<>(world.capturedBlockStates.values());
+             world.capturedBlockStates.clear();
+             StructureGrowEvent structureEvent = null;
 @@ -644,6 +694,11 @@ public class CraftBlock implements Block {
  
      @Override
