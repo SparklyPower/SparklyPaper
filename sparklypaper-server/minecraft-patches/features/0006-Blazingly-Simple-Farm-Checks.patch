@@ -109,7 +109,7 @@ index a31ac95237515b874f59941ec24c74e2c357b3d8..7ddbe4d408c87c5ad9dc03948b0251ef
          int xOff = pos.getX();
          int yOff = pos.getY();
 diff --git a/net/minecraft/world/level/block/StemBlock.java b/net/minecraft/world/level/block/StemBlock.java
-index 2eaf1e43474a49a3315325b831bb86f2e10cc479..ea4010027b67033b1ed8059aca629684e92d3449 100644
+index 2eaf1e43474a49a3315325b831bb86f2e10cc479..fbf5fe7e6152841cea6a72a6992a55f42d7be82d 100644
 --- a/net/minecraft/world/level/block/StemBlock.java
 +++ b/net/minecraft/world/level/block/StemBlock.java
 @@ -69,6 +69,56 @@ public class StemBlock extends VegetationBlock implements BonemealableBlock {
@@ -150,7 +150,7 @@ index 2eaf1e43474a49a3315325b831bb86f2e10cc479..ea4010027b67033b1ed8059aca629684
 +
 +                            if (optional.isPresent() && optional1.isPresent()) {
 +                                // CraftBukkit start
-+                                if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, blockposition1, ((Block) optional.get()).defaultBlockState())) {
++                                if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, blockposition1, ((Block) optional.get()).defaultBlockState(), 3)) {
 +                                    return;
 +                                }
 +                                // CraftBukkit end
