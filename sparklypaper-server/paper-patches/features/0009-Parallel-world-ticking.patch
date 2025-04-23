@@ -283,10 +283,10 @@ index 69cdd304d255d52c9b7dc9b6a33ffdb630b79abe..d8314bae08146f75442c342275d2e94b
 +    // SparklyPaper end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558a96ac350 100644
+index 4a405744061b2689a207aa085bec9a6a223342f2..9670ebd485f065dff742e21c622b240a4de42e79 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -455,7 +455,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -456,7 +456,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
  
      private boolean unloadChunk0(int x, int z, boolean save) {
@@ -295,7 +295,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
          if (!this.isChunkLoaded(x, z)) {
              return true;
          }
-@@ -472,6 +472,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -473,6 +473,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean refreshChunk(int x, int z) {
@@ -303,7 +303,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
          ChunkHolder playerChunk = this.world.getChunkSource().chunkMap.getVisibleChunkIfPresent(ChunkPos.asLong(x, z));
          if (playerChunk == null) return false;
  
-@@ -522,7 +523,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -523,7 +524,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean loadChunk(int x, int z, boolean generate) {
@@ -312,7 +312,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
          warnUnsafeChunk("loading a faraway chunk", x, z); // Paper
          ChunkAccess chunk = this.world.getChunkSource().getChunk(x, z, generate || isChunkGenerated(x, z) ? ChunkStatus.FULL : ChunkStatus.EMPTY, true); // Paper
  
-@@ -750,6 +751,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -751,6 +752,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public boolean generateTree(Location loc, TreeType type, BlockChangeDelegate delegate) {
@@ -320,7 +320,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
          this.world.captureTreeGeneration = true;
          this.world.captureBlockStates = true;
          boolean grownTree = this.generateTree(loc, type);
-@@ -865,6 +867,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -866,6 +868,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      }
      public boolean createExplosion(double x, double y, double z, float power, boolean setFire, boolean breakBlocks, Entity source, Consumer<net.minecraft.world.level.ServerExplosion> configurator) {
      // Paper end - expand explosion API
@@ -328,7 +328,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
          net.minecraft.world.level.Level.ExplosionInteraction explosionType;
          if (!breakBlocks) {
              explosionType = net.minecraft.world.level.Level.ExplosionInteraction.NONE; // Don't break blocks
-@@ -956,6 +959,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -957,6 +960,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public int getHighestBlockYAt(int x, int z, org.bukkit.HeightMap heightMap) {
@@ -336,7 +336,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
          warnUnsafeChunk("getting a faraway chunk", x >> 4, z >> 4); // Paper
          // Transient load for this tick
          return this.world.getChunk(x >> 4, z >> 4).getHeight(CraftHeightMap.toNMS(heightMap), x, z);
-@@ -986,6 +990,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -987,6 +991,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      @Override
      public void setBiome(int x, int y, int z, Holder<net.minecraft.world.level.biome.Biome> bb) {
          BlockPos pos = new BlockPos(x, 0, z);
@@ -344,7 +344,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
          if (this.world.hasChunkAt(pos)) {
              net.minecraft.world.level.chunk.LevelChunk chunk = this.world.getChunkAt(pos);
  
-@@ -2289,6 +2294,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -2295,6 +2300,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public void sendGameEvent(Entity sourceEntity, org.bukkit.GameEvent gameEvent, Vector position) {
@@ -353,7 +353,7 @@ index 1439d282167dc8a2e66f4896849153b810112988..7feeb6944848a9615fd6807cae2d7558
      }
      // Paper end
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
-index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969abc9c028 100644
+index e9ca19c8668d3028f9453f478b1853baa24b47b4..d77a39fcc0118d0da4310e7ba843d253571ab313 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 @@ -75,6 +75,11 @@ public class CraftBlock implements Block {
@@ -368,32 +368,31 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          return this.world.getBlockState(this.position);
      }
  
-@@ -157,6 +162,11 @@ public class CraftBlock implements Block {
+@@ -155,6 +160,11 @@ public class CraftBlock implements Block {
      }
  
-     private void setData(final byte data, int flag) {
+     private void setData(final byte data, int flags) {
 +        // SparklyPaper start - parallel world ticking
 +        if (world instanceof ServerLevel serverWorld) {
 +            ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(serverWorld, position, "Cannot modify world asynchronously");
 +        }
 +        // SparklyPaper end - parallel world ticking
-         this.world.setBlock(this.position, CraftMagicNumbers.getBlock(this.getType(), data), flag);
+         this.world.setBlock(this.position, CraftMagicNumbers.getBlock(this.getType(), data), flags);
      }
  
-@@ -198,6 +208,12 @@ public class CraftBlock implements Block {
+@@ -196,6 +206,11 @@ public class CraftBlock implements Block {
      }
  
-     public static boolean setTypeAndData(LevelAccessor world, BlockPos position, net.minecraft.world.level.block.state.BlockState old, net.minecraft.world.level.block.state.BlockState blockData, boolean applyPhysics) {
+     public static boolean setBlockState(LevelAccessor world, BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState, boolean applyPhysics) {
 +        // SparklyPaper start - parallel world ticking
 +        if (world instanceof ServerLevel serverWorld) {
-+            ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(serverWorld, position, "Cannot modify world asynchronously");
++            ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(serverWorld, pos, "Cannot modify world asynchronously");
 +        }
 +        // SparklyPaper end - parallel world ticking
-+
-         // SPIGOT-611: need to do this to prevent glitchiness. Easier to handle this here (like /setblock) than to fix weirdness in tile entity cleanup
-         if (old.hasBlockEntity() && blockData.getBlock() != old.getBlock()) { // SPIGOT-3725 remove old tile entity if block changes
+         // SPIGOT-611: need to do this to prevent glitchiness. Easier to handle this here (like /setblock) than to fix weirdness in block entity cleanup
+         if (oldState.hasBlockEntity() && newState.getBlock() != oldState.getBlock()) { // SPIGOT-3725 remove old block entity if block changes
              // SPIGOT-4612: faster - just clear tile
-@@ -343,18 +359,33 @@ public class CraftBlock implements Block {
+@@ -344,18 +359,33 @@ public class CraftBlock implements Block {
  
      @Override
      public Biome getBiome() {
@@ -427,7 +426,7 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          this.getWorld().setBiome(this.getX(), this.getY(), this.getZ(), bio);
      }
  
-@@ -402,6 +433,11 @@ public class CraftBlock implements Block {
+@@ -403,6 +433,11 @@ public class CraftBlock implements Block {
  
      @Override
      public boolean isBlockFaceIndirectlyPowered(BlockFace face) {
@@ -439,7 +438,7 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          int power = this.world.getMinecraftWorld().getSignal(this.position, CraftBlock.blockFaceToNotch(face));
  
          Block relative = this.getRelative(face);
-@@ -414,6 +450,11 @@ public class CraftBlock implements Block {
+@@ -415,6 +450,11 @@ public class CraftBlock implements Block {
  
      @Override
      public int getBlockPower(BlockFace face) {
@@ -451,7 +450,7 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          int power = 0;
          net.minecraft.world.level.Level world = this.world.getMinecraftWorld();
          int x = this.getX();
-@@ -484,6 +525,11 @@ public class CraftBlock implements Block {
+@@ -483,6 +523,11 @@ public class CraftBlock implements Block {
  
      @Override
      public boolean breakNaturally() {
@@ -463,7 +462,7 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          return this.breakNaturally(null);
      }
  
-@@ -543,6 +589,11 @@ public class CraftBlock implements Block {
+@@ -542,6 +587,11 @@ public class CraftBlock implements Block {
  
      @Override
      public boolean applyBoneMeal(BlockFace face) {
@@ -475,18 +474,7 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          Direction direction = CraftBlock.blockFaceToNotch(face);
          BlockFertilizeEvent event = null;
          ServerLevel world = this.getCraftWorld().getHandle();
-@@ -554,8 +605,8 @@ public class CraftBlock implements Block {
-         world.captureTreeGeneration = false;
- 
-         if (world.capturedBlockStates.size() > 0) {
--            TreeType treeType = SaplingBlock.treeType;
--            SaplingBlock.treeType = null;
-+            TreeType treeType = SaplingBlock.treeTypeRT.get(); // SparklyPaper - parallel world ticking
-+            SaplingBlock.treeTypeRT.set(null); // SparklyPaper - parallel world ticking
-             List<BlockState> blocks = new ArrayList<>(world.capturedBlockStates.values());
-             world.capturedBlockStates.clear();
-             StructureGrowEvent structureEvent = null;
-@@ -644,6 +695,11 @@ public class CraftBlock implements Block {
+@@ -644,6 +694,11 @@ public class CraftBlock implements Block {
  
      @Override
      public RayTraceResult rayTrace(Location start, Vector direction, double maxDistance, FluidCollisionMode fluidCollisionMode) {
@@ -498,7 +486,7 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          Preconditions.checkArgument(start != null, "Location start cannot be null");
          Preconditions.checkArgument(this.getWorld().equals(start.getWorld()), "Location start cannot be a different world");
          start.checkFinite();
-@@ -685,6 +741,11 @@ public class CraftBlock implements Block {
+@@ -685,6 +740,11 @@ public class CraftBlock implements Block {
  
      @Override
      public boolean canPlace(BlockData data) {
@@ -510,7 +498,7 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          Preconditions.checkArgument(data != null, "BlockData cannot be null");
          net.minecraft.world.level.block.state.BlockState iblockdata = ((CraftBlockData) data).getState();
          net.minecraft.world.level.Level world = this.world.getMinecraftWorld();
-@@ -719,6 +780,11 @@ public class CraftBlock implements Block {
+@@ -719,6 +779,11 @@ public class CraftBlock implements Block {
  
      @Override
      public void tick() {
@@ -523,18 +511,18 @@ index 5cb69d0b822e11a99a96aef4f59986d083b079f4..78f9c3f3b068f638570942961ad41969
          this.getNMS().tick(level, this.position, level.random);
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
-index 768d3f93da2522d467183654260a8bd8653588b1..aa7dcdbf16882fd64ff1b62cce8d83a4a372951f 100644
+index 3422970353dcd886934b9ee906467769d39abbde..79f53cfa396ae67b1e5432ca353cebafae9499fa 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockEntityState.java
 @@ -25,7 +25,7 @@ public abstract class CraftBlockEntityState<T extends BlockEntity> extends Craft
-     private final T tileEntity;
+     private final T blockEntity;
      private final T snapshot;
      public boolean snapshotDisabled; // Paper
 -    public static boolean DISABLE_SNAPSHOT = false; // Paper
 +    public static ThreadLocal<Boolean> DISABLE_SNAPSHOT = ThreadLocal.withInitial(() -> Boolean.FALSE); // SparklyPaper - parallel world ticking
  
-     public CraftBlockEntityState(World world, T tileEntity) {
-         super(world, tileEntity.getBlockPos(), tileEntity.getBlockState());
+     public CraftBlockEntityState(World world, T blockEntity) {
+         super(world, blockEntity.getBlockPos(), blockEntity.getBlockState());
 @@ -34,8 +34,8 @@ public abstract class CraftBlockEntityState<T extends BlockEntity> extends Craft
  
          try { // Paper - Show blockstate location if we failed to read it
@@ -543,14 +531,14 @@ index 768d3f93da2522d467183654260a8bd8653588b1..aa7dcdbf16882fd64ff1b62cce8d83a4
 -        if (DISABLE_SNAPSHOT) {
 +        this.snapshotDisabled = DISABLE_SNAPSHOT.get(); // SparklyPaper - parallel world ticking
 +        if (DISABLE_SNAPSHOT.get()) { // SparklyPaper - parallel world ticking
-             this.snapshot = this.tileEntity;
+             this.snapshot = this.blockEntity;
          } else {
-             this.snapshot = this.createSnapshot(tileEntity);
+             this.snapshot = this.createSnapshot(blockEntity);
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
-index fa63a6cfcfcc4eee4503a82d85333c139c8c8b2b..9856860ee2987738bbcad5d752670e30f569ba74 100644
+index c0a7659776a9f0fb82bb8563acbf3286b318fe03..e7c7c8fec7fdc480afd070b1323326d85994cbe8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockState.java
-@@ -215,6 +215,12 @@ public class CraftBlockState implements BlockState {
+@@ -217,6 +217,12 @@ public class CraftBlockState implements BlockState {
          LevelAccessor access = this.getWorldHandle();
          CraftBlock block = this.getBlock();
  
@@ -563,7 +551,7 @@ index fa63a6cfcfcc4eee4503a82d85333c139c8c8b2b..9856860ee2987738bbcad5d752670e30
          if (block.getType() != this.getType()) {
              if (!force) {
                  return false;
-@@ -350,6 +356,7 @@ public class CraftBlockState implements BlockState {
+@@ -365,6 +371,7 @@ public class CraftBlockState implements BlockState {
  
      @Override
      public java.util.Collection<org.bukkit.inventory.ItemStack> getDrops(org.bukkit.inventory.ItemStack item, org.bukkit.entity.Entity entity) {
@@ -572,57 +560,24 @@ index fa63a6cfcfcc4eee4503a82d85333c139c8c8b2b..9856860ee2987738bbcad5d752670e30
          net.minecraft.world.item.ItemStack nms = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(item);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
-index 56453454cbd4b9e9270fc833f8ab38d5fa7a3763..ad507c36d89ce8639fbedbb1df0da66bdc96affa 100644
+index 2338e7c115037430cefae26a571ded71f77983c4..15ba9c5588b6ef8da7e495dccbdcd53711ee4af1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
-@@ -249,8 +249,8 @@ public final class CraftBlockStates {
-         net.minecraft.world.level.block.state.BlockState blockData = craftBlock.getNMS();
-         BlockEntity tileEntity = craftBlock.getHandle().getBlockEntity(blockPosition);
-         // Paper start - block state snapshots
+@@ -195,14 +195,14 @@ public final class CraftBlockStates {
+         BlockPos pos = craftBlock.getPosition();
+         net.minecraft.world.level.block.state.BlockState state = craftBlock.getNMS();
+         BlockEntity blockEntity = craftBlock.getHandle().getBlockEntity(pos);
 -        boolean prev = CraftBlockEntityState.DISABLE_SNAPSHOT;
 -        CraftBlockEntityState.DISABLE_SNAPSHOT = !useSnapshot;
 +        boolean prev = CraftBlockEntityState.DISABLE_SNAPSHOT.get(); // SparklyPaper - parallel world ticking
 +        CraftBlockEntityState.DISABLE_SNAPSHOT.set(!useSnapshot); // SparklyPaper - parallel world ticking
          try {
-         // Paper end
-         CraftBlockState blockState = CraftBlockStates.getBlockState(world, blockPosition, blockData, tileEntity);
-@@ -258,7 +258,7 @@ public final class CraftBlockStates {
-         return blockState;
-         // Paper start
+             CraftBlockState blockState = CraftBlockStates.getBlockState(world, pos, state, blockEntity);
+             blockState.setWorldHandle(craftBlock.getHandle()); // Inject the block's generator access
+             return blockState;
          } finally {
 -            CraftBlockEntityState.DISABLE_SNAPSHOT = prev;
 +            CraftBlockEntityState.DISABLE_SNAPSHOT.set(prev); // SparklyPaper - parallel world ticking
          }
-         // Paper end
-     }
-diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index 80bb0371eed48dbcb0e4e62dfc7f23f8514bdf77..fc12bcad034ed4fc97029b83360548f226bc2060 100644
---- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-+++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -951,7 +951,7 @@ public class CraftEventFactory {
-         return CraftEventFactory.handleBlockSpreadEvent(world, source, target, block, 2);
      }
  
--    public static BlockPos sourceBlockOverride = null; // SPIGOT-7068: Add source block override, not the most elegant way but better than passing down a BlockPosition up to five methods deep.
-+    public static final ThreadLocal<BlockPos> sourceBlockOverrideRT = new ThreadLocal<>(); // SPIGOT-7068: Add source block override, not the most elegant way but better than passing down a BlockPosition up to five methods deep. // SparklyPaper - parallel world ticking (this is from Folia, fixes concurrency bugs with sculk catalysts)
- 
-     public static boolean handleBlockSpreadEvent(LevelAccessor world, BlockPos source, BlockPos target, net.minecraft.world.level.block.state.BlockState block, int flag) {
-         // Suppress during worldgen
-@@ -963,7 +963,7 @@ public class CraftEventFactory {
-         CraftBlockState state = CraftBlockStates.getBlockState(world, target, flag);
-         state.setData(block);
- 
--        BlockSpreadEvent event = new BlockSpreadEvent(state.getBlock(), CraftBlock.at(world, CraftEventFactory.sourceBlockOverride != null ? CraftEventFactory.sourceBlockOverride : source), state);
-+        BlockSpreadEvent event = new BlockSpreadEvent(state.getBlock(), CraftBlock.at(world, CraftEventFactory.sourceBlockOverrideRT.get() != null ? CraftEventFactory.sourceBlockOverrideRT.get() : source), state); // SparklyPaper - parallel world ticking
-         Bukkit.getPluginManager().callEvent(event);
- 
-         if (!event.isCancelled()) {
-@@ -2250,7 +2250,7 @@ public class CraftEventFactory {
-         CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemStack.copyWithCount(1));
- 
-         org.bukkit.event.block.BlockDispenseEvent event = new org.bukkit.event.block.BlockDispenseEvent(bukkitBlock, craftItem.clone(), CraftVector.toBukkit(to));
--        if (!net.minecraft.world.level.block.DispenserBlock.eventFired) {
-+        if (!net.minecraft.world.level.block.DispenserBlock.eventFired.get()) { // SparklyPaper - parallel world ticking
-             if (!event.callEvent()) {
-                 return itemStack;
-             }

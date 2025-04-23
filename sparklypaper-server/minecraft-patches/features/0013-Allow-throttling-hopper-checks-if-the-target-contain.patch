@@ -6,10 +6,10 @@ Subject: [PATCH] Allow throttling hopper checks if the target container is
 
 
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 5cd1326ad5d046c88b2b3449d610a78fa880b4cd..d512f44dcfc480b5608555aa319c93342ae5b208 100644
+index 15d4f60942c0cc612c1468b4c0fda886867a67cb..6681d31e2278df120a28c09a1e3db4aebd65a96d 100644
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -419,6 +419,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -423,6 +423,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          } else {
              Direction opposite = blockEntity.facing.getOpposite();
              if (isFullContainer(attachedContainer, opposite)) {

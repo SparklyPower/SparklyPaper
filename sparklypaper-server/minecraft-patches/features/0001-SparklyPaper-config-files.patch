@@ -5,10 +5,10 @@ Subject: [PATCH] SparklyPaper config files
 
 
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 97a294d2f5c1ddf0af7ffec3e1425eb329c5751b..4c420e17d936132bb4569776911757fd959e93d6 100644
+index 31e02f50edd46220dac81500dbb273f1ccdbe0b9..4476c52fc616dc4aacef6af5deda67dd358a3e85 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -224,6 +224,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -183,6 +183,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          io.papermc.paper.command.PaperCommands.registerCommands(this); // Paper - setup /paper command
          this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
@@ -25,18 +25,18 @@ index 97a294d2f5c1ddf0af7ffec3e1425eb329c5751b..4c420e17d936132bb4569776911757fd
  
          this.setPvpAllowed(properties.pvp);
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 2bbebb4335d927f240abcac67a5b423e38dc33d7..27c2ea4a387ee5f7d078a42cb57f146cb748501d 100644
+index 013ed7dbe2309f562f63e66203179a90566e8115..9f9859d2e72859e40a3002085ea97e95ee1ec0eb 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -170,6 +170,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
-     // Paper end - add paper world config
+@@ -134,6 +134,7 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
  
+     // CraftBukkit start
      public final io.papermc.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
 +    public net.sparklypower.sparklypaper.configs.SparklyPaperConfig.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper
-     public static BlockPos lastPhysicsProblem; // Spigot
-     private org.spigotmc.TickLimiter entityLimiter;
-     private org.spigotmc.TickLimiter tileLimiter;
-@@ -853,6 +854,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+     private final CraftWorld world;
+     public boolean pvpMode;
+     public org.bukkit.generator.ChunkGenerator generator;
+@@ -840,6 +841,7 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
          // Paper end - getblock optimisations - cache world height/sections
          this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) levelData).getLevelName()); // Spigot
          this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config

@@ -9,15 +9,15 @@ Optimizes "image in map" maps, without requiring the map to be locked, which som
 This has the disadvantage that the vanilla map data will never be updated while the CraftMapRenderer is not present, but that's not a huuuge problem for us
 
 diff --git a/net/minecraft/world/item/MapItem.java b/net/minecraft/world/item/MapItem.java
-index 8795d54cff569c911e0a535f38a0ec4130f7b4d5..31960e54bf5ed4aa31cd12b60ab0fa263902ce2c 100644
+index ba0b254d43651bca1f29b5272af05d068fc37ba8..ab1f9af2659ee9c878fbfe79c68f24f2d9904b0f 100644
 --- a/net/minecraft/world/item/MapItem.java
 +++ b/net/minecraft/world/item/MapItem.java
-@@ -277,7 +277,7 @@ public class MapItem extends Item {
-                     savedData.tickCarriedBy(player, stack);
-                 }
- 
--                if (!savedData.locked && (isSelected || entity instanceof Player && ((Player)entity).getOffhandItem() == stack)) {
-+                if (!savedData.locked && (!level.sparklyPaperConfig.getSkipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer() || savedData.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) && (isSelected || entity instanceof Player && ((Player)entity).getOffhandItem() == stack)) { // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
-                     this.update(level, entity, savedData);
-                 }
+@@ -274,7 +274,7 @@ public class MapItem extends Item {
+                 savedData.tickCarriedBy(player, stack);
              }
+ 
+-            if (!savedData.locked && slot != null && slot.getType() == EquipmentSlot.Type.HAND) {
++            if (!savedData.locked && (!level.sparklyPaperConfig.getSkipMapItemDataUpdatesIfMapDoesNotHaveCraftMapRenderer() || savedData.mapView.getRenderers().stream().anyMatch(mapRenderer -> mapRenderer.getClass() == org.bukkit.craftbukkit.map.CraftMapRenderer.class)) && slot != null && slot.getType() == EquipmentSlot.Type.HAND) { // SparklyPaper - don't update maps if they don't have the CraftMapRenderer in the render list
+                 this.update(level, entity, savedData);
+             }
+         }

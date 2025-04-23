@@ -5,7 +5,7 @@ Subject: [PATCH] Add EntityGetProjectileForWeaponEvent
 
 
 diff --git a/net/minecraft/world/entity/monster/Monster.java b/net/minecraft/world/entity/monster/Monster.java
-index d0d3c825cf8088df4794cf5bfde12a69f4d71754..4cad07ae00eb34b51b8ef3f25f0abf8ed0d267c5 100644
+index 5ef9566b16a4d0300ee45a993c46e734db156416..023cc77b31c5e2ad651a51ccb6c7f6b13811beb3 100644
 --- a/net/minecraft/world/entity/monster/Monster.java
 +++ b/net/minecraft/world/entity/monster/Monster.java
 @@ -137,6 +137,12 @@ public abstract class Monster extends PathfinderMob implements Enemy {
@@ -22,10 +22,10 @@ index d0d3c825cf8088df4794cf5bfde12a69f4d71754..4cad07ae00eb34b51b8ef3f25f0abf8e
              ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedHeldProjectiles);
              return heldProjectile.isEmpty() ? new ItemStack(Items.ARROW) : heldProjectile;
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index a0813aa9ebf5b32375b1bc9f294d8fc34cc867fe..3e89356b177b5033fb58de314b0cb0f591ec4e5b 100644
+index 2046c4d3ad5ea3254ad6bc83e6437e5c237c92b6..7c3219bf17d7724e2d91748034e4e63a96a1556f 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2239,6 +2239,12 @@ public abstract class Player extends LivingEntity {
+@@ -2127,6 +2127,12 @@ public abstract class Player extends LivingEntity {
          if (!(shootable.getItem() instanceof ProjectileWeaponItem)) {
              return ItemStack.EMPTY;
          } else {

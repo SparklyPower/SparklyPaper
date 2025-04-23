@@ -8,19 +8,19 @@ We replaced the `blockEntityTickers` list with a custom list based on fastutil's
 This is WAY FASTER than using `removeAll` with a list of entries to be removed, because we don't need to calculate the identity of each block entity to be removed, and we can jump directly to where the search should begin, giving a performance boost for small removals (because we don't need to loop thru the entire list to find what element should be removed) and a performance boost for big removals (no need to calculate the identity of each block entity).
 
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 27c2ea4a387ee5f7d078a42cb57f146cb748501d..644ab8b2c797f0675530a3efe23a878899689d66 100644
+index 9f9859d2e72859e40a3002085ea97e95ee1ec0eb..9a58b88f1fcca0a55f6a782f97c1d96738a4c46d 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -115,7 +115,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -106,7 +106,7 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
      public static final int TICKS_PER_DAY = 24000;
      public static final int MAX_ENTITY_SPAWN_Y = 20000000;
      public static final int MIN_ENTITY_SPAWN_Y = -20000000;
--    public final List<TickingBlockEntity> blockEntityTickers = Lists.newArrayList(); // Paper - public
-+    public final net.sparklypower.sparklypaper.BlockEntityTickersList blockEntityTickers = new net.sparklypower.sparklypaper.BlockEntityTickersList(); // Paper - public // SparklyPaper - optimize block entity removals
+-    public final List<TickingBlockEntity> blockEntityTickers = Lists.newArrayList();
++    public final net.sparklypower.sparklypaper.BlockEntityTickersList blockEntityTickers = new net.sparklypower.sparklypaper.BlockEntityTickersList(); // SparklyPaper - optimize block entity removals
      protected final NeighborUpdater neighborUpdater;
      private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
      private boolean tickingBlockEntities;
-@@ -1479,7 +1479,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1463,7 +1463,7 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
              TickingBlockEntity tickingBlockEntity = this.blockEntityTickers.get(this.tileTickPosition);
              // Spigot end
              if (tickingBlockEntity.isRemoved()) {
@@ -29,7 +29,7 @@ index 27c2ea4a387ee5f7d078a42cb57f146cb748501d..644ab8b2c797f0675530a3efe23a8788
              } else if (runsNormally && this.shouldTickBlocksAt(tickingBlockEntity.getPos())) {
                  tickingBlockEntity.tick();
                  // Paper start - rewrite chunk system
-@@ -1491,6 +1491,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1475,6 +1475,7 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
          }
          this.blockEntityTickers.removeAll(toRemove); // Paper - Fix MC-117075
  

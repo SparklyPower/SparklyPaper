@@ -65,13 +65,13 @@ index 8fca836e63731c5cef95bbc07e6e1414c9f02bea..c412dcab882abe11ecae34700df3e62e
      public ClientboundBlockUpdatePacket(BlockPos pos, BlockState blockState) {
          this.pos = pos;
 diff --git a/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-index 9e321ef1c3d5803519b243685f4ee598dc0cf640..851931062c4401817aad14721ac7fb0362c3b418 100644
+index 526c117e0d53ad527eb610c79cdc46ec16b18c0c..6f23af7c7ce14408791b47aaccec0d4c0d7d67a4 100644
 --- a/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 +++ b/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-@@ -25,7 +25,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
- public class ClientboundLevelChunkPacketData {
+@@ -30,7 +30,7 @@ public class ClientboundLevelChunkPacketData {
+     );
      private static final int TWO_MEGABYTES = 2097152;
-     private final CompoundTag heightmaps;
+     private final Map<Heightmap.Types, long[]> heightmaps;
 -    private final byte[] buffer;
 +    public byte[] buffer; // SparklyPaper - Helpful NMS packet changes: remove final and make public
      private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
@@ -130,13 +130,13 @@ index 2545057c7f1f355f59f1e7da06ce08fd2d997b43..9920fe2d2f2f74f372731f1be5abaa49
          buffer.writeVarInt(this.cameraId);
      }
 diff --git a/net/minecraft/world/entity/Display.java b/net/minecraft/world/entity/Display.java
-index ff49fdcddb43ee479a377aa219eb18fcaefeffca..33a47487f79fdc5164ff6a6d639dfe5834deed0d 100644
+index 6d489195602c2157d33d7f122a9a339cb3ef1ce1..784b4c1c1befa21601abbc9ff24fd458dfe62dd4 100644
 --- a/net/minecraft/world/entity/Display.java
 +++ b/net/minecraft/world/entity/Display.java
-@@ -800,7 +800,7 @@ public abstract class Display extends Entity {
-         public static final byte FLAG_ALIGN_RIGHT = 16;
+@@ -681,7 +681,7 @@ public abstract class Display extends Entity {
          private static final byte INITIAL_TEXT_OPACITY = -1;
          public static final int INITIAL_BACKGROUND = 1073741824;
+         private static final int INITIAL_LINE_WIDTH = 200;
 -        private static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT);
 +        public static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT); // SparklyPaper - Helpful NMS packet changes: make public
          public static final EntityDataAccessor<Integer> DATA_LINE_WIDTH_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.INT);

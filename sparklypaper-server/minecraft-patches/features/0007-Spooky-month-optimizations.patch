@@ -10,22 +10,22 @@ Caches when Bat's spooky season starts and ends, and when Skeleton and Zombies h
 Avoids unnecessary date checks, even tho that this shouldn't really improve performance that much... unless you have a lot of bats/zombies/skeletons spawning.
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 6ad6bfe60026be304aa2178d5f04a79531cc66a6..4dbf2d9aa52029122f4816ca3504fa330b28a29b 100644
+index 100835481c0862eb3bd0525ccf9591637b4972b8..5686b9be1e620508d4ee0a339fe06ef53f336414 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -304,6 +304,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -303,6 +303,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private final Set<String> pluginsBlockingSleep = new java.util.HashSet<>(); // Paper - API to allow/disallow tick sleeping
      public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
      public final Set<net.minecraft.world.entity.Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
 +    public net.sparklypower.sparklypaper.HalloweenManager halloweenManager = new net.sparklypower.sparklypaper.HalloweenManager(); // SparklyPaper - Spooky month optimizations
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> threadFunction) {
-         ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.init(); // Paper - rewrite data converter system
+         AtomicReference<S> atomicReference = new AtomicReference<>();
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 4c420e17d936132bb4569776911757fd959e93d6..6ac73610f6039290c4ef3dde2206b6863d2b5067 100644
+index 4476c52fc616dc4aacef6af5deda67dd358a3e85..881a36040ef12010774f0ea2573e5f666a9d9d8c 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -233,6 +233,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -192,6 +192,10 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          }
          net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
          // SparklyPaper end
@@ -37,10 +37,10 @@ index 4c420e17d936132bb4569776911757fd959e93d6..6ac73610f6039290c4ef3dde2206b686
  
          this.setPvpAllowed(properties.pvp);
 diff --git a/net/minecraft/world/entity/ambient/Bat.java b/net/minecraft/world/entity/ambient/Bat.java
-index 5ebe7b1dce367d5c5e1136b97b2b9f6737595201..b003fa86fab9a6106c9875205d73e49e46904498 100644
+index eb9fb57440f498079182030a46034008d3f6b5e8..edb09e4e48fd8de959159409ce3ffef09594cc82 100644
 --- a/net/minecraft/world/entity/ambient/Bat.java
 +++ b/net/minecraft/world/entity/ambient/Bat.java
-@@ -231,7 +231,7 @@ public class Bat extends AmbientCreature {
+@@ -232,7 +232,7 @@ public class Bat extends AmbientCreature {
          } else {
              int maxLocalRawBrightness = level.getMaxLocalRawBrightness(pos);
              int i = 4;
@@ -49,7 +49,7 @@ index 5ebe7b1dce367d5c5e1136b97b2b9f6737595201..b003fa86fab9a6106c9875205d73e49e
                  i = 7;
              } else if (randomSource.nextBoolean()) {
                  return false;
-@@ -243,12 +243,15 @@ public class Bat extends AmbientCreature {
+@@ -244,12 +244,15 @@ public class Bat extends AmbientCreature {
          }
      }
  
@@ -66,7 +66,7 @@ index 5ebe7b1dce367d5c5e1136b97b2b9f6737595201..b003fa86fab9a6106c9875205d73e49e
      private void setupAnimationStates() {
          if (this.isResting()) {
 diff --git a/net/minecraft/world/entity/monster/AbstractSkeleton.java b/net/minecraft/world/entity/monster/AbstractSkeleton.java
-index 37abc7769573e3cdda380166dd086551d5e7bd88..be623fd09ca573922297d3af3cd114160ec05061 100644
+index 408c72a28bde6d2f0a7c410c5c7558e5fe7ad4c8..a2edddd11317a4689b65511b5bc9900eedf8c91e 100644
 --- a/net/minecraft/world/entity/monster/AbstractSkeleton.java
 +++ b/net/minecraft/world/entity/monster/AbstractSkeleton.java
 @@ -158,10 +158,12 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
@@ -84,13 +84,13 @@ index 37abc7769573e3cdda380166dd086551d5e7bd88..be623fd09ca573922297d3af3cd11416
 +            if (this.getServer().halloweenManager.isHalloween() /* i1 == 10 && i == 31 */&& random.nextFloat() < 0.25F) {
 +                // SparklyPaper end
                  this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(random.nextFloat() < 0.1F ? Blocks.JACK_O_LANTERN : Blocks.CARVED_PUMPKIN));
-                 this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
+                 this.setDropChance(EquipmentSlot.HEAD, 0.0F);
              }
 diff --git a/net/minecraft/world/entity/monster/Zombie.java b/net/minecraft/world/entity/monster/Zombie.java
-index 637790ff833abaa0c52fdee204abba7077d12ccc..600b96d4b2645e26fd690ac70d3901d567b7bc24 100644
+index 39b65970a48568c95ff482b9636e7391f300ffa8..629e62deff10056c7650d235de78edadf67e97c2 100644
 --- a/net/minecraft/world/entity/monster/Zombie.java
 +++ b/net/minecraft/world/entity/monster/Zombie.java
-@@ -550,10 +550,12 @@ public class Zombie extends Monster {
+@@ -552,10 +552,12 @@ public class Zombie extends Monster {
          }
  
          if (this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
@@ -105,5 +105,5 @@ index 637790ff833abaa0c52fdee204abba7077d12ccc..600b96d4b2645e26fd690ac70d3901d5
 +            if (this.getServer().halloweenManager.isHalloween() /* i1 == 10 && i == 31 */&& random.nextFloat() < 0.25F) {
 +                // SparklyPaper end
                  this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(random.nextFloat() < 0.1F ? Blocks.JACK_O_LANTERN : Blocks.CARVED_PUMPKIN));
-                 this.armorDropChances[EquipmentSlot.HEAD.getIndex()] = 0.0F;
+                 this.setDropChance(EquipmentSlot.HEAD, 0.0F);
              }

@@ -5,10 +5,10 @@ Subject: [PATCH] Blazingly Simple Farm Checks
 
 
 diff --git a/net/minecraft/world/level/block/CropBlock.java b/net/minecraft/world/level/block/CropBlock.java
-index bc0969f40814094e42a860a72314fccd1a66fabe..c14de811ae7cead820a00a87b9d2ce8cfb241d92 100644
+index a38ce03a4dab6c83a0b54f47fd3c36d6da46fa24..e49a5258aa30970318d9f1f9e6e4301ac60bf19b 100644
 --- a/net/minecraft/world/level/block/CropBlock.java
 +++ b/net/minecraft/world/level/block/CropBlock.java
-@@ -87,6 +87,57 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+@@ -79,6 +79,57 @@ public class CropBlock extends VegetationBlock implements BonemealableBlock {
          if (level.getRawBrightness(pos, 0) >= 9) {
              int age = this.getAge(state);
              if (age < this.getMaxAge()) {
@@ -66,7 +66,7 @@ index bc0969f40814094e42a860a72314fccd1a66fabe..c14de811ae7cead820a00a87b9d2ce8c
                  float growthSpeed = getGrowthSpeed(this, level, pos);
                  // Spigot start
                  int modifier = 100;
-@@ -108,6 +159,8 @@ public class CropBlock extends BushBlock implements BonemealableBlock {
+@@ -100,6 +151,8 @@ public class CropBlock extends VegetationBlock implements BonemealableBlock {
                      // Spigot end
                      org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), 2); // CraftBukkit
                  }
@@ -76,7 +76,7 @@ index bc0969f40814094e42a860a72314fccd1a66fabe..c14de811ae7cead820a00a87b9d2ce8c
          }
      }
 diff --git a/net/minecraft/world/level/block/FarmBlock.java b/net/minecraft/world/level/block/FarmBlock.java
-index 1fdede769b67cb5d2f9159c779f19e3639bb6ff5..1de42b2be50a5704a80c6cacc9e2cd82d0959bd6 100644
+index a31ac95237515b874f59941ec24c74e2c357b3d8..7ddbe4d408c87c5ad9dc03948b0251ef8ccfea79 100644
 --- a/net/minecraft/world/level/block/FarmBlock.java
 +++ b/net/minecraft/world/level/block/FarmBlock.java
 @@ -95,6 +95,19 @@ public class FarmBlock extends Block {
@@ -109,10 +109,10 @@ index 1fdede769b67cb5d2f9159c779f19e3639bb6ff5..1de42b2be50a5704a80c6cacc9e2cd82
          int xOff = pos.getX();
          int yOff = pos.getY();
 diff --git a/net/minecraft/world/level/block/StemBlock.java b/net/minecraft/world/level/block/StemBlock.java
-index 3dca57dd0c00dc64724cbc7f5a71963da9d12fd5..9839821365484bac93023b1aa542619dae4c88cf 100644
+index 2eaf1e43474a49a3315325b831bb86f2e10cc479..ea4010027b67033b1ed8059aca629684e92d3449 100644
 --- a/net/minecraft/world/level/block/StemBlock.java
 +++ b/net/minecraft/world/level/block/StemBlock.java
-@@ -79,6 +79,56 @@ public class StemBlock extends BushBlock implements BonemealableBlock {
+@@ -69,6 +69,56 @@ public class StemBlock extends VegetationBlock implements BonemealableBlock {
      @Override
      protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
          if (level.getRawBrightness(pos, 0) >= 9) {
@@ -167,9 +167,9 @@ index 3dca57dd0c00dc64724cbc7f5a71963da9d12fd5..9839821365484bac93023b1aa542619d
 +                }
 +                } else {
              float growthSpeed = CropBlock.getGrowthSpeed(this, level, pos);
-             if (random.nextFloat() < ((this == Blocks.PUMPKIN_STEM ? level.spigotConfig.pumpkinModifier : level.spigotConfig.melonModifier) / (100.0f * (Math.floor((25.0F / growthSpeed) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
+             if (random.nextFloat() < ((this == Blocks.PUMPKIN_STEM ? level.spigotConfig.pumpkinModifier : level.spigotConfig.melonModifier) / (100.0F * (Math.floor((25.0F / growthSpeed) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
                  int ageValue = state.getValue(AGE);
-@@ -105,6 +155,8 @@ public class StemBlock extends BushBlock implements BonemealableBlock {
+@@ -95,6 +145,8 @@ public class StemBlock extends VegetationBlock implements BonemealableBlock {
                  }
              }
          }

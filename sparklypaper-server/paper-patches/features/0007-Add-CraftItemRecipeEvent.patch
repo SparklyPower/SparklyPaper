@@ -6,14 +6,14 @@ Subject: [PATCH] Add CraftItemRecipeEvent
 Used when a player OR a crafter block crafts an item, as an alternative to PrepareItemCraftEvent and CraftItemEvent, because both events are not triggered when a item is crafted from a crafter
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index 57c3f8531bf85b53af3a4aad6e9e369d5cff0ce3..80bb0371eed48dbcb0e4e62dfc7f23f8514bdf77 100644
+index a7e3afe04ffbb0fd5fa5fcf7cd15efd7cea1c4e0..b8e4237dcaa737bf669ea450b343bfb2ded5badd 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -1474,6 +1474,24 @@ public class CraftEventFactory {
+@@ -1307,6 +1307,23 @@ public class CraftEventFactory {
          Bukkit.getPluginManager().callEvent(crafterCraftEvent);
          return crafterCraftEvent;
      }
-+
++    
 +    // SparklyPaper start - add CraftItemRecipeEvent
 +    public static net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent callCraftItemRecipeEvent(net.minecraft.world.inventory.CraftingContainer container, Recipe recipe, ItemStack result) {
 +        org.bukkit.inventory.ItemStack[] matrix = new org.bukkit.inventory.ItemStack[container.getItems().size()];
@@ -30,7 +30,6 @@ index 57c3f8531bf85b53af3a4aad6e9e369d5cff0ce3..80bb0371eed48dbcb0e4e62dfc7f23f8
 +        return event;
 +    }
 +    // SparklyPaper end
-+
+ 
      // Paper start
      @Deprecated
-     public static com.destroystokyo.paper.event.entity.ProjectileCollideEvent callProjectileCollideEvent(Entity entity, EntityHitResult position) {

@@ -5,10 +5,10 @@ Subject: [PATCH] Optimize canSee checks
 
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index b3f498558614243cf633dcd71e3c49c2c55e6e0f..ad9ab7fe6df3880c730388a50741b7938b037ff2 100644
+index 0d8aefe8c886eaa4c33cbab53b0ad1c016f0531f..d7fe8fb9133cdd1a47338ef989ef029ec436ea7c 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -1232,7 +1232,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1302,7 +1302,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
                  flag = flag && this.entity.broadcastToPlayer(player) && ChunkMap.this.isChunkTracked(player, this.entity.chunkPosition().x, this.entity.chunkPosition().z);
                  // Paper end - Configurable entity tracking range by Y
                  // CraftBukkit start - respect vanish API

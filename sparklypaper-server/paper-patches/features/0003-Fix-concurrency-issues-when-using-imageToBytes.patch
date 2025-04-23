@@ -5,10 +5,10 @@ Subject: [PATCH] Fix concurrency issues when using imageToBytes
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java b/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java
-index 8149b9c51b78eb5c689b7218a2ca3aab60e73bcf..c983d8d7e79d55c9757add8ac1093a0a9d98e5b3 100644
+index db51e0f1ad8c2ce22a00fc015978ef773cf2f796..30cc3a10e1f0a08bea40a06e6fbbcf6a99b107c8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java
 +++ b/src/main/java/org/bukkit/craftbukkit/map/CraftMapColorCache.java
-@@ -145,7 +145,7 @@ public class CraftMapColorCache implements MapPalette.MapColorCache {
+@@ -151,7 +151,7 @@ public class CraftMapColorCache implements MapPalette.MapColorCache {
      }
  
      @Override

@@ -5,10 +5,10 @@ Subject: [PATCH] Skip dirty stats copy when requesting player stats
 
 
 diff --git a/net/minecraft/stats/ServerStatsCounter.java b/net/minecraft/stats/ServerStatsCounter.java
-index 6c5205fe1dc6387a77b1edbdcab748d39e775d7f..c6e4a7668ed923d93bd7f67d19af82d5d84a0dc0 100644
+index b147df7479da03fae19294587cded62c210ea590..2c953d0eea91b45b3b8b1f2106948bafb92dbc91 100644
 --- a/net/minecraft/stats/ServerStatsCounter.java
 +++ b/net/minecraft/stats/ServerStatsCounter.java
-@@ -81,11 +81,15 @@ public class ServerStatsCounter extends StatsCounter {
+@@ -100,11 +100,15 @@ public class ServerStatsCounter extends StatsCounter {
          this.dirty.add(stat);
      }
  
@@ -24,7 +24,7 @@ index 6c5205fe1dc6387a77b1edbdcab748d39e775d7f..c6e4a7668ed923d93bd7f67d19af82d5
  
      public void parseLocal(DataFixer fixerUpper, String json) {
          try {
-@@ -190,10 +194,12 @@ public class ServerStatsCounter extends StatsCounter {
+@@ -144,10 +148,12 @@ public class ServerStatsCounter extends StatsCounter {
      public void sendStats(ServerPlayer player) {
          Object2IntMap<Stat<?>> map = new Object2IntOpenHashMap<>();
  

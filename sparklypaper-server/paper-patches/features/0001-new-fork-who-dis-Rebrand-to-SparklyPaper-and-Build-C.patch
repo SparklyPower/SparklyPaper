@@ -18,12 +18,12 @@ index 774556a62eb240da42e84db4502e2ed43495be17..9bc7b99b5b39a8ffe4118b8d86f5b806
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index dced8899be0bb8d562093dc3a7673ed8185b85a6..1498c691d3f9b633494750ba4f5cb704468dfeb9 100644
+index 471941a5bf691d4c31b2eb5ef4a11dc91499f674..d2cbb17df11c55738aff33af5e8949a8843dd846 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
-@@ -77,14 +77,14 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
+@@ -75,14 +75,14 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
+                 this.lastEarlyWarning = currentTime;
                  if (isLongTimeout) {
-                     // Paper end
                      logger.log(Level.SEVERE, "------------------------------");
 -                    logger.log(Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug."); // Paper
 +                    logger.log(Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug. This could be a SparklyPaper bug and, in that case, MrPowerGamerBR probably made a fucky wucky!");  // SparklyPaper - branding changes // Paper
@@ -39,7 +39,7 @@ index dced8899be0bb8d562093dc3a7673ed8185b85a6..1498c691d3f9b633494750ba4f5cb704
  
                      if (net.minecraft.world.level.Level.lastPhysicsProblem != null) {
                          logger.log(Level.SEVERE, "------------------------------");
-@@ -109,7 +109,7 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
+@@ -107,7 +107,7 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre
                  }
                  // Paper end - Different message for short timeout
                  logger.log(Level.SEVERE, "------------------------------");

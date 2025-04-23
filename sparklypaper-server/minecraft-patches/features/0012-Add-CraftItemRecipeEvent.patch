@@ -6,10 +6,10 @@ Subject: [PATCH] Add CraftItemRecipeEvent
 Used when a player OR a crafter block crafts an item, as an alternative to PrepareItemCraftEvent and CraftItemEvent, because both events are not triggered when a item is crafted from a crafter
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 882dbb1276c548316938bbc50f5f7e01f8547ff8..01d526cef9c0aa2d5b6b1ea1c93f8a277bfac8c2 100644
+index 5fb32d5b8ec7d45a67792f46076e820e7a5bd057..3c6f9180059246244dcd52237a85c6715e154422 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -3163,6 +3163,21 @@ public class ServerGamePacketListenerImpl
+@@ -3168,6 +3168,21 @@ public class ServerGamePacketListenerImpl
                                  } else {
                                      event = new CraftItemEvent(recipe, inventory, type, slotNum, click, action);
                                  }
@@ -32,10 +32,10 @@ index 882dbb1276c548316938bbc50f5f7e01f8547ff8..01d526cef9c0aa2d5b6b1ea1c93f8a27
                          }
  
 diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/world/level/block/CrafterBlock.java
-index 5f5966278faf86ed9b28955c80ba845c0cb75595..751969d28951f59f381aa6bf7ad42d55d3e84d57 100644
+index 38b03c7b02bdfc579e5e126c12de3d878e26d188..1c2412105e0d58c77f868dac83bc4a9467e0fd89 100644
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
-@@ -167,6 +167,13 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -159,6 +159,13 @@ public class CrafterBlock extends BaseEntityBlock {
                  }
                  itemStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getResult());
                  // CraftBukkit end

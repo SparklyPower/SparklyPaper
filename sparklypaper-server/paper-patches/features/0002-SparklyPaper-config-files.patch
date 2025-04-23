@@ -5,10 +5,10 @@ Subject: [PATCH] SparklyPaper config files
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index cf5bcb0ebc79c318d106695e39ad2883a5734aa1..6ef9d7a47ff06f5f07c56c8e103bab550b99a904 100644
+index 71f7a8386d616420a0e86233e721f55ab62aae4d..349d75dd25e01031a455bc0d6e86d994c1dc46db 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -111,6 +111,7 @@ import net.minecraft.world.level.storage.PlayerDataStorage;
+@@ -110,6 +110,7 @@ import net.minecraft.world.level.storage.PlayerDataStorage;
  import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.validation.ContentValidationException;
  import net.minecraft.world.phys.Vec3;
@@ -16,7 +16,7 @@ index cf5bcb0ebc79c318d106695e39ad2883a5734aa1..6ef9d7a47ff06f5f07c56c8e103bab55
  import org.bukkit.BanList;
  import org.bukkit.Bukkit;
  import org.bukkit.ChatColor;
-@@ -1088,6 +1089,7 @@ public final class CraftServer implements Server {
+@@ -1067,6 +1068,7 @@ public final class CraftServer implements Server {
  
          org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);
@@ -24,7 +24,7 @@ index cf5bcb0ebc79c318d106695e39ad2883a5734aa1..6ef9d7a47ff06f5f07c56c8e103bab55
          for (ServerLevel world : this.console.getAllLevels()) {
              // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
              world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
-@@ -1103,6 +1105,7 @@ public final class CraftServer implements Server {
+@@ -1082,6 +1084,7 @@ public final class CraftServer implements Server {
                  }
              }
              world.spigotConfig.init(); // Spigot
@@ -32,7 +32,7 @@ index cf5bcb0ebc79c318d106695e39ad2883a5734aa1..6ef9d7a47ff06f5f07c56c8e103bab55
          }
  
          Plugin[] pluginClone = pluginManager.getPlugins().clone(); // Paper
-@@ -1120,6 +1123,7 @@ public final class CraftServer implements Server {
+@@ -1099,6 +1102,7 @@ public final class CraftServer implements Server {
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
          this.spark.registerCommandBeforePlugins(this); // Paper - spark
@@ -41,13 +41,15 @@ index cf5bcb0ebc79c318d106695e39ad2883a5734aa1..6ef9d7a47ff06f5f07c56c8e103bab55
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index bf5343b0847e9f57ffbc7f33714ae6ca62f14332..8cd9a8eb70ebb170a7e0e2f8daa47bd16c457d79 100644
+index a11fc64b4933a5abce0182ba46f1da22043eb0d8..66f654c8f4617a5b9c8e701bc31151078ef72287 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -176,6 +176,14 @@ public class Main {
+@@ -165,6 +165,42 @@ public class Main {
+                         .defaultsTo(new File[] {})
                          .describedAs("Jar file");
-                 // Paper end
  
++<<<<<<< HEAD
++=======
 +                // SparklyPaper Start
 +                acceptsAll(asList("sparklypaper", "sparklypaper-settings"), "File for SparklyPaper settings")
 +                        .withRequiredArg()
@@ -56,6 +58,32 @@ index bf5343b0847e9f57ffbc7f33714ae6ca62f14332..8cd9a8eb70ebb170a7e0e2f8daa47bd1
 +                        .describedAs("Yml file");
 +                // SparklyPaper end
 +
-                 // Paper start
++                // SparklyPaper Start
++                acceptsAll(asList("sparklypaper", "sparklypaper-settings"), "File for SparklyPaper settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("sparklypaper.yml"))
++                        .describedAs("Yml file");
++                // SparklyPaper end
++
++                // SparklyPaper Start
++                acceptsAll(asList("sparklypaper", "sparklypaper-settings"), "File for SparklyPaper settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("sparklypaper.yml"))
++                        .describedAs("Yml file");
++                // SparklyPaper end
++
++                // SparklyPaper Start
++                acceptsAll(asList("sparklypaper", "sparklypaper-settings"), "File for SparklyPaper settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("sparklypaper.yml"))
++                        .describedAs("Yml file");
++                // SparklyPaper end
++
++                // Paper start
++>>>>>>> SparklyPaper config files
                  acceptsAll(asList("server-name"), "Name of the server")
                          .withRequiredArg()
+                         .ofType(String.class)
