@@ -1,0 +1,28 @@
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -87,6 +_,7 @@
+ public final class CraftMagicNumbers implements UnsafeValues {
+     public static final CraftMagicNumbers INSTANCE = new CraftMagicNumbers();
+     public static final boolean DISABLE_OLD_API_SUPPORT = Boolean.getBoolean("paper.disableOldApiSupport"); // Paper
++    private static final boolean JUST_CORRUPT_IT = Boolean.getBoolean("sparklypaper.ignoreItemDataVersion"); // SparklyPaper - allow item downgrades
+ 
+     private final Commodore commodore = new Commodore();
+ 
+@@ -242,7 +_,7 @@
+     @Override
+     public Material getMaterial(String material, int version) {
+         Preconditions.checkArgument(material != null, "material == null");
+-        Preconditions.checkArgument(version <= this.getDataVersion(), "Newer version! Server downgrades are not supported!");
++        Preconditions.checkArgument(JUST_CORRUPT_IT || version <= this.getDataVersion(), "Newer version! Server downgrades are not supported!");
+ 
+         // Fastpath up to date materials
+         if (version == this.getDataVersion()) {
+@@ -752,7 +_,7 @@
+             throw new RuntimeException(ex);
+         }
+         int dataVersion = compound.getIntOr("DataVersion", 0);
+-        Preconditions.checkArgument(dataVersion <= getDataVersion(), "Newer version! Server downgrades are not supported!");
++        Preconditions.checkArgument(JUST_CORRUPT_IT || dataVersion <= getDataVersion(), "Newer version! Server downgrades are not supported!");
+         return compound;
+     }
+ 

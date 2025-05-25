@@ -1,0 +1,131 @@
+--- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -581,6 +_,31 @@
+                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getName().getString(), this.player.getName().getString(), Math.sqrt(d7));
+                 }
+ 
++                // SparklyPaper start - Add PlayerMoveControllableVehicleEvent
++                org.bukkit.entity.Player craftPlayer = this.getCraftPlayer();
++                org.bukkit.entity.Entity bukkitVehicle = rootVehicle.getBukkitEntity();
++                if (bukkitVehicle instanceof org.bukkit.entity.Vehicle) {
++                    net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent playerMoveControllableVehicleEvent = new net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent(
++                        craftPlayer,
++                        (org.bukkit.entity.Vehicle) bukkitVehicle,
++                        new org.bukkit.Location(craftPlayer.getWorld(), x, y, z, f, f1),
++                        new org.bukkit.Location(craftPlayer.getWorld(), d, d1, d2, f, f1)
++                    );
++                    if (!playerMoveControllableVehicleEvent.callEvent()) {
++                        // Cancelled, move back!
++                        rootVehicle.absSnapTo(x, y, z, f, f1);
++                        this.player.absSnapTo(x, y, z, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
++                        this.send(ClientboundMoveVehiclePacket.fromEntity(rootVehicle));
++                        return;
++                    }
++                    d = playerMoveControllableVehicleEvent.getTo().x();
++                    d1 = playerMoveControllableVehicleEvent.getTo().y();
++                    d2 = playerMoveControllableVehicleEvent.getTo().z();
++                    f = playerMoveControllableVehicleEvent.getTo().getYaw();
++                    f1 = playerMoveControllableVehicleEvent.getTo().getPitch();
++                }
++                // SparklyPaper end
++
+                 rootVehicle.absSnapTo(d, d1, d2, f, f1);
+                 this.player.absSnapTo(d, d1, d2, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
+                 // Paper start - optimise out extra getCubes
+@@ -1468,7 +_,7 @@
+                                 d3 = d - this.lastGoodX; // Paper - diff on change, used for checking large move vectors above
+                                 d4 = d1 - this.lastGoodY; // Paper - diff on change, used for checking large move vectors above
+                                 d5 = d2 - this.lastGoodZ; // Paper - diff on change, used for checking large move vectors above
+-                                boolean flag = d4 > 0.0;
++                                boolean flag = d4 > 0.0; // SparklyPaper - diff on change, used to reset the fall distance, checks if d7 is > 0.0D (player is moving upwards)
+                                 if (this.player.onGround() && !packet.isOnGround() && flag) {
+                                     // Paper start - Add PlayerJumpEvent
+                                     org.bukkit.entity.Player player = this.getCraftPlayer();
+@@ -1502,7 +_,37 @@
+ 
+                                 boolean flag1 = this.player.verticalCollisionBelow;
+                                 this.player.move(MoverType.PLAYER, new Vec3(d3, d4, d5));
+-                                this.player.onGround = packet.isOnGround(); // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move
++                                // SparklyPaper start - Add PlayerPreMoveEvent event
++                                boolean isOnGround = packet.isOnGround();
++                                boolean horizontalCollision = packet.horizontalCollision();
++                                if (net.sparklypower.sparklypaper.event.player.PlayerPreMoveEvent.getHandlerList().getRegisteredListeners().length != 0) {
++                                    org.bukkit.entity.Player player = this.getCraftPlayer();
++                                    Location from = new Location(player.getWorld(), lastPosX, lastPosY, lastPosZ, lastYaw, lastPitch); // Get the Players previous Event location.
++                                    Location to = player.getLocation().clone(); // Start off the To location as the Players current location.
++
++                                    // If the packet contains movement information then we update the To location with the correct XYZ.
++                                    if (packet.hasPos) {
++                                        to.setX(packet.x);
++                                        to.setY(packet.y);
++                                        to.setZ(packet.z);
++                                    }
++
++                                    // If the packet contains look information then we update the To location with the correct Yaw & Pitch.
++                                    if (packet.hasRot) {
++                                        to.setYaw(packet.yRot);
++                                        to.setPitch(packet.xRot);
++                                    }
++
++                                    net.sparklypower.sparklypaper.event.player.PlayerPreMoveEvent event = new net.sparklypower.sparklypaper.event.player.PlayerPreMoveEvent(player, from, to, packet.isOnGround(), packet.horizontalCollision(), flag);
++
++                                    if (event.callEvent()) {
++                                        isOnGround = event.isOnGround();
++                                        horizontalCollision = event.isHorizontalCollision();
++                                        flag = event.isResetFallDistance();
++                                    }
++                                }
++                                // SparklyPaper end
++                                this.player.onGround = isOnGround; // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move // SparklyPaper - Add PlayerPreMoveEvent
+                                 final boolean didCollide = toX != this.player.getX() || toY != this.player.getY() || toZ != this.player.getZ(); // Paper - needed here as the difference in Y can be reset - also note: this is only a guess at whether collisions took place, floating point errors can make this true when it shouldn't be...
+                                 // Paper start - prevent position desync
+                                 if (this.awaitingPositionFromClient != null) {
+@@ -1636,14 +_,14 @@
+                                         && this.noBlocksAround(this.player);
+                                     this.player.serverLevel().getChunkSource().move(this.player);
+                                     Vec3 vec3 = new Vec3(this.player.getX() - x, this.player.getY() - y, this.player.getZ() - z);
+-                                    this.player.setOnGroundWithMovement(packet.isOnGround(), packet.horizontalCollision(), vec3);
+-                                    this.player.doCheckFallDamage(vec3.x, vec3.y, vec3.z, packet.isOnGround());
++                                    this.player.setOnGroundWithMovement(isOnGround, horizontalCollision, vec3); // SparklyPaper - Add PlayerPreMoveEvent
++                                    this.player.doCheckFallDamage(vec3.x, vec3.y, vec3.z, isOnGround); // SparklyPaper - Add PlayerPreMoveEvent
+                                     this.handlePlayerKnownMovement(vec3);
+                                     if (flag) {
+                                         this.player.resetFallDistance();
+                                     }
+ 
+-                                    if (packet.isOnGround()
++                                    if (isOnGround // SparklyPaper - Add PlayerPreMoveEvent
+                                         || this.player.hasLandedInLiquid()
+                                         || this.player.onClimbable()
+                                         || this.player.isSpectator()
+@@ -1658,7 +_,7 @@
+                                     this.lastGoodZ = this.player.getZ();
+                                 } else {
+                                     this.internalTeleport(x, y, z, f, f1); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
+-                                    this.player.doCheckFallDamage(this.player.getX() - x, this.player.getY() - y, this.player.getZ() - z, packet.isOnGround());
++                                    this.player.doCheckFallDamage(this.player.getX() - x, this.player.getY() - y, this.player.getZ() - z, isOnGround); // SparklyPaper - Add PlayerPreMoveEvent
+                                     this.player.removeLatestMovementRecordingBatch();
+                                 }
+                             }
+@@ -3163,6 +_,21 @@
+                                 } else {
+                                     event = new CraftItemEvent(recipe, inventory, type, slotNum, click, action);
+                                 }
++                                // SparklyPaper start - add CraftItemRecipeEvent
++                                // We will pigback a bit on the current implementation
++                                net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent craftItemRecipeEvent = new net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent(
++                                    ((org.bukkit.inventory.CraftingInventory) top).getMatrix(), // We cannot use the top inventory directly because (it seems) that the first slot is the "result" slot
++                                    recipe,
++                                    event.getCurrentItem()
++                                );
++                                if (craftItemRecipeEvent.callEvent()) {
++                                    event.setCurrentItem(craftItemRecipeEvent.getResult());
++                                } else {
++                                    event.setCancelled(true);
++                                    cancelled = true;
++                                    event.setCurrentItem(craftItemRecipeEvent.getResult());
++                                }
++                                // SparklyPaper end
+                             }
+                         }
+ 

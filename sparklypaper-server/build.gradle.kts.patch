@@ -1,17 +1,17 @@
 --- a/paper-server/build.gradle.kts
 +++ b/paper-server/build.gradle.kts
-@@ -4,6 +_,8 @@
+@@ -7,6 +_,8 @@
  
  plugins {
      `java-library`
-+    kotlin("jvm") version "2.0.0"
-+    kotlin("plugin.serialization") version "2.0.0"
++    kotlin("jvm") version "2.1.21"
++    kotlin("plugin.serialization") version "2.1.21"
      `maven-publish`
+     idea
      id("io.papermc.paperweight.core")
- }
-@@ -21,6 +_,17 @@
-     // macheOldPath = file("F:\\Projects\\PaperTooling\\mache\\versions\\1.21.4\\src\\main\\java")
-     // gitFilePatches = true
+@@ -24,6 +_,17 @@
+     minecraftVersion = providers.gradleProperty("mcVersion")
+     gitFilePatches = false
  
 +    val fork = forks.register("sparklypaper") {
 +        upstream.patchDir("paperServer") {
@@ -24,10 +24,10 @@
 +
 +    activeFork = fork
 +
-     spigot {
-         buildDataRef = "3edaf46ec1eed4115ce1b18d2846cded42577e42"
-         packageVersion = "v1_21_R3" // also needs to be updated in MappingEnvironment
-@@ -101,7 +_,20 @@
+     //updatingMinecraft {
+     //    oldPaperCommit = "f4f275519f7c1fbe9db173b7144a4fe81440e365"
+     //}
+@@ -108,7 +_,20 @@
      }
  }
  
@@ -49,7 +49,7 @@
  configurations.named(log4jPlugins.compileClasspathConfigurationName) {
      extendsFrom(configurations.compileClasspath.get())
  }
-@@ -119,7 +_,12 @@
+@@ -130,7 +_,12 @@
  }
  
  dependencies {
@@ -57,13 +57,13 @@
 +    // SparklyPaper start
 +    implementation(project(":sparklypaper-api"))
 +    implementation(kotlin("reflect"))
-+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-+    implementation("com.charleskorn.kaml:kaml:0.55.0")
++    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
++    implementation("com.charleskorn.kaml:kaml:0.78.0")
 +    // SparklyPaper end
      implementation("ca.spottedleaf:concurrentutil:0.0.3")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -184,9 +_,14 @@
+@@ -201,9 +_,14 @@
          val build = System.getenv("BUILD_NUMBER") ?: null
          val buildTime = if (build != null) Instant.now() else Instant.EPOCH
          val gitHash = git.exec(providers, "rev-parse", "--short=7", "HEAD").get().trim()
@@ -79,7 +79,7 @@
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "Paper",
-@@ -195,8 +_,8 @@
+@@ -212,8 +_,8 @@
              "Specification-Title" to "Paper",
              "Specification-Version" to project.version,
              "Specification-Vendor" to "Paper Team",
@@ -90,3 +90,12 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
+@@ -267,7 +_,7 @@
+     jvmArgumentProviders.add(provider)
+ }
+ 
+-val generatedDir: java.nio.file.Path = layout.projectDirectory.dir("src/generated/java").asFile.toPath()
++val generatedDir: java.nio.file.Path = rootProject.layout.projectDirectory.dir("paper-server/src/generated/java").asFile.toPath()
+ idea {
+     module {
+         generatedSourceDirs.add(generatedDir.toFile())

@@ -1,0 +1,60 @@
+--- a/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
++++ b/src/main/java/io/papermc/paper/threadedregions/EntityScheduler.java
+@@ -36,6 +_,7 @@
+      * The Entity. Note that it is the CraftEntity, since only that class properly tracks world transfers.
+      */
+     public final CraftEntity entity;
++    public final net.minecraft.server.MinecraftServer server; // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
+ 
+     private static final record ScheduledTask(Consumer<? extends Entity> run, Consumer<? extends Entity> retired) {}
+ 
+@@ -46,7 +_,8 @@
+ 
+     private final ArrayDeque<ScheduledTask> currentlyExecuting = new ArrayDeque<>();
+ 
+-    public EntityScheduler(final CraftEntity entity) {
++    public EntityScheduler(final net.minecraft.server.MinecraftServer server, final CraftEntity entity) { // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++        this.server = Validate.notNull(server);
+         this.entity = Validate.notNull(entity);
+     }
+ 
+@@ -61,14 +_,16 @@
+      * @throws IllegalStateException If the scheduler is already retired.
+      */
+     public void retire() {
++        final Entity thisEntity = this.entity.getHandleRaw(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
+         synchronized (this.stateLock) {
+             if (this.tickCount == RETIRED_TICK_COUNT) {
+                 throw new IllegalStateException("Already retired");
+             }
+             this.tickCount = RETIRED_TICK_COUNT;
++            this.server.entitiesWithScheduledTasks.remove(thisEntity); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
+         }
+ 
+-        final Entity thisEntity = this.entity.getHandleRaw();
++        // final Entity thisEntity = this.entity.getHandleRaw(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (moved up)
+ 
+         // correctly handle and order retiring while running executeTick
+         for (int i = 0, len = this.currentlyExecuting.size(); i < len; ++i) {
+@@ -124,6 +_,7 @@
+             if (this.tickCount == RETIRED_TICK_COUNT) {
+                 return false;
+             }
++            this.server.entitiesWithScheduledTasks.add(this.entity.getHandleRaw()); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
+             this.oneTimeDelayed.computeIfAbsent(this.tickCount + Math.max(1L, delay), (final long keyInMap) -> {
+                 return new ArrayList<>();
+             }).add(task);
+@@ -143,6 +_,13 @@
+         TickThread.ensureTickThread(thisEntity, "May not tick entity scheduler asynchronously");
+         final List<ScheduledTask> toRun;
+         synchronized (this.stateLock) {
++            // SparklyPaper start - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++            // Do we *really* have scheduled tasks tho?
++            if (this.currentlyExecuting.isEmpty() && this.oneTimeDelayed.isEmpty()) { // Check if we have any pending tasks and, if not, skip!
++                this.server.entitiesWithScheduledTasks.remove(thisEntity); // We don't! Bye bye!!
++                return;
++            }
++            // SparklyPaper end
+             if (this.tickCount == RETIRED_TICK_COUNT) {
+                 throw new IllegalStateException("Ticking retired scheduler");
+             }

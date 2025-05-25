@@ -1,0 +1,15 @@
+--- a/net/minecraft/server/level/ServerLevel.java
++++ b/net/minecraft/server/level/ServerLevel.java
+@@ -562,6 +_,12 @@
+     }
+     // Paper end - chunk tick iteration
+ 
++    // SparklyPaper start - track world's MSPT
++    public final MinecraftServer.TickTimes tickTimes5s = new MinecraftServer.TickTimes(100);
++    public final MinecraftServer.TickTimes tickTimes10s = new MinecraftServer.TickTimes(200);
++    public final MinecraftServer.TickTimes tickTimes60s = new MinecraftServer.TickTimes(1200);
++    // SparklyPaper end
++
+     public ServerLevel(
+         MinecraftServer server,
+         Executor dispatcher,

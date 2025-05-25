@@ -1,0 +1,19 @@
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -1697,6 +_,16 @@
+     ZOMBIE_HEAD(-1, Skull.class),
+     ZOMBIE_WALL_HEAD(-1, WallSkull.class),
+     // End generate - Blocks
++    // SparklyPaper start - SparklyPower Survival custom blocks
++    // The IDs themselves doesn't have any correlation with anything, Spigot invented that for backwards compatibility
++    SPARKLYPOWER_RAINBOW_WOOL(-1),
++    SPARKLYPOWER_RAINBOW_CONCRETE(-1),
++    SPARKLYPOWER_RAINBOW_TERRACOTTA(-1),
++    SPARKLYPOWER_ASPHALT_SERVER(-1),
++    SPARKLYPOWER_ASPHALT_SERVER_SLAB(-1, Slab.class),
++    SPARKLYPOWER_ASPHALT_PLAYER(-1),
++    SPARKLYPOWER_ASPHALT_PLAYER_SLAB(-1, Slab.class),
++    // SparklyPaper end
+     // ----- Legacy Separator -----
+     @Deprecated(since = "1.13", forRemoval = true)
+     LEGACY_AIR(0, 0),

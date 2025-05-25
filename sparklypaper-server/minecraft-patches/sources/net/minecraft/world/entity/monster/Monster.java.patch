@@ -1,0 +1,15 @@
+--- a/net/minecraft/world/entity/monster/Monster.java
++++ b/net/minecraft/world/entity/monster/Monster.java
+@@ -137,6 +_,12 @@
+     @Override
+     public ItemStack getProjectile(ItemStack shootable) {
+         if (shootable.getItem() instanceof ProjectileWeaponItem) {
++            // SparklyPaper start - Add EntityGetProjectileForWeaponEvent
++            net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(shootable));
++            event.callEvent();
++            if (event.getArrow() != null)
++                return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());
++            // SparklyPaper end
+             Predicate<ItemStack> supportedHeldProjectiles = ((ProjectileWeaponItem)shootable.getItem()).getSupportedHeldProjectiles();
+             ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedHeldProjectiles);
+             return heldProjectile.isEmpty() ? new ItemStack(Items.ARROW) : heldProjectile;

@@ -1,0 +1,18 @@
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -184,6 +_,15 @@
+         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
+         com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
+         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
++        // SparklyPaper start - config files
++        try {
++            net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.init((java.io.File) options.valueOf("sparklypaper-settings"));
++        } catch (Exception e) {
++            DedicatedServer.LOGGER.error("Unable to load server configuration", e);
++            return false;
++        }
++        net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
++        // SparklyPaper end
+ 
+         this.setPvpAllowed(properties.pvp);
+         this.setFlightAllowed(properties.allowFlight);

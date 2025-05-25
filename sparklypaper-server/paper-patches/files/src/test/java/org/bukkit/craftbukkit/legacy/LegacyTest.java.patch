@@ -1,0 +1,12 @@
+--- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
++++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+@@ -137,6 +_,9 @@
+             Material.RESIN_BRICK, Material.POTTED_OPEN_EYEBLOSSOM, Material.POTTED_CLOSED_EYEBLOSSOM,
+             // 1.21.5
+             Material.WILDFLOWERS, Material.LEAF_LITTER, Material.TEST_BLOCK, Material.TEST_INSTANCE_BLOCK, Material.BUSH, Material.FIREFLY_BUSH, Material.SHORT_DRY_GRASS, Material.TALL_DRY_GRASS, Material.CACTUS_FLOWER, Material.BLUE_EGG, Material.BROWN_EGG,
++            // SparklyPower custom blocks
++            Material.SPARKLYPOWER_RAINBOW_WOOL, Material.SPARKLYPOWER_RAINBOW_CONCRETE, Material.SPARKLYPOWER_RAINBOW_TERRACOTTA, Material.SPARKLYPOWER_ASPHALT_PLAYER, Material.SPARKLYPOWER_ASPHALT_SERVER, Material.SPARKLYPOWER_ASPHALT_PLAYER_SLAB,
++            Material.SPARKLYPOWER_ASPHALT_SERVER_SLAB,
+             //
+             Material.LEGACY_AIR, Material.LEGACY_DEAD_BUSH, Material.LEGACY_BURNING_FURNACE, Material.LEGACY_WALL_SIGN, Material.LEGACY_REDSTONE_TORCH_OFF, Material.LEGACY_SKULL, Material.LEGACY_REDSTONE_COMPARATOR_ON, Material.LEGACY_WALL_BANNER, Material.LEGACY_MONSTER_EGG));
+ 

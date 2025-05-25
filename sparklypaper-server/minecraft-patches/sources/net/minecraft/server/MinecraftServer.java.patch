@@ -1,0 +1,55 @@
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -302,6 +_,7 @@
+     public boolean isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
+     private final Set<String> pluginsBlockingSleep = new java.util.HashSet<>(); // Paper - API to allow/disallow tick sleeping
+     public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
++    public final Set<net.minecraft.world.entity.Entity> entitiesWithScheduledTasks = java.util.concurrent.ConcurrentHashMap.newKeySet(); // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run (concurrent because plugins may schedule tasks async)
+ 
+     public static <S extends MinecraftServer> S spin(Function<Thread, S> threadFunction) {
+         AtomicReference<S> atomicReference = new AtomicReference<>();
+@@ -1657,6 +_,18 @@
+         this.server.getScheduler().mainThreadHeartbeat(); // CraftBukkit
+         // Paper start - Folia scheduler API
+         ((io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler) org.bukkit.Bukkit.getGlobalRegionScheduler()).tick();
++        // SparklyPaper - skip EntityScheduler's executeTick checks if there isn't any tasks to be run
++        for (final net.minecraft.world.entity.Entity entity : entitiesWithScheduledTasks) {
++            if (entity.isRemoved()) {
++                continue;
++            }
++
++            final org.bukkit.craftbukkit.entity.CraftEntity bukkit = entity.getBukkitEntityRaw();
++            if (bukkit != null) {
++                bukkit.taskScheduler.executeTick();
++            }
++        }
++        /*
+         getAllLevels().forEach(level -> {
+             for (final net.minecraft.world.entity.Entity entity : level.getEntities().getAll()) {
+                 if (entity.isRemoved()) {
+@@ -1668,6 +_,8 @@
+                 }
+             }
+         });
++         */
++        // SparklyPaper end
+         // Paper end - Folia scheduler API
+         io.papermc.paper.adventure.providers.ClickCallbackProviderImpl.CALLBACK_MANAGER.handleQueue(this.tickCount); // Paper
+         profilerFiller.push("commandFunctions");
+@@ -1719,7 +_,16 @@
+             profilerFiller.push("tick");
+ 
+             try {
++                long i = Util.getNanos(); // SparklyPaper - track world's MSPT
+                 serverLevel.tick(hasTimeLeft);
++                // SparklyPaper start - track world's MSPT
++                long j = Util.getNanos() - i;
++
++                // These are from the "tickServer" function
++                serverLevel.tickTimes5s.add(this.tickCount, j);
++                serverLevel.tickTimes10s.add(this.tickCount, j);
++                serverLevel.tickTimes60s.add(this.tickCount, j);
++                // SparklyPaper end
+             } catch (Throwable var7) {
+                 CrashReport crashReport = CrashReport.forThrowable(var7, "Exception ticking world");
+                 serverLevel.fillReportDetails(crashReport);

@@ -1,0 +1,49 @@
+--- a/src/main/java/io/papermc/paper/command/MSPTCommand.java
++++ b/src/main/java/io/papermc/paper/command/MSPTCommand.java
+@@ -78,6 +_,46 @@
+                 )
+             )
+         );
++
++        // SparklyPaper start - track world's MSPT
++        sender.sendMessage(text());
++        sender.sendMessage(text().content("World tick times ").color(GOLD)
++            .append(text().color(YELLOW)
++                .append(
++                    text("("),
++                    text("avg", GRAY),
++                    text("/"),
++                    text("min", GRAY),
++                    text("/"),
++                    text("max", GRAY),
++                    text(")")
++                )
++            ).append(
++                text(" from last 5s"),
++                text(",", GRAY),
++                text(" 10s"),
++                text(",", GRAY),
++                text(" 1m"),
++                text(":", YELLOW)
++            )
++        );
++        for (net.minecraft.server.level.ServerLevel serverLevel : server.getAllLevels()) {
++            List<Component> worldTimes = new ArrayList<>();
++            worldTimes.addAll(eval(serverLevel.tickTimes5s.getTimes()));
++            worldTimes.addAll(eval(serverLevel.tickTimes10s.getTimes()));
++            worldTimes.addAll(eval(serverLevel.tickTimes60s.getTimes()));
++
++            sender.sendMessage(text().content("◴ " + serverLevel.getWorld().getName() + ": ").color(GOLD)
++                .append(text().color(GRAY)
++                    .append(
++                        worldTimes.get(0), SLASH, worldTimes.get(1), SLASH, worldTimes.get(2), text(", ", YELLOW),
++                        worldTimes.get(3), SLASH, worldTimes.get(4), SLASH, worldTimes.get(5), text(", ", YELLOW),
++                        worldTimes.get(6), SLASH, worldTimes.get(7), SLASH, worldTimes.get(8)
++                    )
++                )
++            );
++        }
++        // SparklyPaper end
+         return true;
+     }
+ 

@@ -1,0 +1,26 @@
+--- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
++++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+@@ -1307,6 +_,23 @@
+         Bukkit.getPluginManager().callEvent(crafterCraftEvent);
+         return crafterCraftEvent;
+     }
++    
++    // SparklyPaper start - add CraftItemRecipeEvent
++    public static net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent callCraftItemRecipeEvent(net.minecraft.world.inventory.CraftingContainer container, Recipe recipe, ItemStack result) {
++        org.bukkit.inventory.ItemStack[] matrix = new org.bukkit.inventory.ItemStack[container.getItems().size()];
++        int i = 0;
++        for (ItemStack item : container.getItems()) {
++            matrix[i] = CraftItemStack.asCraftMirror(item);
++            i++;
++        }
++        org.bukkit.inventory.ItemStack bukkitResult = CraftItemStack.asCraftMirror(result);
++
++        net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent event = new net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent(matrix, recipe, bukkitResult);
++        Bukkit.getPluginManager().callEvent(event);
++
++        return event;
++    }
++    // SparklyPaper end
+ 
+     // Paper start
+     @Deprecated

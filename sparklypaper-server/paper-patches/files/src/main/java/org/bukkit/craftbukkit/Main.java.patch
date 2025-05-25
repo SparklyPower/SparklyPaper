@@ -1,0 +1,17 @@
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -165,6 +_,14 @@
+                         .defaultsTo(new File[] {})
+                         .describedAs("Jar file");
+ 
++                // SparklyPaper start - config files
++                acceptsAll(asList("sparklypaper", "sparklypaper-settings"), "File for SparklyPaper settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("sparklypaper.yml"))
++                        .describedAs("Yml file");
++                // SparklyPaper end
++
+                 acceptsAll(asList("server-name"), "Name of the server")
+                         .withRequiredArg()
+                         .ofType(String.class)
