@@ -1,0 +1,44 @@
+--- a/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
+@@ -22,7 +_,7 @@
+     private static final double LIMIT = 3.9;
+     private final int id;
+     private final UUID uuid;
+-    private final EntityType<?> type;
++    public EntityType<?> type; // SparklyPaper - Helpful NMS packet changes: remove final and make public
+     private final double x;
+     private final double y;
+     private final double z;
+@@ -179,6 +_,32 @@
+     public float getYHeadRot() {
+         return Mth.unpackDegrees(this.yHeadRot);
+     }
++
++    // SparklyPaper - Helpful NMS packet changes: expose raw rotational fields
++    public int getXaRaw() {
++        return this.xa;
++    }
++
++    public int getYaRaw() {
++        return this.ya;
++    }
++
++    public int getZaRaw() {
++        return this.za;
++    }
++
++    public byte getXRotRaw() {
++        return this.xRot;
++    }
++
++    public byte getYRotRaw() {
++        return this.yRot;
++    }
++
++    public byte getYHeadRotRaw() {
++        return this.yHeadRot;
++    }
++    // SparklyPaper end
+ 
+     public int getData() {
+         return this.data;

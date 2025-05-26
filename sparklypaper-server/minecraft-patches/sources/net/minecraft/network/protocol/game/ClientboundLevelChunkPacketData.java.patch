@@ -1,0 +1,11 @@
+--- a/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
++++ b/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+@@ -30,7 +_,7 @@
+     );
+     private static final int TWO_MEGABYTES = 2097152;
+     private final Map<Heightmap.Types, long[]> heightmaps;
+-    private final byte[] buffer;
++    public byte[] buffer; // SparklyPaper - Helpful NMS packet changes: remove final and make public
+     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
+     // Paper start - Handle oversized block entities in chunks
+     private final java.util.List<net.minecraft.network.protocol.Packet<?>> extraPackets = new java.util.ArrayList<>();

@@ -1,0 +1,15 @@
+--- a/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
+@@ -22,6 +_,12 @@
+         this.cameraId = buffer.readVarInt();
+     }
+ 
++    // SparklyPaper - Helpful NMS packet changes: add direct entityId constructor
++    public ClientboundSetCameraPacket(int entityId) {
++        this.cameraId = entityId;
++     }
++    // SparklyPaper end
++
+     private void write(FriendlyByteBuf buffer) {
+         buffer.writeVarInt(this.cameraId);
+     }

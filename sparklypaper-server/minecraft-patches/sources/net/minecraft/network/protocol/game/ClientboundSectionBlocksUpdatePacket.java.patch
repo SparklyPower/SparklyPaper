@@ -1,0 +1,15 @@
+--- a/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
+@@ -17,9 +_,9 @@
+         ClientboundSectionBlocksUpdatePacket::write, ClientboundSectionBlocksUpdatePacket::new
+     );
+     private static final int POS_IN_SECTION_BITS = 12;
+-    private final SectionPos sectionPos;
+-    private final short[] positions;
+-    private final BlockState[] states;
++    public SectionPos sectionPos; // SparklyPaper - Helpful NMS packet changes: remove final and make public
++    public short[] positions; // SparklyPaper - Helpful NMS packet changes: remove final and make public
++    public BlockState[] states; // SparklyPaper - Helpful NMS packet changes: remove final and make public
+ 
+     public ClientboundSectionBlocksUpdatePacket(SectionPos sectionPos, ShortSet positions, LevelChunkSection section) {
+         this.sectionPos = sectionPos;

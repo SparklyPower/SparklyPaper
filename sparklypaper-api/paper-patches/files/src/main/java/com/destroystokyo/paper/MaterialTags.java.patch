@@ -8,11 +8,19 @@
          .ensureSize("CONCRETES", 16).lock();
  
      /**
-@@ -152,6 +_,7 @@
-      */
-     public static final MaterialSetTag GLAZED_TERRACOTTA = new MaterialSetTag(keyFor("glazed_terracotta"))
-         .endsWith("GLAZED_TERRACOTTA")
+@@ -161,6 +_,7 @@
+         .endsWith("TERRACOTTA")
+         .not(Material.TERRACOTTA)
+         .notEndsWith("GLAZED_TERRACOTTA")
 +        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
-         .ensureSize("GLAZED_TERRACOTTA", 16).lock();
+         .ensureSize("STAINED_TERRACOTTA", 16).lock();
+ 
+     /**
+@@ -168,6 +_,7 @@
+      */
+     public static final MaterialSetTag TERRACOTTA = new MaterialSetTag(keyFor("terracotta"))
+         .endsWith("TERRACOTTA")
++        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
+         .ensureSize("TERRACOTTA", 33).lock();
  
      /**

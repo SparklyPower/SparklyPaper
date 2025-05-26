@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/entity/Display.java
++++ b/net/minecraft/world/entity/Display.java
+@@ -681,7 +_,7 @@
+         private static final byte INITIAL_TEXT_OPACITY = -1;
+         public static final int INITIAL_BACKGROUND = 1073741824;
+         private static final int INITIAL_LINE_WIDTH = 200;
+-        private static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT);
++        public static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT); // SparklyPaper - Helpful NMS packet changes: make public
+         public static final EntityDataAccessor<Integer> DATA_LINE_WIDTH_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.INT);
+         public static final EntityDataAccessor<Integer> DATA_BACKGROUND_COLOR_ID = SynchedEntityData.defineId(
+             Display.TextDisplay.class, EntityDataSerializers.INT

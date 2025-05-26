@@ -1,0 +1,16 @@
+--- a/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
+@@ -20,6 +_,13 @@
+         this.yHeadRot = yHeadRot;
+     }
+ 
++    // SparklyPaper start - Helpful NMS packet changes: add entity ID constructor
++    public ClientboundRotateHeadPacket(int entityId, byte headYaw) {
++        this.entityId = entityId;
++        this.yHeadRot = headYaw;
++    }
++    // SparklyPaper end
++
+     private ClientboundRotateHeadPacket(FriendlyByteBuf buffer) {
+         this.entityId = buffer.readVarInt();
+         this.yHeadRot = buffer.readByte();
