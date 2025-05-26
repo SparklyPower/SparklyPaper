@@ -158,6 +158,19 @@ index 8e83d37ffda1b5bfcacd5578e622b5dc09f6870c..11d334db1688dfaf087d854da604895f
  
          this.setPvpAllowed(properties.pvp);
          this.setFlightAllowed(properties.allowFlight);
+diff --git a/net/minecraft/server/level/ServerChunkCache.java b/net/minecraft/server/level/ServerChunkCache.java
+index 59e8a5e1b35c81883c9b1ca00c6e55d77584d8cc..b8a2f110aeb30d1d75222712de9186a185129807 100644
+--- a/net/minecraft/server/level/ServerChunkCache.java
++++ b/net/minecraft/server/level/ServerChunkCache.java
+@@ -177,7 +177,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+ 
+             // call mid-tick tasks for chunk system
+             if ((i & 7) == 0) {
+-                ((ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer)this.level.getServer()).moonrise$executeMidTickTasks();
++                // ((ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer)this.level.getServer()).moonrise$executeMidTickTasks(); // SparklyPaper - parallel world ticking (only run mid-tick at the end of each tick / fixes concurrency bugs related to executeMidTickTasks)
+                 continue;
+             }
+         }
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
 index 2915ad139a094f6d487c65b39ef065c1340a4685..dac59bdd0496c592d8148e05b82e6ff280f05d5d 100644
 --- a/net/minecraft/server/level/ServerLevel.java
@@ -704,3 +717,18 @@ index 423779a2b690f387a4f0bd07b97b50e0baefda76..24f9632e73d73c2ad68ebf30eb0e4cca
          // Paper start - rewrite chunk system
          // To ensure nothing weird happens with dimension travelling, do not iterate over new entries...
          // (by dfl iterator() is configured to not iterate over new entries)
+diff --git a/net/minecraft/world/level/saveddata/maps/MapIndex.java b/net/minecraft/world/level/saveddata/maps/MapIndex.java
+index 06025d79cc2297119b22224d777aca79f9d3d9c1..c4c6e28b58ec921ebc18b427e562fbaa51da65c8 100644
+--- a/net/minecraft/world/level/saveddata/maps/MapIndex.java
++++ b/net/minecraft/world/level/saveddata/maps/MapIndex.java
+@@ -23,8 +23,10 @@ public class MapIndex extends SavedData {
+     }
+ 
+     public MapId getNextMapId() {
++        synchronized (TYPE) { // SparklyPaper start - parallel world ticking
+         MapId mapId = new MapId(++this.lastMapId);
+         this.setDirty();
+         return mapId;
++        } // SparklyPaper end
+     }
+ }
