@@ -1,0 +1,69 @@
+--- a/net/minecraft/world/level/block/CropBlock.java
++++ b/net/minecraft/world/level/block/CropBlock.java
+@@ -79,6 +_,57 @@
+         if (level.getRawBrightness(pos, 0) >= 9) {
+             int age = this.getAge(state);
+             if (age < this.getMaxAge()) {
++                // SparklyPaper start - Blazingly simple farm checks
++                if (level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {
++                    // These checks are similar to getGrowthSpeed, but we have "inlined" them because we want to access stuff like the farm block data later on
++                    // Is the block below us moisturised?
++                    BlockPos farmlandBelowTheCurrentBlock = pos.below();
++                    BlockState farmlandBelowTheCurrentBlockData = level.getBlockState(farmlandBelowTheCurrentBlock);
++                    float f = level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getDefaultGrowthSpeed();
++                    boolean isCurrentFarmlandStateMoist = false;
++                    if (farmlandBelowTheCurrentBlockData.is(Blocks.FARMLAND)) {
++                        if ((Integer) farmlandBelowTheCurrentBlockData.getValue(FarmBlock.MOISTURE) > 0) {
++                            // If we are currently moist, increase the speed!
++                            f = level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getMoistGrowthSpeed();
++                            isCurrentFarmlandStateMoist = true;
++                        }
++                    }
++                    // If we are skipping the middle aging stages, we need to change the growth speed and the next stage accordingly
++                    if (level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getSkipMiddleAgingStagesForCrops()) {
++                        f = f / getMaxAge();
++                        age = getMaxAge() - 1;
++                    }
++
++                    // Spigot start
++                    int modifier;
++                    if (this == Blocks.BEETROOTS) {
++                        modifier = level.spigotConfig.beetrootModifier;
++                    } else if (this == Blocks.CARROTS) {
++                        modifier = level.spigotConfig.carrotModifier;
++                    } else if (this == Blocks.POTATOES) {
++                        modifier = level.spigotConfig.potatoModifier;
++                        // Paper start
++                    } else if (this == Blocks.TORCHFLOWER_CROP) {
++                        modifier = level.spigotConfig.torchFlowerModifier;
++                        // Paper end
++                    } else {
++                        modifier = level.spigotConfig.wheatModifier;
++                    }
++
++                    if (random.nextFloat() < (modifier / (100.0f * (Math.floor((25.0F / f) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
++                        // Spigot end
++                        if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), 2)) {
++                            return;
++                        }
++
++                        // Now that we know that the crop will grow... is the next stage the crop's max age? If yes, we are going to check if the farm land is moist!
++                        if (age + 1 == getMaxAge() && isCurrentFarmlandStateMoist && !FarmBlock.isNearWater(level, farmlandBelowTheCurrentBlock)) {
++                            // Whoops, farm land ain't moist!
++                            // From FarmBlock, set the moisture to 0
++                            org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(level, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmBlock.MOISTURE, 0), 2); // CraftBukkit
++                        }
++                    }
++                } else {
+                 float growthSpeed = getGrowthSpeed(this, level, pos);
+                 // Spigot start
+                 int modifier = 100;
+@@ -101,6 +_,8 @@
+                     org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), 2); // CraftBukkit
+                 }
+             }
++            }
++            // SparklyPaper end
+         }
+     }
+ 
