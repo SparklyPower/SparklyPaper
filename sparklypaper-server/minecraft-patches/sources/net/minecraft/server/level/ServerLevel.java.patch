@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -562,6 +_,12 @@
+@@ -565,6 +_,12 @@
      }
      // Paper end - chunk tick iteration
  

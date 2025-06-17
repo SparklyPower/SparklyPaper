@@ -1,0 +1,10 @@
+--- a/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
++++ b/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
+@@ -1220,6 +_,7 @@
+             ret.setString("id", this.id);
+             ret.setInt("count", this.count);
+             if (!this.tag.isEmpty()) {
++                net.sparklypower.sparklypaper.LegacyNBTRemapper.INSTANCE.remap(this.tag); // SparklyPaper - Remap SparklyPower hacky legacy NBT tags
+                 this.components.setMap("minecraft:custom_data", this.tag);
+             }
+ 
