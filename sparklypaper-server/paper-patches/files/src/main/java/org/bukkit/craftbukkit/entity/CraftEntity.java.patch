@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-@@ -85,7 +_,7 @@
+@@ -93,7 +_,7 @@
      private final CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer(CraftEntity.DATA_TYPE_REGISTRY);
      protected net.kyori.adventure.pointer.Pointers adventure$pointers; // Paper - implement pointers
      // Paper start - Folia shedulers
@@ -9,7 +9,7 @@
      private final io.papermc.paper.threadedregions.scheduler.FoliaEntityScheduler apiScheduler = new io.papermc.paper.threadedregions.scheduler.FoliaEntityScheduler(this);
  
      @Override
-@@ -98,6 +_,7 @@
+@@ -106,6 +_,7 @@
          this.server = server;
          this.entity = entity;
          this.entityType = CraftEntityType.minecraftToBukkit(entity.getType());
