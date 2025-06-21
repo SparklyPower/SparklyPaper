@@ -5,19 +5,19 @@ Subject: [PATCH] Parallel World Ticking
 
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-index f473999938840562b1007a789600342e5796a123..cb62ac5ee7ed059adde7027156421bdbef0924f3 100644
+index 6ce4a98e4d3b633e3c87944c23b6b3f0ff58f159..9be4bbf155dae9ef34e423f5e84de8292c6e321c 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-@@ -1116,7 +1116,7 @@ public final class ChunkHolderManager {
+@@ -1142,7 +1142,7 @@ public final class ChunkHolderManager {
          if (changedFullStatus.isEmpty()) {
              return;
          }
 -        if (!TickThread.isTickThread()) {
 +        if (!TickThread.isTickThreadFor(world)) { // SparklyPaper - parallel world ticking
-             this.taskScheduler.scheduleChunkTask(() -> {
-                 final ArrayDeque<NewChunkHolder> pendingFullLoadUpdate = ChunkHolderManager.this.pendingFullLoadUpdate;
-                 for (int i = 0, len = changedFullStatus.size(); i < len; ++i) {
-@@ -1142,7 +1142,7 @@ public final class ChunkHolderManager {
+             // These will be handled on the next ServerChunkCache$MainThreadExecutor#pollTask, as it runs the distance manager update
+             // which will invoke processTicketUpdates
+             this.offThreadPendingFullLoadUpdate.addAll(changedFullStatus);
+@@ -1163,7 +1163,7 @@ public final class ChunkHolderManager {
  
      // note: never call while inside the chunk system, this will absolutely break everything
      public void processUnloads() {
@@ -26,15 +26,21 @@ index f473999938840562b1007a789600342e5796a123..cb62ac5ee7ed059adde7027156421bdb
  
          if (BLOCK_TICKET_UPDATES.get() == Boolean.TRUE) {
              throw new IllegalStateException("Cannot unload chunks recursively");
-@@ -1424,7 +1424,7 @@ public final class ChunkHolderManager {
- 
-         List<NewChunkHolder> changedFullStatus = null;
- 
+@@ -1429,12 +1429,12 @@ public final class ChunkHolderManager {
+         if (BLOCK_TICKET_UPDATES.get() == Boolean.TRUE) {
+             throw new IllegalStateException("Cannot update ticket level while unloading chunks or updating entity manager");
+         }
 -        final boolean isTickThread = TickThread.isTickThread();
 +        final boolean isTickThread = TickThread.isTickThreadFor(world);
  
+         if (!PlatformHooks.get().allowAsyncTicketUpdates() && isTickThread) {
+             TickThread.ensureTickThread("Cannot asynchronously process ticket updates");
+         }
+-
++        
          boolean ret = false;
-         final boolean canProcessFullUpdates = processFullUpdates & isTickThread;
+ 
+         if (this.ticketLevelPropagator.hasPendingUpdates()) {
 diff --git a/net/minecraft/core/dispenser/DispenseItemBehavior.java b/net/minecraft/core/dispenser/DispenseItemBehavior.java
 index ca02c4c71a0a5a1a0ae8bbb40f0b1b7eac64e6fd..7ce68f270d809ab0b2be45ffdd0346f053bd3b1e 100644
 --- a/net/minecraft/core/dispenser/DispenseItemBehavior.java
@@ -340,7 +346,7 @@ index b1524279c02cd3be82338a6bd0320cb125a134d5..9b291998bb5a5dcb94e2e6f8f1813a08
          serverPlayer.connection = player.connection;
          serverPlayer.restoreFrom(player, keepInventory);
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 9344cdbad8415f6ff4d592d3f13390e85477a10d..b862f751c582716bc44342418bf33467aeaf3d16 100644
+index 7546ff4c5ffc62d93a3f874519db8fef1e3bfbcb..ab951849440817877ecf6f52ba61cebd900cf100 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -834,7 +834,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -361,7 +367,7 @@ index 9344cdbad8415f6ff4d592d3f13390e85477a10d..b862f751c582716bc44342418bf33467
          List<Entity> list = new ArrayList<>(passengers.size());
          this.ejectPassengers();
 diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/minecraft/world/inventory/AbstractContainerMenu.java
-index 813417a09b4acc7d57e80a53d970767e230d75b1..b8ff46e7543f00d963a6aa87509a1173c0ee34ec 100644
+index f4548edae77eb86e54ba499acbb20613fd60d7bd..3f4cce0ba360652b09076ff265aaf5f6e633cd53 100644
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
 @@ -95,8 +95,14 @@ public abstract class AbstractContainerMenu {
