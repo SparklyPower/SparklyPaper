@@ -241,18 +241,18 @@ index ecfe237fbecde610d095647a1f2a10f7d426d786..4211816c3b21a2ee66297a8f58b51de3
          // Paper start - extra debug info
          if (entity.valid) {
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index f3eca351021c37b64315872d075bd0a84aeee267..d4648ecc943324d1f66fe5fcfe4cfafef98af7ba 100644
+index dfa00516e9a6c941087bd7ecfd5aca8a9f7915be..6a71b746b282ee53f838c509c36590c8dd8eca4a 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -525,6 +525,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
-         }
+@@ -459,6 +459,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+         return this.viewDistanceHolder;
      }
-     // Paper end - improve keepalives
+     // Paper end - rewrite chunk system
 +    public boolean hasTickedAtLeastOnceInNewWorld = false; // SparklyPaper - parallel world ticking (fixes bug in DreamResourceReset where the inventory is opened AFTER the player has changed worlds, if you click with the quick tp torch in a chest, because the inventory is opened AFTER the player has teleported)
  
      public ServerPlayer(MinecraftServer server, ServerLevel level, GameProfile gameProfile, ClientInformation clientInformation) {
          super(level, gameProfile);
-@@ -805,6 +806,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -739,6 +740,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
  
      @Override
      public void tick() {
@@ -260,7 +260,7 @@ index f3eca351021c37b64315872d075bd0a84aeee267..d4648ecc943324d1f66fe5fcfe4cfafe
          // CraftBukkit start
          if (this.joining) {
              this.joining = false;
-@@ -1460,6 +1462,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1394,6 +1396,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  return this;
              } else {
                  // CraftBukkit start
@@ -268,7 +268,7 @@ index f3eca351021c37b64315872d075bd0a84aeee267..d4648ecc943324d1f66fe5fcfe4cfafe
                  /*
                  this.isChangingDimension = true;
                  LevelData levelData = level.getLevelData();
-@@ -1796,6 +1799,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1730,6 +1733,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  return OptionalInt.empty();
              } else {
                  // CraftBukkit start
@@ -281,7 +281,7 @@ index f3eca351021c37b64315872d075bd0a84aeee267..d4648ecc943324d1f66fe5fcfe4cfafe
                  this.containerMenu = abstractContainerMenu; // Moved up
                  if (!this.isImmobile())
                  this.connection
-@@ -1860,6 +1869,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1794,6 +1803,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      }
      @Override
      public void closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason reason) {
@@ -294,7 +294,7 @@ index f3eca351021c37b64315872d075bd0a84aeee267..d4648ecc943324d1f66fe5fcfe4cfafe
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index b1524279c02cd3be82338a6bd0320cb125a134d5..9b291998bb5a5dcb94e2e6f8f1813a083fbb55a1 100644
+index dea72819f2933e5a806bb3a0603e4ebdf7f99456..1652cb7df981225e551b9c034f0a3756a1a91193 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -112,7 +112,7 @@ public abstract class PlayerList {
@@ -323,7 +323,7 @@ index b1524279c02cd3be82338a6bd0320cb125a134d5..9b291998bb5a5dcb94e2e6f8f1813a08
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
          GameProfile gameProfile = player.getGameProfile();
-@@ -709,6 +710,12 @@ public abstract class PlayerList {
+@@ -676,6 +677,12 @@ public abstract class PlayerList {
      }
  
      public ServerPlayer respawn(ServerPlayer player, boolean keepInventory, Entity.RemovalReason reason, @Nullable org.bukkit.event.player.PlayerRespawnEvent.RespawnReason eventReason, @Nullable org.bukkit.Location location) {
@@ -336,7 +336,7 @@ index b1524279c02cd3be82338a6bd0320cb125a134d5..9b291998bb5a5dcb94e2e6f8f1813a08
          player.stopRiding(); // CraftBukkit
          this.players.remove(player);
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
-@@ -719,6 +726,7 @@ public abstract class PlayerList {
+@@ -686,6 +693,7 @@ public abstract class PlayerList {
          ServerPlayer serverPlayer = player;
          Level fromWorld = player.level();
          player.wonGame = false;
@@ -429,7 +429,7 @@ index f9e7532f86122a379692561a639a209a126e8bba..2709dfae53c1a210f36c45fa0df0d495
              if (isLocatorBarEnabledFor(player)) {
                  if (!connection.isBroken()) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 81413ac0de7b3c7a72bc606fe5ae6fb4ae7055e3..69980f5a2766b17c429785ef05520d6af3201735 100644
+index 3d2c0a4d3a1f9d3e5cc6cd0cdb988ae1205de821..53d99753ab7454df5fd9f2565283f93404030c70 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -834,7 +834,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
