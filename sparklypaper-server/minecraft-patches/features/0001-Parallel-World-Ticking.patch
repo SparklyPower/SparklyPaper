@@ -57,7 +57,7 @@ index ca02c4c71a0a5a1a0ae8bbb40f0b1b7eac64e6fd..7ce68f270d809ab0b2be45ffdd0346f0
                      List<org.bukkit.block.BlockState> states = new java.util.ArrayList<>(level.capturedBlockStates.values());
                      level.capturedBlockStates.clear();
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 52fa5112cd90ba766c94512a02401dd3aee82cc9..07528605b060115fe4a61c881eec76897320df63 100644
+index 7aac2a6889af3edaebfaf94deecbf00d00758b68..650b324eeb6173d51069a918ec2fd1e84e054c30 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -303,6 +303,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -68,7 +68,7 @@ index 52fa5112cd90ba766c94512a02401dd3aee82cc9..07528605b060115fe4a61c881eec7689
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> threadFunction) {
          ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.init(); // Paper - rewrite data converter system
-@@ -1703,6 +1704,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1704,6 +1705,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
  
          this.isIteratingOverLevels = true; // Paper - Throw exception on world create while being ticked
@@ -78,7 +78,7 @@ index 52fa5112cd90ba766c94512a02401dd3aee82cc9..07528605b060115fe4a61c881eec7689
          for (ServerLevel serverLevel : this.getAllLevels()) {
              serverLevel.hasPhysicsEvent = org.bukkit.event.block.BlockPhysicsEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - BlockPhysicsEvent
              serverLevel.hasEntityMoveEvent = io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - Add EntityMoveEvent
-@@ -1719,18 +1723,45 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1720,18 +1724,45 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              profilerFiller.push("tick");
  
@@ -131,7 +131,7 @@ index 52fa5112cd90ba766c94512a02401dd3aee82cc9..07528605b060115fe4a61c881eec7689
          this.isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
  
          profilerFiller.popPush("connection");
-@@ -1821,6 +1852,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1822,6 +1853,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          Map<ResourceKey<Level>, ServerLevel> oldLevels = this.levels;
          Map<ResourceKey<Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
          newLevels.remove(level.dimension());
@@ -241,7 +241,7 @@ index ecfe237fbecde610d095647a1f2a10f7d426d786..4211816c3b21a2ee66297a8f58b51de3
          // Paper start - extra debug info
          if (entity.valid) {
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index dfa00516e9a6c941087bd7ecfd5aca8a9f7915be..6a71b746b282ee53f838c509c36590c8dd8eca4a 100644
+index 37c0a84758a1526791913898358659de202fa19f..a40e62beb26f89d306af3a5b6ce74b93407cde76 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -459,6 +459,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -260,7 +260,7 @@ index dfa00516e9a6c941087bd7ecfd5aca8a9f7915be..6a71b746b282ee53f838c509c36590c8
          // CraftBukkit start
          if (this.joining) {
              this.joining = false;
-@@ -1394,6 +1396,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1403,6 +1405,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  return this;
              } else {
                  // CraftBukkit start
@@ -268,7 +268,7 @@ index dfa00516e9a6c941087bd7ecfd5aca8a9f7915be..6a71b746b282ee53f838c509c36590c8
                  /*
                  this.isChangingDimension = true;
                  LevelData levelData = level.getLevelData();
-@@ -1730,6 +1733,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1739,6 +1742,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
                  return OptionalInt.empty();
              } else {
                  // CraftBukkit start
@@ -281,7 +281,7 @@ index dfa00516e9a6c941087bd7ecfd5aca8a9f7915be..6a71b746b282ee53f838c509c36590c8
                  this.containerMenu = abstractContainerMenu; // Moved up
                  if (!this.isImmobile())
                  this.connection
-@@ -1794,6 +1803,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1803,6 +1812,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      }
      @Override
      public void closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason reason) {
@@ -294,7 +294,7 @@ index dfa00516e9a6c941087bd7ecfd5aca8a9f7915be..6a71b746b282ee53f838c509c36590c8
          // Paper end - Inventory close reason
          this.connection.send(new ClientboundContainerClosePacket(this.containerMenu.containerId));
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index dea72819f2933e5a806bb3a0603e4ebdf7f99456..1652cb7df981225e551b9c034f0a3756a1a91193 100644
+index 2c2015bf19d5b30e945118661b7a9b474a1bddc8..816f850e636385ae61832874d9f46be86dda132c 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -112,7 +112,7 @@ public abstract class PlayerList {
@@ -429,7 +429,7 @@ index f9e7532f86122a379692561a639a209a126e8bba..2709dfae53c1a210f36c45fa0df0d495
              if (isLocatorBarEnabledFor(player)) {
                  if (!connection.isBroken()) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 3d2c0a4d3a1f9d3e5cc6cd0cdb988ae1205de821..53d99753ab7454df5fd9f2565283f93404030c70 100644
+index 70b6ea8ab35e88989b5b1f5ffd64490a9d743b56..0860bb163e9b7bf52c618e1e342dbee92e8770b8 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -834,7 +834,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -441,7 +441,7 @@ index 3d2c0a4d3a1f9d3e5cc6cd0cdb988ae1205de821..53d99753ab7454df5fd9f2565283f934
              this.handlePortal();
          }
      }
-@@ -3999,6 +3999,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -3998,6 +3998,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      private Entity teleportCrossDimension(ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition teleportTransition) {
@@ -450,7 +450,7 @@ index 3d2c0a4d3a1f9d3e5cc6cd0cdb988ae1205de821..53d99753ab7454df5fd9f2565283f934
          List<Entity> list = new ArrayList<>(passengers.size());
          this.ejectPassengers();
 diff --git a/net/minecraft/world/inventory/AbstractContainerMenu.java b/net/minecraft/world/inventory/AbstractContainerMenu.java
-index f4548edae77eb86e54ba499acbb20613fd60d7bd..3f4cce0ba360652b09076ff265aaf5f6e633cd53 100644
+index 96da9b8e3556e58365dc6742f44d6dfd608e2953..3366a21dd176efb09718a70fcb323c2e8d35e8a9 100644
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
 @@ -95,8 +95,14 @@ public abstract class AbstractContainerMenu {
@@ -469,7 +469,7 @@ index f4548edae77eb86e54ba499acbb20613fd60d7bd..3f4cce0ba360652b09076ff265aaf5f6
          this.containerId = containerId;
      }
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index cf283389d9263ba29720bf296a778be9eaf308a7..403cc6642dad5ac46f989ebcfb042fa0a36bc035 100644
+index da16f4831c875e07c25d7ed041bed493db614658..fc1512e434f5363d28f5cb9d58094c2d99bfb565 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
 @@ -398,8 +398,8 @@ public final class ItemStack implements DataComponentHolder {
