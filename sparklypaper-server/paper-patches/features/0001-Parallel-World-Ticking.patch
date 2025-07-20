@@ -363,7 +363,7 @@ index 68351e47609ae06f0a1641b4ad2013ce6261ae4e..7e70491d6ff92feb64141925dc1e482f
      }
      // Paper end
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
-index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d1684d224 100644
+index 6809f9dcf8510c714145d99d250eb69f98d9bf27..acb01a80019796b64c287f11d0dbe23691467bee 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 @@ -155,6 +155,11 @@ public class CraftBlock implements Block {
@@ -448,10 +448,10 @@ index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d
          int power = 0;
          net.minecraft.world.level.Level world = this.world.getMinecraftWorld();
          int x = this.getX();
-@@ -499,6 +534,11 @@ public class CraftBlock implements Block {
+@@ -504,6 +539,11 @@ public class CraftBlock implements Block {
  
      @Override
-     public boolean breakNaturally(ItemStack item, boolean triggerEffect, boolean dropExperience) {
+     public boolean breakNaturally(ItemStack item, boolean triggerEffect, boolean dropExperience, boolean forceEffect) {
 +        // SparklyPaper start - parallel world ticking
 +        if (world instanceof ServerLevel serverWorld) {
 +            ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(serverWorld, position, "Cannot modify world asynchronously");
@@ -460,7 +460,7 @@ index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d
          // Paper end
          // Order matters here, need to drop before setting to air so skulls can get their data
          net.minecraft.world.level.block.state.BlockState state = this.getNMS();
-@@ -542,6 +582,11 @@ public class CraftBlock implements Block {
+@@ -548,6 +588,11 @@ public class CraftBlock implements Block {
  
      @Override
      public boolean applyBoneMeal(BlockFace face) {
@@ -472,7 +472,7 @@ index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d
          Direction direction = CraftBlock.blockFaceToNotch(face);
          BlockFertilizeEvent event = null;
          ServerLevel world = this.getCraftWorld().getHandle();
-@@ -553,8 +598,8 @@ public class CraftBlock implements Block {
+@@ -559,8 +604,8 @@ public class CraftBlock implements Block {
          world.captureTreeGeneration = false;
  
          if (!world.capturedBlockStates.isEmpty()) {
@@ -483,7 +483,7 @@ index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d
              List<BlockState> states = new ArrayList<>(world.capturedBlockStates.values());
              world.capturedBlockStates.clear();
              StructureGrowEvent structureEvent = null;
-@@ -593,6 +638,11 @@ public class CraftBlock implements Block {
+@@ -599,6 +644,11 @@ public class CraftBlock implements Block {
      @Override
      public Collection<ItemStack> getDrops(ItemStack item, Entity entity) {
          net.minecraft.world.level.block.state.BlockState state = this.getNMS();
@@ -495,7 +495,7 @@ index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d
          net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
  
          // Modelled off Player#hasCorrectToolForDrops
-@@ -644,6 +694,11 @@ public class CraftBlock implements Block {
+@@ -650,6 +700,11 @@ public class CraftBlock implements Block {
  
      @Override
      public RayTraceResult rayTrace(Location start, Vector direction, double maxDistance, FluidCollisionMode fluidCollisionMode) {
@@ -507,7 +507,7 @@ index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d
          Preconditions.checkArgument(start != null, "Location start cannot be null");
          Preconditions.checkArgument(this.getWorld().equals(start.getWorld()), "Location start cannot be a different world");
          start.checkFinite();
-@@ -685,6 +740,11 @@ public class CraftBlock implements Block {
+@@ -691,6 +746,11 @@ public class CraftBlock implements Block {
  
      @Override
      public boolean canPlace(BlockData data) {
@@ -519,7 +519,7 @@ index a4d5c65edc1db59f3486ce5d3757cc306211a54b..3609e71f382f80017acb91c5e286008d
          Preconditions.checkArgument(data != null, "BlockData cannot be null");
          net.minecraft.world.level.block.state.BlockState iblockdata = ((CraftBlockData) data).getState();
          net.minecraft.world.level.Level world = this.world.getMinecraftWorld();
-@@ -724,6 +784,11 @@ public class CraftBlock implements Block {
+@@ -730,6 +790,11 @@ public class CraftBlock implements Block {
  
      @Override
      public void tick() {
