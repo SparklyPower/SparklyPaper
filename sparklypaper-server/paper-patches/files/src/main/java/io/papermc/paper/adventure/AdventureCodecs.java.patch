@@ -1,0 +1,11 @@
+--- a/src/main/java/io/papermc/paper/adventure/AdventureCodecs.java
++++ b/src/main/java/io/papermc/paper/adventure/AdventureCodecs.java
+@@ -96,7 +_,7 @@
+         if (textColor instanceof NamedTextColor named) {
+             return NamedTextColor.NAMES.keyOrThrow(named);
+         } else {
+-            return textColor.asHexString();
++            return textColor.asHexString().toUpperCase(java.util.Locale.ROOT); // SparklyPaper - (Adventure Bug #1275) Fix item desyncs with items that have custom colors
+         }
+     });
+ 
