@@ -1,6 +1,6 @@
 --- a/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
 +++ b/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
-@@ -1220,6 +_,7 @@
+@@ -1230,6 +_,7 @@
              ret.setString("id", this.id);
              ret.setInt("count", this.count);
              if (!this.tag.isEmpty()) {

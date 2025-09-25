@@ -1,7 +1,7 @@
 --- a/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
 +++ b/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
-@@ -22,7 +_,7 @@
-     private static final double LIMIT = 3.9;
+@@ -20,7 +_,7 @@
+     );
      private final int id;
      private final UUID uuid;
 -    private final EntityType<?> type;
@@ -9,7 +9,7 @@
      private final double x;
      private final double y;
      private final double z;
-@@ -179,6 +_,32 @@
+@@ -161,6 +_,32 @@
      public float getYHeadRot() {
          return Mth.unpackDegrees(this.yHeadRot);
      }

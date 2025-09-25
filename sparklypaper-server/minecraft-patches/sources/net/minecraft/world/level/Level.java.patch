@@ -1,23 +1,23 @@
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -106,7 +_,7 @@
-     public static final int TICKS_PER_DAY = 24000;
-     public static final int MAX_ENTITY_SPAWN_Y = 20000000;
-     public static final int MIN_ENTITY_SPAWN_Y = -20000000;
+@@ -111,7 +_,7 @@
+         .add(new ExplosionParticleInfo(ParticleTypes.POOF, 0.5F, 1.0F))
+         .add(new ExplosionParticleInfo(ParticleTypes.SMOKE, 1.0F, 1.0F))
+         .build();
 -    public final List<TickingBlockEntity> blockEntityTickers = Lists.newArrayList();
 +    public final net.sparklypower.sparklypaper.BlockEntityTickersList blockEntityTickers = new net.sparklypower.sparklypaper.BlockEntityTickersList(); // SparklyPaper - optimize block entity removals
-     protected final NeighborUpdater neighborUpdater;
+     protected final CollectingNeighborUpdater neighborUpdater;
      private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
      private boolean tickingBlockEntities;
-@@ -134,6 +_,7 @@
+@@ -139,6 +_,7 @@
  
      // CraftBukkit start
      public final io.papermc.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
 +    public net.sparklypower.sparklypaper.configs.SparklyPaperConfig.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper - config files
      private final CraftWorld world;
-     public boolean pvpMode;
+     public net.kyori.adventure.util.TriState pvpMode = net.kyori.adventure.util.TriState.NOT_SET;
      public @Nullable org.bukkit.generator.ChunkGenerator generator;
-@@ -840,6 +_,7 @@
+@@ -845,6 +_,7 @@
          // Paper end - getblock optimisations - cache world height/sections
          this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) levelData).getLevelName()); // Spigot
          this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
@@ -25,7 +25,7 @@
          this.generator = generator;
          this.world = new CraftWorld((ServerLevel) this, generator, biomeProvider, environment);
  
-@@ -1455,13 +_,11 @@
+@@ -1406,13 +_,11 @@
          boolean runsNormally = this.tickRateManager().runsNormally();
  
          int tickedEntities = 0; // Paper - rewrite chunk system
@@ -40,7 +40,7 @@
              } else if (runsNormally && this.shouldTickBlocksAt(tickingBlockEntity.getPos())) {
                  tickingBlockEntity.tick();
                  // Paper start - rewrite chunk system
-@@ -1471,7 +_,7 @@
+@@ -1422,7 +_,7 @@
                  // Paper end - rewrite chunk system
              }
          }
@@ -48,4 +48,4 @@
 +        this.blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
  
          this.tickingBlockEntities = false;
-         profilerFiller.pop();
+         this.spigotConfig.currentPrimedTnt = 0; // Spigot

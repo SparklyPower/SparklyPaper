@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -423,6 +_,7 @@
+@@ -424,6 +_,7 @@
          } else {
              Direction opposite = blockEntity.facing.getOpposite();
              if (isFullContainer(attachedContainer, opposite)) {
