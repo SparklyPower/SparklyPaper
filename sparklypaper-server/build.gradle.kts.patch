@@ -4,8 +4,8 @@
  
  plugins {
      `java-library`
-+    kotlin("jvm") version "2.1.21"
-+    kotlin("plugin.serialization") version "2.1.21"
++    kotlin("jvm") version "2.2.20"
++    kotlin("plugin.serialization") version "2.2.20"
      `maven-publish`
      idea
      id("io.papermc.paperweight.core")
@@ -55,8 +55,8 @@
 +    // SparklyPaper start
 +    implementation(project(":sparklypaper-api"))
 +    implementation(kotlin("reflect"))
-+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-+    implementation("com.charleskorn.kaml:kaml:0.78.0")
++    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
++    implementation("com.charleskorn.kaml:kaml:0.97.0")
 +    // SparklyPaper end
      implementation("ca.spottedleaf:concurrentutil:0.0.5")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
