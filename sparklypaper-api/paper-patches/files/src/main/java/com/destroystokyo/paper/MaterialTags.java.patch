@@ -1,6 +1,6 @@
 --- a/src/main/java/com/destroystokyo/paper/MaterialTags.java
 +++ b/src/main/java/com/destroystokyo/paper/MaterialTags.java
-@@ -83,6 +_,7 @@
+@@ -99,6 +_,7 @@
       */
      public static final MaterialSetTag CONCRETES = new MaterialSetTag(keyFor("concretes"))
          .endsWith("_CONCRETE")
@@ -8,7 +8,7 @@
          .ensureSize("CONCRETES", 16).lock();
  
      /**
-@@ -161,6 +_,7 @@
+@@ -181,6 +_,7 @@
          .endsWith("TERRACOTTA")
          .not(Material.TERRACOTTA)
          .notEndsWith("GLAZED_TERRACOTTA")
@@ -16,7 +16,7 @@
          .ensureSize("STAINED_TERRACOTTA", 16).lock();
  
      /**
-@@ -168,6 +_,7 @@
+@@ -188,6 +_,7 @@
       */
      public static final MaterialSetTag TERRACOTTA = new MaterialSetTag(keyFor("terracotta"))
          .endsWith("TERRACOTTA")

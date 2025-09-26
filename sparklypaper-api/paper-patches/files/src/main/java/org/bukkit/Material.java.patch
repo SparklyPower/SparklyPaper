@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -1718,6 +_,16 @@
+@@ -1791,6 +_,16 @@
      ZOMBIE_HEAD(-1, Skull.class),
      ZOMBIE_WALL_HEAD(-1, WallSkull.class),
      // End generate - Blocks
