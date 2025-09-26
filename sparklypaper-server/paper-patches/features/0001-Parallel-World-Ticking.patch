@@ -294,7 +294,7 @@ index 69cdd304d255d52c9b7dc9b6a33ffdb630b79abe..636ec7172e9b535f7b4f95b4a9743217
 +    // SparklyPaper end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 48f6f41d59983e52b9db41a7555423d6e9a416d4..c85d682b85830f1c70d0bba192f8a0275c5dba49 100644
+index 48f6f41d59983e52b9db41a7555423d6e9a416d4..df4ba7ce478ed64f3dbd73e1ff4272fba6716c8f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -472,6 +472,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
@@ -345,14 +345,14 @@ index 48f6f41d59983e52b9db41a7555423d6e9a416d4..c85d682b85830f1c70d0bba192f8a027
          warnUnsafeChunk("getting a faraway chunk", x >> 4, z >> 4); // Paper
          // Transient load for this tick
          return this.world.getChunk(x >> 4, z >> 4).getHeight(CraftHeightMap.toNMS(heightMap), x, z);
-@@ -915,6 +921,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
- 
+@@ -923,6 +929,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      @Override
-     public void setBiome(int x, int z, Biome bio) {
+     public void setBiome(int x, int y, int z, Holder<net.minecraft.world.level.biome.Biome> bb) {
+         BlockPos pos = new BlockPos(x, 0, z);
 +        ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.world, pos, "Cannot retrieve chunk asynchronously"); // SparklyPaper - parallel world ticking (additional concurrency issues logs)
-         for (int y = this.getMinHeight(); y < this.getMaxHeight(); y++) {
-             this.setBiome(x, y, z, bio);
-         }
+         if (this.world.hasChunkAt(pos)) {
+             net.minecraft.world.level.chunk.LevelChunk chunk = this.world.getChunkAt(pos);
+ 
 @@ -1902,6 +1909,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
