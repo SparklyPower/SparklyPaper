@@ -5,7 +5,7 @@ Subject: [PATCH] Parallel World Ticking
 
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-index 80f13315e8c7c0e3c82ab98f92387f56bb3b6481..d1cef62d7003f675d902c1c88ee42422ec1a8404 100644
+index e03faa94df6c77ab4f3f5d9ffe107220387a0dde..44fb3f9baf5f5cb5226b975d76e2700c71a4f072 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 @@ -1124,7 +1124,7 @@ public final class ChunkHolderManager {
@@ -57,18 +57,18 @@ index 703a75c7c6cd05a95afb630973250898dbc7223d..1bc84d3aa569222d20bc3c05b99de759
                      List<org.bukkit.block.BlockState> states = new java.util.ArrayList<>(level.capturedBlockStates.values());
                      level.capturedBlockStates.clear();
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 4607ba3fbc327fd1f6a7701af05cd18d6e4107e6..e34a8bea43d1aa82081b21c468d3b8315d77c151 100644
+index f585af90e6311def989590a7787184af870c295e..0d49a8ee8863df568a679cf8a69b6c6a121e7caf 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -310,6 +310,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-     public boolean isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
-     private final Set<String> pluginsBlockingSleep = new java.util.HashSet<>(); // Paper - API to allow/disallow tick sleeping
-     public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
+@@ -346,6 +346,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         };
+     }
+     // Paper end - improve tick loop
 +    public java.util.concurrent.Semaphore serverLevelTickingSemaphore = null; // SparklyPaper - parallel world ticking
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> threadFunction) {
          ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry.init(); // Paper - rewrite data converter system
-@@ -1642,6 +1643,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1744,6 +1745,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
  
          this.isIteratingOverLevels = true; // Paper - Throw exception on world create while being ticked
@@ -78,12 +78,20 @@ index 4607ba3fbc327fd1f6a7701af05cd18d6e4107e6..e34a8bea43d1aa82081b21c468d3b831
          for (ServerLevel serverLevel : this.getAllLevels()) {
              serverLevel.hasPhysicsEvent = org.bukkit.event.block.BlockPhysicsEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - BlockPhysicsEvent
              serverLevel.hasEntityMoveEvent = io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - Add EntityMoveEvent
-@@ -1658,18 +1662,45 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1760,26 +1764,45 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              profilerFiller.push("tick");
  
 -            try {
+-                long i = Util.getNanos(); // SparklyPaper - track world's MSPT
 -                serverLevel.tick(hasTimeLeft);
+-                // SparklyPaper start - track world's MSPT
+-                long j = Util.getNanos() - i;
+-                // These are from the "tickServer" function
+-                serverLevel.tickTimes5s.add(this.tickCount, j);
+-                serverLevel.tickTimes10s.add(this.tickCount, j);
+-                serverLevel.tickTimes1m.add(this.tickCount, j);
+-                // SparklyPaper end
 -            } catch (Throwable var7) {
 -                CrashReport crashReport = CrashReport.forThrowable(var7, "Exception ticking world");
 -                serverLevel.fillReportDetails(crashReport);
@@ -104,7 +112,7 @@ index 4607ba3fbc327fd1f6a7701af05cd18d6e4107e6..e34a8bea43d1aa82081b21c468d3b831
 +                        // These are from the "tickServer" function
 +                        serverLevel.tickTimes5s.add(this.tickCount, j);
 +                        serverLevel.tickTimes10s.add(this.tickCount, j);
-+                        serverLevel.tickTimes60s.add(this.tickCount, j);
++                        serverLevel.tickTimes1m.add(this.tickCount, j);
 +                        // SparklyPaper end
 +                    } catch (Throwable throwable) {
 +                        CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
@@ -131,7 +139,7 @@ index 4607ba3fbc327fd1f6a7701af05cd18d6e4107e6..e34a8bea43d1aa82081b21c468d3b831
          this.isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
  
          profilerFiller.popPush("connection");
-@@ -1772,6 +1803,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1882,6 +1905,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          Map<ResourceKey<Level>, ServerLevel> oldLevels = this.levels;
          Map<ResourceKey<Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
          newLevels.remove(level.dimension());
@@ -168,7 +176,7 @@ index 413f0673557b9e3f9177d15e9bef61bded209e34..db9c312c13c971e75fc4afeff5159564
              }
          }
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 6620678f5d51379c376b425302a98200283ab84f..25910e2bbe55852d6cd5f1338cec4041356e96b8 100644
+index dbd0bfb29a27d1abd19db38cda280e6fdbb98cac..4bb75621a71f0993962665d191f424a62c8943bb 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -188,7 +188,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -241,7 +249,7 @@ index 6620678f5d51379c376b425302a98200283ab84f..25910e2bbe55852d6cd5f1338cec4041
          // Paper start - extra debug info
          if (entity.valid) {
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 2a10190f00d406b4fc747ef207a399f6d3fa4c08..cb42ab07921b1ddc0411cf7c64548a1c6be2b6d1 100644
+index 00c77be8c02e5603bbb4207804d712a77994658b..669db63497387a80291194806873ad9f1f320099 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -472,6 +472,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc

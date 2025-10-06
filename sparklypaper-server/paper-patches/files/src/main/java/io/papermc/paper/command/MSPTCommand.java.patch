@@ -1,6 +1,6 @@
 --- a/src/main/java/io/papermc/paper/command/MSPTCommand.java
 +++ b/src/main/java/io/papermc/paper/command/MSPTCommand.java
-@@ -78,6 +_,46 @@
+@@ -82,6 +_,46 @@
                  )
              )
          );
@@ -31,7 +31,7 @@
 +            List<Component> worldTimes = new ArrayList<>();
 +            worldTimes.addAll(eval(serverLevel.tickTimes5s.getTimes()));
 +            worldTimes.addAll(eval(serverLevel.tickTimes10s.getTimes()));
-+            worldTimes.addAll(eval(serverLevel.tickTimes60s.getTimes()));
++            worldTimes.addAll(eval(serverLevel.tickTimes1m.getTimes()));
 +
 +            sender.sendMessage(text().content("◴ " + serverLevel.getWorld().getName() + ": ").color(GOLD)
 +                .append(text().color(GRAY)
@@ -47,3 +47,27 @@
          return true;
      }
  
+@@ -92,6 +_,23 @@
+         double maxD = reportData == null ? 0.0 : reportData.timePerTickData().segmentAll().greatest() * 1.0E-6D;
+         return Arrays.asList(getColor(avgD), getColor(minD), getColor(maxD));
+     }
++
++    // SparklyPaper start - track world's MSPT
++    private static List<Component> eval(long[] times) {
++        long min = Integer.MAX_VALUE;
++        long max = 0L;
++        long total = 0L;
++        for (long value : times) {
++            if (value > 0L && value < min) min = value;
++            if (value > max) max = value;
++            total += value;
++        }
++        double avgD = ((double) total / (double) times.length) * 1.0E-6D;
++        double minD = ((double) min) * 1.0E-6D;
++        double maxD = ((double) max) * 1.0E-6D;
++        return Arrays.asList(getColor(avgD), getColor(minD), getColor(maxD));
++    }
++    // SparklyPaper end
+ 
+     private static Component getColor(double avg) {
+         return text(ONE_DECIMAL_PLACES.get().format(avg), avg >= 50 ? RED : avg >= 40 ? YELLOW : GREEN);

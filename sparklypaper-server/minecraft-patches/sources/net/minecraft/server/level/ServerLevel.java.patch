@@ -7,7 +7,7 @@
 +    // SparklyPaper start - track world's MSPT
 +    public final MinecraftServer.TickTimes tickTimes5s = new MinecraftServer.TickTimes(100);
 +    public final MinecraftServer.TickTimes tickTimes10s = new MinecraftServer.TickTimes(200);
-+    public final MinecraftServer.TickTimes tickTimes60s = new MinecraftServer.TickTimes(1200);
++    public final MinecraftServer.TickTimes tickTimes1m = new MinecraftServer.TickTimes(1200);
 +    // SparklyPaper end
 +
      public ServerLevel(

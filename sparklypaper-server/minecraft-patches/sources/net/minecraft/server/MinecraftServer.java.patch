@@ -1,0 +1,18 @@
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -1761,7 +_,15 @@
+             profilerFiller.push("tick");
+ 
+             try {
++                long i = Util.getNanos(); // SparklyPaper - track world's MSPT
+                 serverLevel.tick(hasTimeLeft);
++                // SparklyPaper start - track world's MSPT
++                long j = Util.getNanos() - i;
++                // These are from the "tickServer" function
++                serverLevel.tickTimes5s.add(this.tickCount, j);
++                serverLevel.tickTimes10s.add(this.tickCount, j);
++                serverLevel.tickTimes1m.add(this.tickCount, j);
++                // SparklyPaper end
+             } catch (Throwable var7) {
+                 CrashReport crashReport = CrashReport.forThrowable(var7, "Exception ticking world");
+                 serverLevel.fillReportDetails(crashReport);
