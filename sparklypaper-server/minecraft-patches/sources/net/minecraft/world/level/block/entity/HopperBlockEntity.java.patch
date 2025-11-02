@@ -1,5 +1,69 @@
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -228,7 +_,15 @@
+         for (int i = 0; i < hopper.getContainerSize(); ++i) {
+             final ItemStack item = hopper.getItem(i);
+             if (!item.isEmpty()) {
++                // SparklyPaper start - InventoryPreMoveItemEvent
++                if (!foundItem) {
++                    // Only call it once per push, instead of per item
++                    if (!callPushPreMoveEvent(destination, hopper))
++                        return false;
++                }
++                // SparklyPaper end
+                 foundItem = true;
++
+                 ItemStack origItemStack = item;
+                 ItemStack movedItem = origItemStack;
+ 
+@@ -268,6 +_,10 @@
+     }
+ 
+     private static boolean hopperPull(final Level level, final Hopper hopper, final Container container, ItemStack origItemStack, final int i) {
++        // SparklyPaper start - InventoryPreMoveItemEvent
++        if (!callPullPreMoveEvent(hopper, container))
++            return true;
++        // SparklyPaper end
+         ItemStack movedItem = origItemStack;
+         final int originalItemCount = origItemStack.getCount();
+         final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
+@@ -357,6 +_,36 @@
+         }
+     }
+ 
++    // SparklyPaper start - InventoryPreMoveItemEvent
++    private static boolean callPushPreMoveEvent(Container destination, HopperBlockEntity hopper) {
++        final org.bukkit.inventory.Inventory destinationInventory = getInventory(destination);
++        final net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent event = new net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent(
++            hopper.getOwner(false).getInventory(),
++            destinationInventory,
++            true
++        );
++        final boolean result = event.callEvent();
++        if (!result) {
++            applyCooldown(hopper);
++        }
++
++        return result;
++    }
++
++    private static boolean callPullPreMoveEvent(final Hopper hopper, final Container container) {
++        final org.bukkit.inventory.Inventory sourceInventory = getInventory(container);
++        final org.bukkit.inventory.Inventory destination = getInventory(hopper);
++
++        // Mirror is safe as no plugins ever use this item
++        final net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent event = new net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent(sourceInventory, destination, false);
++        final boolean result = event.callEvent();
++        if (!result)
++            applyCooldown(hopper);
++
++        return result;
++    }
++    // SparklyPaper end
++
+     private static org.bukkit.inventory.Inventory getInventory(final Container container) {
+         final org.bukkit.inventory.Inventory sourceInventory;
+         if (container instanceof net.minecraft.world.CompoundContainer compoundContainer) {
 @@ -424,6 +_,7 @@
          } else {
              Direction opposite = blockEntity.facing.getOpposite();
