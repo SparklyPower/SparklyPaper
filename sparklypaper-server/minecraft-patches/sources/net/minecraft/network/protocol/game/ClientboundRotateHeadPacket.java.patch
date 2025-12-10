@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
 +++ b/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
-@@ -20,6 +_,13 @@
+@@ -21,6 +_,13 @@
          this.yHeadRot = yHeadRot;
      }
  

@@ -9,7 +9,7 @@
      `maven-publish`
      idea
      id("io.papermc.paperweight.core")
-@@ -20,6 +_,16 @@
+@@ -19,6 +_,16 @@
  }
  
  paperweight {
@@ -61,7 +61,7 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.7")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -192,9 +_,14 @@
+@@ -193,9 +_,14 @@
          val build = System.getenv("BUILD_NUMBER") ?: null
          val buildTime = providers.environmentVariable("BUILD_STARTED_AT").map(Instant::parse).orElse(Instant.EPOCH).get()
          val gitHash = git.exec(providers, "rev-parse", "--short=7", "HEAD").get().trim()
@@ -77,7 +77,7 @@
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "Paper",
-@@ -203,8 +_,8 @@
+@@ -204,8 +_,8 @@
              "Specification-Title" to "Paper",
              "Specification-Version" to project.version,
              "Specification-Vendor" to "Paper Team",
@@ -88,7 +88,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -263,7 +_,7 @@
+@@ -264,7 +_,7 @@
      jvmArgumentProviders.add(provider)
  }
  

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/Blocks.java
 +++ b/net/minecraft/world/level/block/Blocks.java
-@@ -7060,6 +_,52 @@
+@@ -7123,6 +_,52 @@
              .sound(SoundType.SWEET_BERRY_BUSH)
              .pushReaction(PushReaction.DESTROY)
      );

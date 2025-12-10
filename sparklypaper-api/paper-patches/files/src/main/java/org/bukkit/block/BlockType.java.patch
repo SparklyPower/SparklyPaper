@@ -1,0 +1,19 @@
+--- a/src/main/java/org/bukkit/block/BlockType.java
++++ b/src/main/java/org/bukkit/block/BlockType.java
+@@ -2525,6 +_,16 @@
+     BlockType.Typed<WallSkull> ZOMBIE_WALL_HEAD = getBlockType("zombie_wall_head");
+     // End generate - BlockType
+     //</editor-fold>
++    
++    // SparklyPaper start - SparklyPower Survival custom blocks
++    BlockType.Typed<BlockData> SPARKLYPOWER_RAINBOW_WOOL = getBlockType("sparklypower_rainbow_wool");
++    BlockType.Typed<BlockData> SPARKLYPOWER_RAINBOW_CONCRETE = getBlockType("sparklypower_rainbow_concrete");
++    BlockType.Typed<BlockData> SPARKLYPOWER_RAINBOW_TERRACOTTA = getBlockType("sparklypower_rainbow_terracotta");
++    BlockType.Typed<BlockData> SPARKLYPOWER_ASPHALT_SERVER = getBlockType("sparklypower_asphalt_server");
++    BlockType.Typed<Slab> SPARKLYPOWER_ASPHALT_SERVER_SLAB = getBlockType("sparklypower_asphalt_server_slab");
++    BlockType.Typed<BlockData> SPARKLYPOWER_ASPHALT_PLAYER = getBlockType("sparklypower_asphalt_player");
++    BlockType.Typed<Slab> SPARKLYPOWER_ASPHALT_PLAYER_SLAB = getBlockType("sparklypower_asphalt_player_slab");
++    // SparklyPaper end
+ 
+     @SuppressWarnings("unchecked")
+     private static <B extends BlockType> B getBlockType(@KeyPattern.Value final String key) {

@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -1308,6 +_,23 @@
+@@ -1432,6 +_,23 @@
          Bukkit.getPluginManager().callEvent(crafterCraftEvent);
          return crafterCraftEvent;
      }

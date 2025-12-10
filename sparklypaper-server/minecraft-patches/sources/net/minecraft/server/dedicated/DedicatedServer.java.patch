@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -260,6 +_,15 @@
+@@ -257,6 +_,15 @@
          org.spigotmc.SpigotConfig.registerCommands();
          // Spigot end
          io.papermc.paper.util.ObfHelper.INSTANCE.getClass(); // Paper - load mappings for stacktrace deobf and etc.
