@@ -3,13 +3,10 @@ name: Patch and Build
 on:
   push:
     branches: [ "**" ]
-  pull_request:
 
 jobs:
   build:
-    # Only run on PRs if the source branch is on someone else's repo
-    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v3
