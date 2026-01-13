@@ -1,0 +1,15 @@
+--- a/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java
++++ b/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java
+@@ -22,6 +_,12 @@
+ 
+     @Override
+     public void apply(ServerLevel level, int enchantmentLevel, EnchantedItemInUse item, Entity entity, Vec3 origin) {
++        // SparklyPaper start - Add EntityApplyEnchantmentImpulseEvent
++        net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent event = new net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(item.itemStack()));
++        if (!event.callEvent())
++            return;
++        // SparklyPaper end
++
+         Vec3 lookAngle = entity.getLookAngle();
+         Vec3 vec3 = lookAngle.addLocalCoordinates(this.direction).multiply(this.coordinateScale).scale(this.magnitude.calculate(enchantmentLevel));
+         entity.addDeltaMovement(vec3);
