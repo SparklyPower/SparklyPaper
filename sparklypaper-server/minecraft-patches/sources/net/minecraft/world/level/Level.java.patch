@@ -15,9 +15,9 @@
      public final io.papermc.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
 +    public net.sparklypower.sparklypaper.configs.SparklyPaperConfig.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper - config files
      private final CraftWorld world;
-     public net.kyori.adventure.util.TriState pvpMode = net.kyori.adventure.util.TriState.NOT_SET;
      public org.bukkit.generator.@Nullable ChunkGenerator generator;
-@@ -846,6 +_,7 @@
+ 
+@@ -845,6 +_,7 @@
          // Paper end - getblock optimisations - cache world height/sections
          this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) levelData).getLevelName()); // Spigot
          this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
@@ -25,7 +25,7 @@
          this.generator = generator;
          this.world = new CraftWorld((ServerLevel) this, generator, biomeProvider, environment);
  
-@@ -1402,13 +_,11 @@
+@@ -1401,13 +_,11 @@
          boolean runsNormally = this.tickRateManager().runsNormally();
  
          int tickedEntities = 0; // Paper - rewrite chunk system
@@ -40,7 +40,7 @@
              } else if (runsNormally && this.shouldTickBlocksAt(tickingBlockEntity.getPos())) {
                  tickingBlockEntity.tick();
                  // Paper start - rewrite chunk system
-@@ -1418,7 +_,7 @@
+@@ -1417,7 +_,7 @@
                  // Paper end - rewrite chunk system
              }
          }

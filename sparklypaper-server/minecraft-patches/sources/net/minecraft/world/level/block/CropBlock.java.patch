@@ -59,7 +59,7 @@
                  // Spigot start
                  int modifier = 100;
 @@ -101,6 +_,8 @@
-                     org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), 2); // CraftBukkit
+                     org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), Block.UPDATE_CLIENTS); // CraftBukkit
                  }
              }
 +            }
