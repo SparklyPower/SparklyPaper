@@ -16,4 +16,4 @@
 +    // SparklyPaper end
      // ----- Legacy Separator -----
      @Deprecated(since = "1.13", forRemoval = true)
-     LEGACY_AIR(0, 0),
+     LEGACY_AIR(0),
