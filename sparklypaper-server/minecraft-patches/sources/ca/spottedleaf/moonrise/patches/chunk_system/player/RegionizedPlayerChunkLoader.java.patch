@@ -1,0 +1,42 @@
+--- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
++++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
+@@ -563,26 +_,26 @@
+         }
+ 
+         private double getMaxChunkLoadRate() {
+-            final double configRate = PlatformHooks.get().configPlayerMaxLoadRate();
++            final double configRate = this.player.chunkLoadRateOverride != null ? this.player.chunkLoadRateOverride : PlatformHooks.get().configPlayerMaxLoadRate(); // SparklyPaper - per-player chunk rate overrides
+ 
+             return configRate <= 0.0 || configRate > (double)MAX_RATE ? (double)MAX_RATE : Math.max(1.0, configRate);
+         }
+ 
+         private double getMaxChunkGenRate() {
+-            final double configRate = PlatformHooks.get().configPlayerMaxGenRate();
++            final double configRate = this.player.chunkGenRateOverride != null ? this.player.chunkGenRateOverride : PlatformHooks.get().configPlayerMaxGenRate(); // SparklyPaper - per-player chunk rate overrides
+ 
+             return configRate <= 0.0 || configRate > (double)MAX_RATE ? (double)MAX_RATE : Math.max(1.0, configRate);
+         }
+ 
+         private double getMaxChunkSendRate() {
+-            final double configRate = PlatformHooks.get().configPlayerMaxSendRate();
++            final double configRate = this.player.chunkSendRateOverride != null ? this.player.chunkSendRateOverride : PlatformHooks.get().configPlayerMaxSendRate(); // SparklyPaper - per-player chunk rate overrides
+ 
+             return configRate <= 0.0 || configRate > (double)MAX_RATE ? (double)MAX_RATE : Math.max(1.0, configRate);
+         }
+ 
+         private long getMaxChunkLoads() {
+             final long radiusChunks = (2L * this.lastLoadDistance + 1L) * (2L * this.lastLoadDistance + 1L);
+-            long configLimit = (long)PlatformHooks.get().configPlayerMaxConcurrentLoads();
++            long configLimit = this.player.maxConcurrentChunkLoadsOverride != null ? this.player.maxConcurrentChunkLoadsOverride : (long)PlatformHooks.get().configPlayerMaxConcurrentLoads(); // SparklyPaper - per-player chunk rate overrides
+             if (configLimit == 0L) {
+                 // by default, only allow 1/5th of the chunks in the view distance to be concurrently active
+                 configLimit = Math.max(5L, radiusChunks / 5L);
+@@ -596,7 +_,7 @@
+ 
+         private long getMaxChunkGenerates() {
+             final long radiusChunks = (2L * this.lastLoadDistance + 1L) * (2L * this.lastLoadDistance + 1L);
+-            long configLimit = (long)PlatformHooks.get().configPlayerMaxConcurrentGens();
++            long configLimit = this.player.maxConcurrentChunkGeneratesOverride != null ? this.player.maxConcurrentChunkGeneratesOverride : (long)PlatformHooks.get().configPlayerMaxConcurrentGens(); // SparklyPaper - per-player chunk rate overrides
+             if (configLimit == 0L) {
+                 // by default, only allow 1/5th of the chunks in the view distance to be concurrently active
+                 configLimit = Math.max(5L, radiusChunks / 5L);

@@ -1,0 +1,59 @@
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -3360,4 +_,56 @@
+             entity.remove();
+         }
+     }
++
++    // SparklyPaper start - per-player chunk rate overrides
++    @Override
++    public void setChunkLoadRateOverride(@org.jetbrains.annotations.Nullable Double rate) {
++        this.getHandle().chunkLoadRateOverride = rate;
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable Double getChunkLoadRateOverride() {
++        return this.getHandle().chunkLoadRateOverride;
++    }
++
++    @Override
++    public void setChunkGenRateOverride(@org.jetbrains.annotations.Nullable Double rate) {
++        this.getHandle().chunkGenRateOverride = rate;
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable Double getChunkGenRateOverride() {
++        return this.getHandle().chunkGenRateOverride;
++    }
++
++    @Override
++    public void setChunkSendRateOverride(@org.jetbrains.annotations.Nullable Double rate) {
++        this.getHandle().chunkSendRateOverride = rate;
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable Double getChunkSendRateOverride() {
++        return this.getHandle().chunkSendRateOverride;
++    }
++
++    @Override
++    public void setMaxConcurrentChunkLoadsOverride(@org.jetbrains.annotations.Nullable Long limit) {
++        this.getHandle().maxConcurrentChunkLoadsOverride = limit;
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable Long getMaxConcurrentChunkLoadsOverride() {
++        return this.getHandle().maxConcurrentChunkLoadsOverride;
++    }
++
++    @Override
++    public void setMaxConcurrentChunkGeneratesOverride(@org.jetbrains.annotations.Nullable Long limit) {
++        this.getHandle().maxConcurrentChunkGeneratesOverride = limit;
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable Long getMaxConcurrentChunkGeneratesOverride() {
++        return this.getHandle().maxConcurrentChunkGeneratesOverride;
++    }
++    // SparklyPaper end
+ }

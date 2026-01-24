@@ -1,0 +1,84 @@
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -4004,4 +_,81 @@
+      */
+     @ApiStatus.Experimental
+     PlayerGameConnection getConnection();
++
++    // SparklyPaper start - per-player chunk rate overrides
++    /**
++     * Sets the per-player chunk load rate override.
++     * If set to null, uses the global configuration.
++     *
++     * @param rate the chunks per second to load, or null for default
++     */
++    void setChunkLoadRateOverride(@Nullable Double rate);
++
++    /**
++     * Gets the per-player chunk load rate override.
++     *
++     * @return the override rate, or null if using global configuration
++     */
++    @Nullable Double getChunkLoadRateOverride();
++
++    /**
++     * Sets the per-player chunk generation rate override.
++     * If set to null, uses the global configuration.
++     *
++     * @param rate the chunks per second to generate, or null for default
++     */
++    void setChunkGenRateOverride(@Nullable Double rate);
++
++    /**
++     * Gets the per-player chunk generation rate override.
++     *
++     * @return the override rate, or null if using global configuration
++     */
++    @Nullable Double getChunkGenRateOverride();
++
++    /**
++     * Sets the per-player chunk send rate override.
++     * If set to null, uses the global configuration.
++     *
++     * @param rate the chunks per second to send, or null for default
++     */
++    void setChunkSendRateOverride(@Nullable Double rate);
++
++    /**
++     * Gets the per-player chunk send rate override.
++     *
++     * @return the override rate, or null if using global configuration
++     */
++    @Nullable Double getChunkSendRateOverride();
++
++    /**
++     * Sets the per-player max concurrent chunk loads override.
++     * If set to null, uses the global configuration.
++     *
++     * @param limit the maximum concurrent chunk loads, or null for default
++     */
++    void setMaxConcurrentChunkLoadsOverride(@Nullable Long limit);
++
++    /**
++     * Gets the per-player max concurrent chunk loads override.
++     *
++     * @return the override limit, or null if using global configuration
++     */
++    @Nullable Long getMaxConcurrentChunkLoadsOverride();
++
++    /**
++     * Sets the per-player max concurrent chunk generates override.
++     * If set to null, uses the global configuration.
++     *
++     * @param limit the maximum concurrent chunk generates, or null for default
++     */
++    void setMaxConcurrentChunkGeneratesOverride(@Nullable Long limit);
++
++    /**
++     * Gets the per-player max concurrent chunk generates override.
++     *
++     * @return the override limit, or null if using global configuration
++     */
++    @Nullable Long getMaxConcurrentChunkGeneratesOverride();
++    // SparklyPaper end
+ }

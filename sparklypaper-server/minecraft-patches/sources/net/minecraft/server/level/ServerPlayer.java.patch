@@ -1,0 +1,16 @@
+--- a/net/minecraft/server/level/ServerPlayer.java
++++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -463,6 +_,13 @@
+         return this.viewDistanceHolder;
+     }
+     // Paper end - rewrite chunk system
++    // SparklyPaper start - per-player chunk rate overrides
++    public @Nullable Double chunkLoadRateOverride = null;
++    public @Nullable Double chunkGenRateOverride = null;
++    public @Nullable Double chunkSendRateOverride = null;
++    public @Nullable Long maxConcurrentChunkLoadsOverride = null;
++    public @Nullable Long maxConcurrentChunkGeneratesOverride = null;
++    // SparklyPaper end
+ 
+     public ServerPlayer(MinecraftServer server, ServerLevel level, GameProfile gameProfile, ClientInformation clientInformation) {
+         super(level, gameProfile);
