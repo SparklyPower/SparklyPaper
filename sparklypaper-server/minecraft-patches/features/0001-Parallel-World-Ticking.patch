@@ -433,19 +433,18 @@ index 471e558a609c9e457720660b90fe57322b860461..0c8d2de1702824cd44e1e40bac94325b
              if (isLocatorBarEnabledFor(player)) {
                  if (!connection.isBroken()) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 3bf618f1d756bad7755a87803132bd731e7c41be..59e8b6268ceda9d60f2195292711329056904526 100644
+index 3bf618f1d756bad7755a87803132bd731e7c41be..8c4c8b5ffc8cf4a4c6dd0cf5cc1038851e063294 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -844,7 +844,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
-     // CraftBukkit start
-     public void postTick() {
-         // No clean way to break out of ticking once the entity has been copied to a new world, so instead we move the portalling later in the tick cycle
--        if (!(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities
-+        if (false && !(this instanceof ServerPlayer) && this.isAlive()) { // Paper - don't attempt to teleport dead entities // SparklyPaper - parallel world ticking (see issue #9, this is executed in the server level tick for non-player entities)
-             this.handlePortal();
-         }
+@@ -3486,6 +3486,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
      }
-@@ -4081,6 +4081,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
+ 
+     protected void handlePortal() {
++        if (true) return; // SparklyPaper - parallel world ticking (see issue #9, this is executed in the server level tick for non-player entities)
+         if (this.level() instanceof ServerLevel serverLevel) {
+             this.processPortalCooldown();
+             if (this.portalProcess != null) {
+@@ -4081,6 +4082,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
      }
  
      private @Nullable Entity teleportCrossDimension(ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition teleportTransition) {
