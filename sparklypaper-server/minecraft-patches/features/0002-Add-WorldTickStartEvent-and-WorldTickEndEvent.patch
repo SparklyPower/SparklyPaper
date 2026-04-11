@@ -5,22 +5,22 @@ Subject: [PATCH] Add WorldTickStartEvent and WorldTickEndEvent
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index e1c60bccc68c724ce61a790fc9e23f875617a52c..a12171f1d9ecbccfe154194f8710db469c95eda4 100644
+index 8f402f184d20e0381f6c33c5b909935f3374d969..66b1d3799e40ece397dede2164d1a35493a7dc63 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1831,11 +1831,15 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1851,11 +1851,15 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                          ca.spottedleaf.moonrise.common.util.TickThread.ServerLevelTickThread currentThread = (ca.spottedleaf.moonrise.common.util.TickThread.ServerLevelTickThread) Thread.currentThread();
-                         currentThread.currentlyTickingServerLevel = serverLevel;
+                         currentThread.currentlyTickingServerLevel = level;
  
-+                        new net.sparklypower.sparklypaper.event.world.WorldTickStartEvent(serverLevel.getWorld(), this.tickCount).callEvent();
++                        new net.sparklypower.sparklypaper.event.world.WorldTickStartEvent(level.getWorld(), this.tickCount).callEvent();
 +
                          long i = Util.getNanos(); // SparklyPaper - track world's MSPT
-                         serverLevel.tick(hasTimeLeft);
+                         level.tick(haveTime);
                          // SparklyPaper start - track world's MSPT
                          long j = Util.getNanos() - i;
  
-+                        new net.sparklypower.sparklypaper.event.world.WorldTickEndEvent(serverLevel.getWorld(), this.tickCount, j).callEvent();
++                        new net.sparklypower.sparklypaper.event.world.WorldTickEndEvent(level.getWorld(), this.tickCount, j).callEvent();
 +                        
                          // These are from the "tickServer" function
-                         serverLevel.tickTimes5s.add(this.tickCount, j);
-                         serverLevel.tickTimes10s.add(this.tickCount, j);
+                         level.tickTimes5s.add(this.tickCount, j);
+                         level.tickTimes10s.add(this.tickCount, j);

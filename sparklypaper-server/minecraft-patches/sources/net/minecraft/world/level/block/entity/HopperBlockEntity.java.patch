@@ -66,9 +66,9 @@
          if (container instanceof net.minecraft.world.CompoundContainer compoundContainer) {
 @@ -424,6 +_,7 @@
          } else {
-             Direction opposite = blockEntity.facing.getOpposite();
-             if (isFullContainer(attachedContainer, opposite)) {
-+                if (level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull() != 0) blockEntity.setCooldown(level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull()); // SparklyPaper - Allow throttling hopper checks if the target container is full
+             Direction direction = self.facing.getOpposite();
+             if (isFullContainer(container, direction)) {
++                if (level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull() != 0) self.setCooldown(level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull()); // SparklyPaper - Allow throttling hopper checks if the target container is full
                  return false;
              } else {
-                 // Paper start - Perf: Optimize Hoppers
+                 return hopperPush(level, container, direction, self); // Paper - Perf: Optimize Hoppers

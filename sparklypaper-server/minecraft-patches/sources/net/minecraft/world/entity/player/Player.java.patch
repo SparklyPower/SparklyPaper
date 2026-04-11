@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2029,6 +_,12 @@
-         if (!(shootable.getItem() instanceof ProjectileWeaponItem)) {
+@@ -2036,6 +_,12 @@
+         if (!(heldWeapon.getItem() instanceof ProjectileWeaponItem)) {
              return ItemStack.EMPTY;
          } else {
 +            // SparklyPaper start - Add EntityGetProjectileForWeaponEvent
-+            net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(shootable));
++            net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(heldWeapon));
 +            event.callEvent();
 +            if (event.getArrow() != null)
 +                return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());
 +            // SparklyPaper end
              final org.apache.commons.lang3.mutable.MutableBoolean anyEventCancelled = new org.apache.commons.lang3.mutable.MutableBoolean(); // Paper - PlayerReadyArrowEvent
-             Predicate<ItemStack> supportedHeldProjectiles = ((ProjectileWeaponItem)shootable.getItem()).getSupportedHeldProjectiles().and(item -> this.tryReadyArrow(shootable, item, anyEventCancelled)); // Paper - PlayerReadyArrowEvent
-             ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedHeldProjectiles);
+             Predicate<ItemStack> supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getSupportedHeldProjectiles().and(item -> this.tryReadyArrow(heldWeapon, item, anyEventCancelled)); // Paper - PlayerReadyArrowEvent
+             ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedProjectiles);

@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/block/StemBlock.java
 +++ b/net/minecraft/world/level/block/StemBlock.java
-@@ -69,6 +_,56 @@
+@@ -82,6 +_,56 @@
      @Override
-     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+     protected void randomTick(BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
          if (level.getRawBrightness(pos, 0) >= 9) {
 +            // SparklyPaper start - Blazingly simple farm checks
 +            if (level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {
@@ -13,7 +13,7 @@
 +                float f = level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getDefaultGrowthSpeed();
 +                boolean isCurrentFarmlandStateMoist = false;
 +                if (farmlandBelowTheCurrentBlockData.is(Blocks.FARMLAND)) {
-+                    if ((Integer) farmlandBelowTheCurrentBlockData.getValue(FarmBlock.MOISTURE) > 0) {
++                    if ((Integer) farmlandBelowTheCurrentBlockData.getValue(FarmlandBlock.MOISTURE) > 0) {
 +                        // If we are currently moist, increase the speed!
 +                        f = level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getMoistGrowthSpeed();
 +                        isCurrentFarmlandStateMoist = true;
@@ -31,7 +31,7 @@
 +                        BlockPos blockposition1 = pos.relative(enumdirection);
 +                        BlockState iblockdata1 = level.getBlockState(blockposition1.below());
 +
-+                        if (level.getBlockState(blockposition1).isAir() && (iblockdata1.is(Blocks.FARMLAND) || iblockdata1.is(BlockTags.DIRT))) {
++                        if (level.getBlockState(blockposition1).isAir() && (iblockdata1.is(Blocks.FARMLAND) || iblockdata1.is(net.minecraft.tags.BlockTags.DIRT))) {
 +                            Registry<Block> iregistry = net.minecraft.core.registries.BuiltInRegistries.BLOCK;
 +                            Optional<Block> optional = iregistry.getOptional(this.fruit);
 +                            Optional<Block> optional1 = iregistry.getOptional(this.attachedStem);
@@ -43,10 +43,10 @@
 +                                }
 +                                // CraftBukkit end
 +                                // Now that we know that the crop will grow... is the next stage the crop's max age? If yes, we are going to check if the farm land is moist!
-+                                if (isCurrentFarmlandStateMoist && !FarmBlock.isNearWater(level, farmlandBelowTheCurrentBlock)) {
++                                if (isCurrentFarmlandStateMoist && !FarmlandBlock.isNearWater(level, farmlandBelowTheCurrentBlock)) {
 +                                    // Whoops, farm land ain't moist!
 +                                    // From FarmBlock, set the moisture to 0
-+                                    org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(level, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmBlock.MOISTURE, 0), 2); // CraftBukkit
++                                    org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(level, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmlandBlock.MOISTURE, 0), 2); // CraftBukkit
 +                                }
 +                                level.setBlockAndUpdate(pos, (BlockState) ((Block) optional1.get()).defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, enumdirection));
 +                            }
@@ -56,8 +56,8 @@
 +            } else {
              float growthSpeed = CropBlock.getGrowthSpeed(this, level, pos);
              if (random.nextFloat() < ((this == Blocks.PUMPKIN_STEM ? level.spigotConfig.pumpkinModifier : level.spigotConfig.melonModifier) / (100.0F * (Math.floor((25.0F / growthSpeed) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
-                 int ageValue = state.getValue(AGE);
-@@ -95,6 +_,8 @@
+                 int age = state.getValue(AGE);
+@@ -108,6 +_,8 @@
                  }
              }
          }

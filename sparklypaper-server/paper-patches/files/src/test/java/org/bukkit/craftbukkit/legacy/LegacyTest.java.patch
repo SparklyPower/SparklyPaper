@@ -1,9 +1,9 @@
 --- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
 +++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
-@@ -156,6 +_,9 @@
-             // 1.21.11
-             Material.COPPER_NAUTILUS_ARMOR, Material.COPPER_SPEAR, Material.DIAMOND_NAUTILUS_ARMOR, Material.DIAMOND_SPEAR, Material.GOLDEN_NAUTILUS_ARMOR, Material.GOLDEN_SPEAR, Material.IRON_NAUTILUS_ARMOR, Material.IRON_SPEAR, Material.NAUTILUS_SPAWN_EGG,
+@@ -158,6 +_,9 @@
              Material.NETHERITE_NAUTILUS_ARMOR, Material.NETHERITE_SPEAR, Material.STONE_SPEAR, Material.WOODEN_SPEAR, Material.ZOMBIE_NAUTILUS_SPAWN_EGG, Material.CAMEL_HUSK_SPAWN_EGG, Material.PARCHED_SPAWN_EGG, Material.NETHERITE_HORSE_ARMOR,
+             // 26.1
+             Material.GOLDEN_DANDELION, Material.POTTED_GOLDEN_DANDELION,
 +            // SparklyPower custom blocks
 +            Material.SPARKLYPOWER_RAINBOW_WOOL, Material.SPARKLYPOWER_RAINBOW_CONCRETE, Material.SPARKLYPOWER_RAINBOW_TERRACOTTA, Material.SPARKLYPOWER_ASPHALT_PLAYER, Material.SPARKLYPOWER_ASPHALT_SERVER, Material.SPARKLYPOWER_ASPHALT_PLAYER_SLAB,
 +            Material.SPARKLYPOWER_ASPHALT_SERVER_SLAB,

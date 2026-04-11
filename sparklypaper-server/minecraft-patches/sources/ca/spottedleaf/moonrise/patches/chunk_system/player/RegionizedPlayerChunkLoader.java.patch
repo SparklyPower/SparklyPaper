@@ -1,6 +1,6 @@
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
-@@ -563,26 +_,26 @@
+@@ -581,26 +_,26 @@
          }
  
          private double getMaxChunkLoadRate() {
@@ -31,7 +31,7 @@
              if (configLimit == 0L) {
                  // by default, only allow 1/5th of the chunks in the view distance to be concurrently active
                  configLimit = Math.max(5L, radiusChunks / 5L);
-@@ -596,7 +_,7 @@
+@@ -614,7 +_,7 @@
  
          private long getMaxChunkGenerates() {
              final long radiusChunks = (2L * this.lastLoadDistance + 1L) * (2L * this.lastLoadDistance + 1L);

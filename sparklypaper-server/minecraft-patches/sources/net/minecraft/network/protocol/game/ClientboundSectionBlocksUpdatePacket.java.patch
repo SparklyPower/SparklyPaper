@@ -11,5 +11,5 @@
 +    public short[] positions; // SparklyPaper - Helpful NMS packet changes: remove final and make public
 +    public BlockState[] states; // SparklyPaper - Helpful NMS packet changes: remove final and make public
  
-     public ClientboundSectionBlocksUpdatePacket(SectionPos sectionPos, ShortSet positions, LevelChunkSection section) {
+     public ClientboundSectionBlocksUpdatePacket(final SectionPos sectionPos, final ShortSet changes, final LevelChunkSection section) {
          this.sectionPos = sectionPos;

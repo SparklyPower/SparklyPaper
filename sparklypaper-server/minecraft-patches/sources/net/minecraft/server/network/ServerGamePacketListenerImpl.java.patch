@@ -1,50 +1,50 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -639,6 +_,31 @@
-                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getPlainTextName(), this.player.getPlainTextName(), Math.sqrt(d7));
+@@ -650,6 +_,31 @@
+                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", vehicle.getPlainTextName(), this.player.getPlainTextName(), Math.sqrt(movedDist));
                  }
  
 +                // SparklyPaper start - Add PlayerMoveControllableVehicleEvent
 +                org.bukkit.entity.Player craftPlayer = this.getCraftPlayer();
-+                org.bukkit.entity.Entity bukkitVehicle = rootVehicle.getBukkitEntity();
++                org.bukkit.entity.Entity bukkitVehicle = vehicle.getBukkitEntity();
 +                if (bukkitVehicle instanceof org.bukkit.entity.Vehicle) {
 +                    net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent playerMoveControllableVehicleEvent = new net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent(
 +                        craftPlayer,
 +                        (org.bukkit.entity.Vehicle) bukkitVehicle,
-+                        new org.bukkit.Location(craftPlayer.getWorld(), x, y, z, f, f1),
-+                        new org.bukkit.Location(craftPlayer.getWorld(), d, d1, d2, f, f1)
++                        new org.bukkit.Location(craftPlayer.getWorld(), oldX, oldY, oldZ, targetYRot, targetXRot),
++                        new org.bukkit.Location(craftPlayer.getWorld(), targetX, targetY, targetZ, targetYRot, targetXRot)
 +                    );
 +                    if (!playerMoveControllableVehicleEvent.callEvent()) {
 +                        // Cancelled, move back!
-+                        rootVehicle.absSnapTo(x, y, z, f, f1);
-+                        this.player.absSnapTo(x, y, z, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
-+                        this.send(ClientboundMoveVehiclePacket.fromEntity(rootVehicle));
++                        vehicle.absSnapTo(oldX, oldY, oldZ, targetYRot, targetXRot);
++                        this.player.absSnapTo(oldX, oldY, oldZ, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
++                        this.send(ClientboundMoveVehiclePacket.fromEntity(vehicle));
 +                        return;
 +                    }
-+                    d = playerMoveControllableVehicleEvent.getTo().x();
-+                    d1 = playerMoveControllableVehicleEvent.getTo().y();
-+                    d2 = playerMoveControllableVehicleEvent.getTo().z();
-+                    f = playerMoveControllableVehicleEvent.getTo().getYaw();
-+                    f1 = playerMoveControllableVehicleEvent.getTo().getPitch();
++                    targetX = playerMoveControllableVehicleEvent.getTo().x();
++                    targetY = playerMoveControllableVehicleEvent.getTo().y();
++                    targetZ = playerMoveControllableVehicleEvent.getTo().z();
++                    targetYRot = playerMoveControllableVehicleEvent.getTo().getYaw();
++                    targetXRot = playerMoveControllableVehicleEvent.getTo().getPitch();
 +                }
 +                // SparklyPaper end
 +
                  // Paper start - optimise out extra getCubes
-                 boolean teleportBack = flag1;
+                 boolean teleportBack = fail;
                  if (!teleportBack) {
-@@ -1539,7 +_,7 @@
-                                 d3 = d - this.lastGoodX; // Paper - diff on change, used for checking large move vectors above
-                                 d4 = d1 - this.lastGoodY; // Paper - diff on change, used for checking large move vectors above
-                                 d5 = d2 - this.lastGoodZ; // Paper - diff on change, used for checking large move vectors above
--                                boolean flag = d4 > 0.0;
-+                                boolean flag = d4 > 0.0; // SparklyPaper - diff on change, used to reset the fall distance, checks if d7 is > 0.0D (player is moving upwards)
-                                 if (this.player.onGround() && !packet.isOnGround() && flag) {
+@@ -1580,7 +_,7 @@
+                                 xDist = targetX - this.lastGoodX; // Paper - diff on change, used for checking large move vectors above
+                                 yDist = targetY - this.lastGoodY; // Paper - diff on change, used for checking large move vectors above
+                                 zDist = targetZ - this.lastGoodZ; // Paper - diff on change, used for checking large move vectors above
+-                                boolean movedUpwards = yDist > 0.0;
++                                boolean movedUpwards = yDist > 0.0; // SparklyPaper - diff on change, used to reset the fall distance, checks if yDist is > 0.0D (player is moving upwards)
+                                 if (this.player.onGround() && !packet.isOnGround() && movedUpwards) {
                                      // Paper start - Add PlayerJumpEvent
                                      org.bukkit.entity.Player player = this.getCraftPlayer();
-@@ -1573,7 +_,37 @@
+@@ -1614,7 +_,37 @@
  
-                                 boolean flag1 = this.player.verticalCollisionBelow;
-                                 this.player.move(MoverType.PLAYER, new Vec3(d3, d4, d5));
+                                 boolean playerStandsOnSomething = this.player.verticalCollisionBelow;
+                                 this.player.move(MoverType.PLAYER, new Vec3(xDist, yDist, zDist));
 -                                this.player.onGround = packet.isOnGround(); // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move
 +                                // SparklyPaper start - Add PlayerPreMoveEvent event
 +                                boolean isOnGround = packet.isOnGround();
@@ -67,29 +67,29 @@
 +                                        to.setPitch(packet.xRot);
 +                                    }
 +
-+                                    net.sparklypower.sparklypaper.event.player.PlayerPreMoveEvent event = new net.sparklypower.sparklypaper.event.player.PlayerPreMoveEvent(player, from, to, packet.isOnGround(), packet.horizontalCollision(), flag);
++                                    net.sparklypower.sparklypaper.event.player.PlayerPreMoveEvent event = new net.sparklypower.sparklypaper.event.player.PlayerPreMoveEvent(player, from, to, packet.isOnGround(), packet.horizontalCollision(), movedUpwards);
 +
 +                                    if (event.callEvent()) {
 +                                        isOnGround = event.isOnGround();
 +                                        horizontalCollision = event.isHorizontalCollision();
-+                                        flag = event.isResetFallDistance();
++                                        movedUpwards = event.isResetFallDistance();
 +                                    }
 +                                }
 +                                // SparklyPaper end
 +                                this.player.onGround = isOnGround; // CraftBukkit - SPIGOT-5810, SPIGOT-5835, SPIGOT-6828: reset by this.player.move // SparklyPaper - Add PlayerPreMoveEvent
-                                 final boolean didCollide = toX != this.player.getX() || toY != this.player.getY() || toZ != this.player.getZ(); // Paper - needed here as the difference in Y can be reset - also note: this is only a guess at whether collisions took place, floating point errors can make this true when it shouldn't be...
+                                 final boolean didCollide = targetX != this.player.getX() || targetY != this.player.getY() || targetZ != this.player.getZ(); // Paper - needed here as the difference in Y can be reset - also note: this is only a guess at whether collisions took place, floating point errors can make this true when it shouldn't be...
                                  // Paper start - prevent position desync
                                  if (this.awaitingPositionFromClient != null) {
-@@ -1707,14 +_,14 @@
+@@ -1748,14 +_,14 @@
                                          && this.noBlocksAround(this.player);
                                      this.player.level().getChunkSource().move(this.player);
-                                     Vec3 vec3 = new Vec3(this.player.getX() - x, this.player.getY() - y, this.player.getZ() - z);
--                                    this.player.setOnGroundWithMovement(packet.isOnGround(), packet.horizontalCollision(), vec3);
--                                    this.player.doCheckFallDamage(vec3.x, vec3.y, vec3.z, packet.isOnGround());
-+                                    this.player.setOnGroundWithMovement(isOnGround, horizontalCollision, vec3); // SparklyPaper - Add PlayerPreMoveEvent
-+                                    this.player.doCheckFallDamage(vec3.x, vec3.y, vec3.z, isOnGround); // SparklyPaper - Add PlayerPreMoveEvent
-                                     this.handlePlayerKnownMovement(vec3);
-                                     if (flag) {
+                                     Vec3 clientDeltaMovement = new Vec3(this.player.getX() - startX, this.player.getY() - startY, this.player.getZ() - startZ);
+-                                    this.player.setOnGroundWithMovement(packet.isOnGround(), packet.horizontalCollision(), clientDeltaMovement);
+-                                    this.player.doCheckFallDamage(clientDeltaMovement.x, clientDeltaMovement.y, clientDeltaMovement.z, packet.isOnGround());
++                                    this.player.setOnGroundWithMovement(isOnGround, horizontalCollision, clientDeltaMovement); // SparklyPaper - Add PlayerPreMoveEvent
++                                    this.player.doCheckFallDamage(clientDeltaMovement.x, clientDeltaMovement.y, clientDeltaMovement.z, isOnGround); // SparklyPaper - Add PlayerPreMoveEvent
+                                     this.handlePlayerKnownMovement(clientDeltaMovement);
+                                     if (movedUpwards) {
                                          this.player.resetFallDistance();
                                      }
  
@@ -98,18 +98,18 @@
                                          || this.player.hasLandedInLiquid()
                                          || this.player.onClimbable()
                                          || this.player.isSpectator()
-@@ -1729,7 +_,7 @@
-                                     this.lastGoodZ = this.player.getZ();
-                                 } else {
-                                     this.internalTeleport(x, y, z, f, f1); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
--                                    this.player.doCheckFallDamage(this.player.getX() - x, this.player.getY() - y, this.player.getZ() - z, packet.isOnGround());
-+                                    this.player.doCheckFallDamage(this.player.getX() - x, this.player.getY() - y, this.player.getZ() - z, isOnGround); // SparklyPaper - Add PlayerPreMoveEvent
+@@ -1772,7 +_,7 @@
+                                     this.internalTeleport(startX, startY, startZ, targetYRot, targetXRot); // CraftBukkit - SPIGOT-1807: Don't call teleport event, when the client thinks the player is falling, because the chunks are not loaded on the client yet.
+                                     this.player
+                                         .doCheckFallDamage(
+-                                            this.player.getX() - startX, this.player.getY() - startY, this.player.getZ() - startZ, packet.isOnGround()
++                                            this.player.getX() - startX, this.player.getY() - startY, this.player.getZ() - startZ, isOnGround // SparklyPaper - Add PlayerPreMoveEvent
+                                         );
                                      this.player.removeLatestMovementRecording();
                                  }
-                             }
-@@ -3264,6 +_,21 @@
+@@ -3334,6 +_,21 @@
                                  } else {
-                                     event = new CraftItemEvent(recipe, inventory, type, slotNum, click, action);
+                                     event = new CraftItemEvent(recipe, inventory, type, slotIndex, click, action);
                                  }
 +                                // SparklyPaper start - add CraftItemRecipeEvent
 +                                // We will pigback a bit on the current implementation

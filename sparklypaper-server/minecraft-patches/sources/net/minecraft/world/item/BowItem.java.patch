@@ -2,13 +2,13 @@
 +++ b/net/minecraft/world/item/BowItem.java
 @@ -33,6 +_,11 @@
              } else {
-                 int i = this.getUseDuration(stack, entity) - timeLeft;
-                 float powerForTime = getPowerForTime(i);
+                 int timeHeld = this.getUseDuration(itemStack, entity) - remainingTime;
+                 float pow = getPowerForTime(timeHeld);
 +                // SparklyPaper start - Add PreEntityShootBowEvent
-+                net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent event = new net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent(player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(stack), player.getUsedItemHand() == InteractionHand.MAIN_HAND ? org.bukkit.inventory.EquipmentSlot.HAND : org.bukkit.inventory.EquipmentSlot.OFF_HAND, powerForTime);
-+                if (!event.callEvent())
++                net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent preShootEvent = new net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent(player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemStack), player.getUsedItemHand() == InteractionHand.MAIN_HAND ? org.bukkit.inventory.EquipmentSlot.HAND : org.bukkit.inventory.EquipmentSlot.OFF_HAND, pow);
++                if (!preShootEvent.callEvent())
 +                    return false;
 +                // SparklyPaper end
-                 if (powerForTime < 0.1) {
+                 if (pow < 0.1) {
                      return false;
                  } else {

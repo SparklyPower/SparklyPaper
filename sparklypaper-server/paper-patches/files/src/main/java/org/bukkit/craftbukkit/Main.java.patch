@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -156,7 +_,14 @@
+@@ -126,7 +_,14 @@
                          .ofType(File.class)
                          .defaultsTo(new File("paper.yml"))
                          .describedAs("Yml file");

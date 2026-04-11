@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/Blocks.java
 +++ b/net/minecraft/world/level/block/Blocks.java
-@@ -7123,6 +_,52 @@
+@@ -7044,6 +_,52 @@
              .sound(SoundType.SWEET_BERRY_BUSH)
              .pushReaction(PushReaction.DESTROY)
      );
@@ -51,5 +51,5 @@
 +    );
 +    // SparklyPaper end
  
-     private static ToIntFunction<BlockState> litBlockEmission(int lightValue) {
-         return state -> state.getValue(BlockStateProperties.LIT) ? lightValue : 0;
+     private static ToIntFunction<BlockState> litBlockEmission(final int lightEmission) {
+         return state -> state.getValue(BlockStateProperties.LIT) ? lightEmission : 0;

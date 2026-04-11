@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -112,7 +_,7 @@
+@@ -117,7 +_,7 @@
          .add(new ExplosionParticleInfo(ParticleTypes.POOF, 0.5F, 1.0F))
          .add(new ExplosionParticleInfo(ParticleTypes.SMOKE, 1.0F, 1.0F))
          .build();
@@ -9,7 +9,7 @@
      protected final CollectingNeighborUpdater neighborUpdater;
      private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
      private boolean tickingBlockEntities;
-@@ -140,6 +_,7 @@
+@@ -145,6 +_,7 @@
  
      // CraftBukkit start
      public final io.papermc.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
@@ -17,35 +17,37 @@
      private final CraftWorld world;
      public org.bukkit.generator.@Nullable ChunkGenerator generator;
  
-@@ -845,6 +_,7 @@
+@@ -850,6 +_,7 @@
          // Paper end - getblock optimisations - cache world height/sections
-         this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) levelData).getLevelName()); // Spigot
+         this.spigotConfig = new org.spigotmc.SpigotWorldConfig(bukkitName); // Spigot
          this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
-+        this.sparklyPaperConfig = net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getWorldSettings(((net.minecraft.world.level.storage.PrimaryLevelData) levelData).getLevelName()); // SparklyPaper - config files
++        this.sparklyPaperConfig = net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getWorldSettings(((net.minecraft.world.level.storage.ServerLevelData) levelData).getLevelName()); // SparklyPaper - config files
          this.generator = generator;
          this.world = new CraftWorld((ServerLevel) this, generator, biomeProvider, environment);
  
-@@ -1401,13 +_,11 @@
-         boolean runsNormally = this.tickRateManager().runsNormally();
+@@ -1488,14 +_,10 @@
+         boolean tickBlockEntities = this.tickRateManager().runsNormally();
  
          int tickedEntities = 0; // Paper - rewrite chunk system
--        var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
--        toRemove.add(null); // Paper - Fix MC-117075
-         for (this.tileTickPosition = 0; this.tileTickPosition < this.blockEntityTickers.size(); this.tileTickPosition++) { // Paper - Disable tick limiters
-             TickingBlockEntity tickingBlockEntity = this.blockEntityTickers.get(this.tileTickPosition);
-             // Spigot end
-             if (tickingBlockEntity.isRemoved()) {
--                toRemove.add(tickingBlockEntity); // Paper - Fix MC-117075; use removeAll
-+                this.blockEntityTickers.markAsRemoved(this.tileTickPosition); // SparklyPaper - optimize block entity removals
-             } else if (runsNormally && this.shouldTickBlocksAt(tickingBlockEntity.getPos())) {
-                 tickingBlockEntity.tick();
+-        // Paper start - Fix MC-117075 use removeAll
+-        final it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<@Nullable TickingBlockEntity> toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<>();
+-        toRemove.add(null);
+-        for (int tickerIndex = 0; tickerIndex < this.blockEntityTickers.size(); tickerIndex++) {
++        for (int tickerIndex = 0; tickerIndex < this.blockEntityTickers.size(); tickerIndex++) { // Paper - Fix MC-117075 use removeAll
+             final TickingBlockEntity ticker = this.blockEntityTickers.get(tickerIndex);
+-        // Paper end - Fix MC-117075 use removeAll
+             if (ticker.isRemoved()) {
+-                toRemove.add(ticker); // Paper - Fix MC-117075 use removeAll
++                this.blockEntityTickers.markAsRemoved(tickerIndex); // SparklyPaper - optimize block entity removals
+             } else if (tickBlockEntities && this.shouldTickBlocksAt(ticker.getPos())) {
+                 ticker.tick();
                  // Paper start - rewrite chunk system
-@@ -1417,7 +_,7 @@
-                 // Paper end - rewrite chunk system
+@@ -1506,7 +_,7 @@
              }
          }
--        this.blockEntityTickers.removeAll(toRemove); // Paper - Fix MC-117075
-+        this.blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
  
+-        this.blockEntityTickers.removeAll(toRemove); // Paper - Fix MC-117075 use removeAll
++        this.blockEntityTickers.removeMarkedEntries(); // SparklyPaper - optimize block entity removals
          this.tickingBlockEntities = false;
          this.spigotConfig.currentPrimedTnt = 0; // Spigot
+     }

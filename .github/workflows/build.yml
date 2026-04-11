@@ -12,7 +12,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - name: Checkout Git Repository
         uses: actions/checkout@v3
       - name: Validate Gradle wrapper
@@ -38,4 +38,4 @@ jobs:
         name: "Upload Mojang Mappings Paperclip JAR"
         with:
           name: SparklyPaper Paperclip (Mojang Mappings - mojmap)
-          path: "sparklypaper-server/build/libs/sparklypaper-paperclip-*-mojmap.jar"
+          path: "sparklypaper-server/build/libs/sparklypaper-paperclip-*.jar"

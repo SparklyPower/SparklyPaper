@@ -1,0 +1,31 @@
+--- a/net/minecraft/world/level/block/FarmlandBlock.java
++++ b/net/minecraft/world/level/block/FarmlandBlock.java
+@@ -94,6 +_,19 @@
+     @Override
+     protected void randomTick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+         int moisture = state.getValue(MOISTURE);
++        // SparklyPaper start - Blazingly simple farm checks
++        if (level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getEnabled()) {
++            if (moisture == 0) { // We only care about non-moisturised farm blocks
++                if (FarmlandBlock.isNearWater(level, pos)) {
++                    // Make it MOIST!
++                    org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(level, pos, (BlockState) state.setValue(FarmlandBlock.MOISTURE, 7), 2); // CraftBukkit
++                } else if (!FarmlandBlock.shouldMaintainFarmland(level, pos)) {
++                    FarmlandBlock.turnToDirt((Entity) null, state, level, pos);
++                }
++            }
++            return;
++        }
++        // SparklyPaper end
+         if (moisture > 0 && level.paperConfig().tickRates.wetFarmland != 1 && (level.paperConfig().tickRates.wetFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % level.paperConfig().tickRates.wetFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
+         if (moisture == 0 && level.paperConfig().tickRates.dryFarmland != 1 && (level.paperConfig().tickRates.dryFarmland < 1 || (net.minecraft.server.MinecraftServer.currentTick + pos.hashCode()) % level.paperConfig().tickRates.dryFarmland != 0)) { return; } // Paper - Configurable random tick rates for blocks
+         if (!isNearWater(level, pos) && !level.isRainingAt(pos.above())) {
+@@ -156,7 +_,7 @@
+         return level.getBlockState(pos.above()).is(BlockTags.MAINTAINS_FARMLAND);
+     }
+ 
+-    private static boolean isNearWater(final LevelReader level, final BlockPos pos) {
++    public static boolean isNearWater(final LevelReader level, final BlockPos pos) { // SparklyPaper - make public for the Blazingly simple farm checks
+         // Paper start - Perf: remove abstract block iteration
+         int xOff = pos.getX();
+         int yOff = pos.getY();

@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3360,4 +_,56 @@
+@@ -3373,4 +_,56 @@
              entity.remove();
          }
      }

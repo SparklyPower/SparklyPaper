@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -598,6 +_,12 @@
+@@ -603,6 +_,12 @@
      }
      // Paper end - chunk tick iteration
  
@@ -11,5 +11,5 @@
 +    // SparklyPaper end
 +
      public ServerLevel(
-         MinecraftServer server,
-         Executor dispatcher,
+         final MinecraftServer server,
+         final Executor executor,

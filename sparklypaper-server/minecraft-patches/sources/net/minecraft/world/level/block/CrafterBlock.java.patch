@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
-@@ -158,6 +_,12 @@
+@@ -162,6 +_,12 @@
                  }
-                 itemStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getResult());
+                 results = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getResult());
                  // CraftBukkit end
 +                // SparklyPaper - add CraftItemRecipeEvent
-+                net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent sparklyEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callCraftItemRecipeEvent(crafterBlockEntity, recipeHolder.toBukkitRecipe(), itemStack);
++                net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent sparklyEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callCraftItemRecipeEvent(blockEntity, pickedRecipe.toBukkitRecipe(), results);
 +                if (sparklyEvent.isCancelled())
 +                    return;
-+                itemStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(sparklyEvent.getResult());
++                results = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(sparklyEvent.getResult());
 +                // SparklyPaper end
-                 if (itemStack.isEmpty()) {
+                 if (results.isEmpty()) {
                      level.levelEvent(LevelEvent.SOUND_CRAFTER_FAIL, pos, 0);
                  } else {

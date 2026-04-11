@@ -9,7 +9,7 @@
      private final double x;
      private final double y;
      private final double z;
-@@ -161,6 +_,20 @@
+@@ -171,6 +_,20 @@
      public float getYHeadRot() {
          return Mth.unpackDegrees(this.yHeadRot);
      }

@@ -11,6 +11,6 @@
 +    }
 +    // SparklyPaper end
 +
-     private ClientboundRotateHeadPacket(FriendlyByteBuf buffer) {
-         this.entityId = buffer.readVarInt();
-         this.yHeadRot = buffer.readByte();
+     private ClientboundRotateHeadPacket(final FriendlyByteBuf input) {
+         this.entityId = input.readVarInt();
+         this.yHeadRot = input.readByte();

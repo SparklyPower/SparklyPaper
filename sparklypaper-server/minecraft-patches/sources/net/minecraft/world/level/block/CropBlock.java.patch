@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/CropBlock.java
 +++ b/net/minecraft/world/level/block/CropBlock.java
-@@ -79,6 +_,57 @@
+@@ -80,6 +_,57 @@
          if (level.getRawBrightness(pos, 0) >= 9) {
              int age = this.getAge(state);
              if (age < this.getMaxAge()) {
@@ -13,7 +13,7 @@
 +                    float f = level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getDefaultGrowthSpeed();
 +                    boolean isCurrentFarmlandStateMoist = false;
 +                    if (farmlandBelowTheCurrentBlockData.is(Blocks.FARMLAND)) {
-+                        if ((Integer) farmlandBelowTheCurrentBlockData.getValue(FarmBlock.MOISTURE) > 0) {
++                        if ((Integer) farmlandBelowTheCurrentBlockData.getValue(FarmlandBlock.MOISTURE) > 0) {
 +                            // If we are currently moist, increase the speed!
 +                            f = level.sparklyPaperConfig.getBlazinglySimpleFarmChecks().getMoistGrowthSpeed();
 +                            isCurrentFarmlandStateMoist = true;
@@ -48,17 +48,17 @@
 +                        }
 +
 +                        // Now that we know that the crop will grow... is the next stage the crop's max age? If yes, we are going to check if the farm land is moist!
-+                        if (age + 1 == getMaxAge() && isCurrentFarmlandStateMoist && !FarmBlock.isNearWater(level, farmlandBelowTheCurrentBlock)) {
++                        if (age + 1 == getMaxAge() && isCurrentFarmlandStateMoist && !FarmlandBlock.isNearWater(level, farmlandBelowTheCurrentBlock)) {
 +                            // Whoops, farm land ain't moist!
 +                            // From FarmBlock, set the moisture to 0
-+                            org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(level, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmBlock.MOISTURE, 0), 2); // CraftBukkit
++                            org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(level, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmlandBlock.MOISTURE, 0), 2); // CraftBukkit
 +                        }
 +                    }
 +                } else {
                  float growthSpeed = getGrowthSpeed(this, level, pos);
                  // Spigot start
                  int modifier = 100;
-@@ -101,6 +_,8 @@
+@@ -102,6 +_,8 @@
                      org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), Block.UPDATE_CLIENTS); // CraftBukkit
                  }
              }

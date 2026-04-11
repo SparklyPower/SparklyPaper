@@ -3,11 +3,11 @@
 @@ -197,6 +_,7 @@
  
                  if (this.entity.needsSync || this.trackDelta || this.entity instanceof LivingEntity && ((LivingEntity)this.entity).isFallFlying()) {
-                     Vec3 deltaMovement = this.entity.getDeltaMovement();
-+                    if (deltaMovement != this.lastSentMovement) { // SparklyPaper start - skip distanceToSqr call in ServerEntity#sendChanges if the delta movement hasn't changed
-                     double d = deltaMovement.distanceToSqr(this.lastSentMovement);
-                     if (d > 1.0E-7 || d > 0.0 && deltaMovement.lengthSqr() == 0.0) {
-                         this.lastSentMovement = deltaMovement;
+                     Vec3 movement = this.entity.getDeltaMovement();
++                    if (movement != this.lastSentMovement) { // SparklyPaper start - skip distanceToSqr call in ServerEntity#sendChanges if the delta movement hasn't changed
+                     double diff = movement.distanceToSqr(this.lastSentMovement);
+                     if (diff > 1.0E-7 || diff > 0.0 && movement.lengthSqr() == 0.0) {
+                         this.lastSentMovement = movement;
 @@ -214,6 +_,7 @@
                              this.synchronizer.sendToTrackingPlayers(new ClientboundSetEntityMotionPacket(this.entity.getId(), this.lastSentMovement));
                          }
