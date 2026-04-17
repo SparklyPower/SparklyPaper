@@ -27,18 +27,18 @@
 +                        state = (BlockState) state.setValue(StemBlock.AGE, i + 1);
 +                        org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, state, 2); // CraftBukkit
 +                    } else {
-+                        Direction enumdirection = Direction.Plane.HORIZONTAL.getRandomDirection(random);
-+                        BlockPos blockposition1 = pos.relative(enumdirection);
-+                        BlockState iblockdata1 = level.getBlockState(blockposition1.below());
++                        Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
++                        BlockPos relative = pos.relative(direction);
++                        BlockState stateBelow = level.getBlockState(relative.below());
 +
-+                        if (level.getBlockState(blockposition1).isAir() && (iblockdata1.is(Blocks.FARMLAND) || iblockdata1.is(net.minecraft.tags.BlockTags.DIRT))) {
-+                            Registry<Block> iregistry = net.minecraft.core.registries.BuiltInRegistries.BLOCK;
-+                            Optional<Block> optional = iregistry.getOptional(this.fruit);
-+                            Optional<Block> optional1 = iregistry.getOptional(this.attachedStem);
++                        if (level.getBlockState(relative).isAir() && stateBelow.is(this.fruitSupportBlocks)) {
++                            Registry<Block> blocks = net.minecraft.core.registries.BuiltInRegistries.BLOCK;
++                            Optional<Block> fruit = blocks.getOptional(this.fruit);
++                            Optional<Block> stem = blocks.getOptional(this.attachedStem);
 +
-+                            if (optional.isPresent() && optional1.isPresent()) {
++                            if (fruit.isPresent() && stem.isPresent()) {
 +                                // CraftBukkit start
-+                                if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, blockposition1, ((Block) optional.get()).defaultBlockState(), 2)) {
++                                if (!org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, relative, ((Block) fruit.get()).defaultBlockState(), 2)) {
 +                                    return;
 +                                }
 +                                // CraftBukkit end
@@ -48,7 +48,7 @@
 +                                    // From FarmBlock, set the moisture to 0
 +                                    org.bukkit.craftbukkit.event.CraftEventFactory.handleMoistureChangeEvent(level, farmlandBelowTheCurrentBlock, (BlockState) farmlandBelowTheCurrentBlockData.setValue(FarmlandBlock.MOISTURE, 0), 2); // CraftBukkit
 +                                }
-+                                level.setBlockAndUpdate(pos, (BlockState) ((Block) optional1.get()).defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, enumdirection));
++                                level.setBlockAndUpdate(pos, (BlockState) ((Block) stem.get()).defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, direction));
 +                            }
 +                        }
 +                    }
