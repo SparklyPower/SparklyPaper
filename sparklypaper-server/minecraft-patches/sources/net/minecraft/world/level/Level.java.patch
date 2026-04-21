@@ -19,7 +19,7 @@
  
 @@ -850,6 +_,7 @@
          // Paper end - getblock optimisations - cache world height/sections
-         this.spigotConfig = new org.spigotmc.SpigotWorldConfig(bukkitName); // Spigot
+         this.spigotConfig = new org.spigotmc.SpigotWorldConfig(bukkitName, CraftNamespacedKey.fromMinecraft(dimension.identifier())); // Spigot
          this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
 +        this.sparklyPaperConfig = net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getWorldSettings(((net.minecraft.world.level.storage.ServerLevelData) levelData).getLevelName()); // SparklyPaper - config files
          this.generator = generator;
