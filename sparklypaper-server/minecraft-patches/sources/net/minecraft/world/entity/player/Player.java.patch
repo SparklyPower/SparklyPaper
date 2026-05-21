@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2036,6 +_,12 @@
+@@ -2044,6 +_,12 @@
          if (!(heldWeapon.getItem() instanceof ProjectileWeaponItem)) {
              return ItemStack.EMPTY;
          } else {

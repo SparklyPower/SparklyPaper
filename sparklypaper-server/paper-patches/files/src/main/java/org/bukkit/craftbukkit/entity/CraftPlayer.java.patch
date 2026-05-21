@@ -1,8 +1,8 @@
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3373,4 +_,56 @@
-             entity.remove();
-         }
+@@ -3367,4 +_,56 @@
+         super.knockback(strength, directionX, directionZ);
+         this.entity.hurtMarked = true;
      }
 +
 +    // SparklyPaper start - per-player chunk rate overrides

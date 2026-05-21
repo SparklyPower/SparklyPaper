@@ -7,8 +7,8 @@
 +    private boolean bypassVelocityForwarding = false; // SparklyPaper - Per-player Velocity check override
      public java.util.@Nullable UUID requestedUuid; // Paper
      private final io.papermc.paper.connection.PaperPlayerLoginConnection paperLoginConnection; // Paper - Config API
-     private volatile boolean disconnecting = false; // Paper - Fix disconnect still ticking login
-@@ -171,12 +_,24 @@
+ 
+@@ -179,12 +_,24 @@
              } else {
                  // Paper start - Add Velocity IP Forwarding Support
                  if (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) {
@@ -38,8 +38,8 @@
 +                    // SparklyPaper end - Per-player Velocity check override
                  }
                  // Paper end - Add Velocity IP Forwarding Support
-                 // CraftBukkit start
-@@ -314,7 +_,9 @@
+                 // Paper start - Virtual authenticator threads
+@@ -320,7 +_,9 @@
      // CraftBukkit start
      private GameProfile callPlayerPreLoginEvents(GameProfile gameprofile) throws Exception { // Paper - Add more fields to AsyncPlayerPreLoginEvent
          // Paper start - Add Velocity IP Forwarding Support
