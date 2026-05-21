@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/block/BlockType.java
 +++ b/src/main/java/org/bukkit/block/BlockType.java
-@@ -2525,6 +_,16 @@
+@@ -2529,6 +_,16 @@
      BlockType.Typed<WallSkull> ZOMBIE_WALL_HEAD = getBlockType("zombie_wall_head");
      // End generate - BlockType
      //</editor-fold>

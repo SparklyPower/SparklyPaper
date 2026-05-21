@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3367,4 +_,56 @@
+@@ -3367,4 +_,70 @@
          super.knockback(strength, directionX, directionZ);
          this.entity.hurtMarked = true;
      }
@@ -56,4 +56,18 @@
 +        return this.getHandle().maxConcurrentChunkGeneratesOverride;
 +    }
 +    // SparklyPaper end
++
++    // SparklyPaper start - per-player statistic tracking opt-out
++    @Override
++    public void trackStatistic(org.bukkit.Statistic statistic, boolean tracked) {
++        com.google.common.base.Preconditions.checkNotNull(statistic, "statistic");
++        this.getHandle().getStats().setStatisticTracked(statistic, tracked);
++    }
++
++    @Override
++    public boolean isStatisticTracked(org.bukkit.Statistic statistic) {
++        com.google.common.base.Preconditions.checkNotNull(statistic, "statistic");
++        return this.getHandle().getStats().isStatisticTracked(statistic);
++    }
++    // SparklyPaper end - per-player statistic tracking opt-out
  }
