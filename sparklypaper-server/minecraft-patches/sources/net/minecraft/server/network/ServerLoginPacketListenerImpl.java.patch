@@ -39,7 +39,7 @@
                  }
                  // Paper end - Add Velocity IP Forwarding Support
                  // Paper start - Virtual authenticator threads
-@@ -320,7 +_,9 @@
+@@ -316,7 +_,9 @@
      // CraftBukkit start
      private GameProfile callPlayerPreLoginEvents(GameProfile gameprofile) throws Exception { // Paper - Add more fields to AsyncPlayerPreLoginEvent
          // Paper start - Add Velocity IP Forwarding Support

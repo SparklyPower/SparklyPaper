@@ -107,7 +107,7 @@
                                          );
                                      this.player.removeLatestMovementRecording();
                                  }
-@@ -3326,6 +_,21 @@
+@@ -3328,6 +_,21 @@
                                  } else {
                                      event = new CraftItemEvent(recipe, inventory, type, slotIndex, click, action);
                                  }

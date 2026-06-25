@@ -64,11 +64,11 @@
      private static org.bukkit.inventory.Inventory getInventory(final Container container) {
          final org.bukkit.inventory.Inventory sourceInventory;
          if (container instanceof net.minecraft.world.CompoundContainer compoundContainer) {
-@@ -424,6 +_,7 @@
-         } else {
-             Direction direction = self.facing.getOpposite();
-             if (isFullContainer(container, direction)) {
-+                if (level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull() != 0) self.setCooldown(level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull()); // SparklyPaper - Allow throttling hopper checks if the target container is full
-                 return false;
-             } else {
-                 return hopperPush(level, container, direction, self); // Paper - Perf: Optimize Hoppers
+@@ -425,6 +_,7 @@
+ 
+         Direction direction = self.facing.getOpposite();
+         if (isFullContainer(container, direction)) {
++            if (level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull() != 0) self.setCooldown(level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull()); // SparklyPaper - Allow throttling hopper checks if the target container is full
+             return false;
+         }
+ 

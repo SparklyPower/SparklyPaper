@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1855,7 +_,15 @@
+@@ -1845,7 +_,15 @@
              profiler.push("tick");
  
              try {
@@ -13,6 +13,6 @@
 +                level.tickTimes10s.add(this.tickCount, j);
 +                level.tickTimes1m.add(this.tickCount, j);
 +                // SparklyPaper end
-             } catch (Throwable var7) {
-                 CrashReport report = CrashReport.forThrowable(var7, "Exception ticking world");
+             } catch (Throwable t) {
+                 CrashReport report = CrashReport.forThrowable(t, "Exception ticking world");
                  level.fillReportDetails(report);

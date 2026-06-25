@@ -25,7 +25,7 @@
          this.generator = generator;
          this.world = new CraftWorld((ServerLevel) this, worldKey, biomeProvider, environment);
  
-@@ -1491,14 +_,10 @@
+@@ -1490,14 +_,10 @@
          boolean tickBlockEntities = this.tickRateManager().runsNormally();
  
          int tickedEntities = 0; // Paper - rewrite chunk system
@@ -42,7 +42,7 @@
              } else if (tickBlockEntities && this.shouldTickBlocksAt(ticker.getPos())) {
                  ticker.tick();
                  // Paper start - rewrite chunk system
-@@ -1509,7 +_,7 @@
+@@ -1508,7 +_,7 @@
              }
          }
  
