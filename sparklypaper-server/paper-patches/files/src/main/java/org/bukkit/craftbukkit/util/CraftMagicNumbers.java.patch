@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -97,6 +_,7 @@
+@@ -89,6 +_,7 @@
  
      public static final CraftMagicNumbers INSTANCE = new CraftMagicNumbers();
      public static final boolean DISABLE_OLD_API_SUPPORT = Boolean.getBoolean("paper.disableOldApiSupport"); // Paper
@@ -8,7 +8,7 @@
  
      private final Commodore commodore = new Commodore();
  
-@@ -252,7 +_,7 @@
+@@ -209,7 +_,7 @@
      @Override
      public Material getMaterial(String material, int version) {
          Preconditions.checkArgument(material != null, "material == null");
@@ -17,12 +17,12 @@
  
          // Fastpath up to date materials
          if (version == this.getDataVersion()) {
-@@ -780,7 +_,7 @@
-             throw new RuntimeException(ex);
-         }
-         int dataVersion = compound.getIntOr("DataVersion", 0);
--        Preconditions.checkArgument(dataVersion <= getDataVersion(), "Newer version! Server downgrades are not supported!");
-+        Preconditions.checkArgument(JUST_CORRUPT_IT || dataVersion <= getDataVersion(), "Newer version! Server downgrades are not supported!");
-         return compound;
-     }
+@@ -542,7 +_,7 @@
  
+         CompoundTag tag = MCUtil.deserializeTagFromBytes(data);
+         int dataVersion = NbtUtils.getDataVersion(tag, 0);
+-        Preconditions.checkArgument(dataVersion <= Bukkit.getUnsafe().getDataVersion(), "Newer version! Server downgrades are not supported!");
++        Preconditions.checkArgument(JUST_CORRUPT_IT || dataVersion <= Bukkit.getUnsafe().getDataVersion(), "Newer version! Server downgrades are not supported!");
+         tag = PlatformHooks.get().convertNBT(References.ENTITY, MinecraftServer.getServer().getFixerUpper(), tag, dataVersion, this.getDataVersion()); // Paper - possibly use dataconverter
+         if (!preservePassengers) {
+             tag.remove(Entity.TAG_PASSENGERS);

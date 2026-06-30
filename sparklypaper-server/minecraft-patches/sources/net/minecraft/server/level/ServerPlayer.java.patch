@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -465,6 +_,13 @@
+@@ -471,6 +_,13 @@
          return this.viewDistanceHolder;
      }
      // Paper end - rewrite chunk system

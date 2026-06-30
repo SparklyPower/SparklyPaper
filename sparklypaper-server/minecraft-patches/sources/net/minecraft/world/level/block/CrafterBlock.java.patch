@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
-@@ -162,6 +_,12 @@
+@@ -163,6 +_,12 @@
                  }
                  results = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getResult());
                  // CraftBukkit end

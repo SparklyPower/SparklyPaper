@@ -4,7 +4,7 @@
          ClientboundBlockUpdatePacket::new
      );
      private final BlockPos pos;
--    public final BlockState blockState;
+-    private final BlockState blockState;
 +    public BlockState blockState; // SparklyPaper - Helpful NMS packet changes: remove final
  
      public ClientboundBlockUpdatePacket(final BlockPos pos, final BlockState state) {

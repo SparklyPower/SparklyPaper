@@ -8,7 +8,7 @@
          .ensureSize("CONCRETES", 16).lock();
  
      /**
-@@ -182,6 +_,7 @@
+@@ -183,6 +_,7 @@
          .endsWith("TERRACOTTA")
          .not(Material.TERRACOTTA)
          .notEndsWith("GLAZED_TERRACOTTA")
@@ -16,7 +16,7 @@
          .ensureSize("STAINED_TERRACOTTA", 16).lock();
  
      /**
-@@ -189,6 +_,7 @@
+@@ -190,6 +_,7 @@
       */
      public static final MaterialSetTag TERRACOTTA = new MaterialSetTag(keyFor("terracotta"))
          .endsWith("TERRACOTTA")

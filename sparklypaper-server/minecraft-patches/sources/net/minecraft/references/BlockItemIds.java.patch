@@ -1,0 +1,16 @@
+--- a/net/minecraft/references/BlockItemIds.java
++++ b/net/minecraft/references/BlockItemIds.java
+@@ -788,4 +_,13 @@
+     private static WeatheringCopperCollection<BlockItemId> createSimpleCopper(final String baseName) {
+         return WeatheringCopperCollection.prefixWithState(WeatheringCopperCollection.create(baseName)).map(BlockItemId::create);
+     }
++
++    // SparklyPower Block IDs
++    public static final BlockItemId SPARKLYPOWER_RAINBOW_WOOL = BlockItemId.create("sparklypower_rainbow_wool");
++    public static final BlockItemId SPARKLYPOWER_RAINBOW_CONCRETE = BlockItemId.create("sparklypower_rainbow_concrete");
++    public static final BlockItemId SPARKLYPOWER_RAINBOW_TERRACOTTA = BlockItemId.create("sparklypower_rainbow_terracotta");
++    public static final BlockItemId SPARKLYPOWER_ASPHALT_SERVER = BlockItemId.create("sparklypower_asphalt_server");
++    public static final BlockItemId SPARKLYPOWER_ASPHALT_SERVER_SLAB = BlockItemId.create("sparklypower_asphalt_server_slab");
++    public static final BlockItemId SPARKLYPOWER_ASPHALT_PLAYER = BlockItemId.create("sparklypower_asphalt_player");
++    public static final BlockItemId SPARKLYPOWER_ASPHALT_PLAYER_SLAB = BlockItemId.create("sparklypower_asphalt_player_slab");
+ }

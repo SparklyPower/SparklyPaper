@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1845,7 +_,15 @@
+@@ -1821,7 +_,15 @@
              profiler.push("tick");
  
              try {

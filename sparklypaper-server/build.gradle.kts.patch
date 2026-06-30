@@ -58,7 +58,7 @@
 +    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 +    implementation("com.charleskorn.kaml:kaml:0.97.0")
 +    // SparklyPaper end
-     implementation("ca.spottedleaf:concurrentutil:0.0.10")
+     implementation("ca.spottedleaf:leafpile:1.0.0")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
 @@ -193,9 +_,14 @@

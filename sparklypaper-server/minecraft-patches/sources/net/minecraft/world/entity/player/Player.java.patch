@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2045,6 +_,12 @@
+@@ -2060,6 +_,12 @@
              return ItemStack.EMPTY;
          }
  

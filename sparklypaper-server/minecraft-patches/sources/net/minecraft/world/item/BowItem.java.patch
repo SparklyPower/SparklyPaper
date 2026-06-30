@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/BowItem.java
 +++ b/net/minecraft/world/item/BowItem.java
-@@ -34,6 +_,11 @@
+@@ -32,6 +_,11 @@
  
              int timeHeld = this.getUseDuration(itemStack, entity) - remainingTime;
              float pow = getPowerForTime(timeHeld);
