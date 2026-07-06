@@ -479,7 +479,7 @@ index b37618125e85c1c6f284c7287202aae814c1ecfe..7074db0f9f9030040a6ce32ed5eda4ec
          this.containerId = containerId;
      }
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index f1e6e876460e62cee24c4ca4adcf047fb96b1909..764bc5f4d5e57806677eefd297ad80e9309d8866 100644
+index 44a7590558fa73fb570f76ba7a4e7db1415d08f7..95fd1ba6f9b246ca3e41c93ef20497125f82fb5d 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
 @@ -403,8 +403,8 @@ public final class ItemStack implements DataComponentHolder, ItemInstance {
@@ -667,10 +667,10 @@ index 0e594121b60aa5a01b5bbe94b80350f2fc698b1a..d7fafbc6f7b23eb8ffe371974b5172e1
      }
  
 diff --git a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java b/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
-index 4aa2d141eba2596e782fc4ab4890c5e2d80eb811..43eb9b2bb4021d19618e2cc71d30b9290dfdf36d 100644
+index 4aa2d141eba2596e782fc4ab4890c5e2d80eb811..32298b1795d0d517d3f028d709c65744da924a8c 100644
 --- a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
-@@ -44,9 +44,8 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
+@@ -44,9 +44,9 @@ public class SculkCatalystBlockEntity extends BlockEntity implements GameEventLi
      // Paper end - Fix NPE in SculkBloomEvent world access
  
      public static void serverTick(final Level level, final BlockPos pos, final BlockState state, final SculkCatalystBlockEntity entity) {
@@ -678,6 +678,7 @@ index 4aa2d141eba2596e782fc4ab4890c5e2d80eb811..43eb9b2bb4021d19618e2cc71d30b929
 +        org.bukkit.craftbukkit.event.CraftEventFactory.sourceBlockOverrideRT.set(pos); // SparklyPaper - parallel world ticking // CraftBukkit - SPIGOT-7068: Add source block override, not the most elegant way but better than passing down a BlockPos up to five methods deep.
          entity.catalystListener.getSculkSpreader().updateCursors(level, pos, level.getRandom(), true);
 -        org.bukkit.craftbukkit.event.CraftEventFactory.sourceBlockOverride = null; // CraftBukkit
++        org.bukkit.craftbukkit.event.CraftEventFactory.sourceBlockOverrideRT.set(null); // SparklyPaper - parallel world ticking // CraftBukkit
      }
  
      @Override
