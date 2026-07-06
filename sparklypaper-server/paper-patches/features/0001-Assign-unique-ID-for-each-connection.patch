@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Mon, 6 Jul 2026 13:42:30 -0300
+Subject: [PATCH] Assign unique ID for each connection
+
+It is useful when you need to "bootstrap" a connection, that is, you want to query player data from a external service before the player actually logs in
+
+Using the player's unique ID is not a good solution because of race conditions where a player may have multiple connections in flight, so using a unique ID per connection is more safe
+
+diff --git a/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java b/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java
+index 49ea407cd91297cd5df98ecf23aa2aa54196facb..ada3e9cda4500a751790262c48c879aa4554436a 100644
+--- a/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java
++++ b/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java
+@@ -153,4 +153,11 @@ public class PaperPlayerConfigurationConnection extends PaperCommonConnection<Se
+     public boolean isConnected() {
+         return this.packetListener.connection.isConnected();
+     }
++
++    // SparklyPaper start - assign unique ID for each connection
++    @Override
++    public long getConnectionId() {
++        return packetListener.connection.connectionId;
++    }
++    // SparklyPaper end
+ }
+diff --git a/src/main/java/io/papermc/paper/connection/PaperPlayerGameConnection.java b/src/main/java/io/papermc/paper/connection/PaperPlayerGameConnection.java
+index 0b17dc4eb635de252dceb535bd101053fccaa3fe..36fe571ac79b54990500a1d9b7338711a8806ebd 100644
+--- a/src/main/java/io/papermc/paper/connection/PaperPlayerGameConnection.java
++++ b/src/main/java/io/papermc/paper/connection/PaperPlayerGameConnection.java
+@@ -44,4 +44,11 @@ public class PaperPlayerGameConnection extends PaperCommonConnection<ServerGameP
+     public boolean isConnected() {
+         return getPlayer().isConnected();
+     }
++
++    // SparklyPaper start - assign unique ID for each connection
++    @Override
++    public long getConnectionId() {
++        return packetListener.connection.connectionId;
++    }
++    // SparklyPaper end
+ }
