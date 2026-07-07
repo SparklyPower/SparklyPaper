@@ -41,13 +41,13 @@ index 5f5afcdb3c9e669ed0e730c720ad91d16b95602c..941893faaf3ed892607c73f481247b10
 +    // SparklyPaper end
  }
 diff --git a/src/main/java/io/papermc/paper/connection/PlayerCommonConnection.java b/src/main/java/io/papermc/paper/connection/PlayerCommonConnection.java
-index 7cba94e4916b64c20ea34ed6626cde7f697d9cd5..38d3429c06a7d3b0bd118160b554cada31df5489 100644
+index 157fc8ffe59718bc31863e568870071cc06644e3..34472cb1d8ae398e09e67061e47e2c4ca9126c4b 100644
 --- a/src/main/java/io/papermc/paper/connection/PlayerCommonConnection.java
 +++ b/src/main/java/io/papermc/paper/connection/PlayerCommonConnection.java
-@@ -43,4 +43,8 @@ public interface PlayerCommonConnection extends WritablePlayerCookieConnection,
-      * @return the client option value of the player
+@@ -53,4 +53,8 @@ public interface PlayerCommonConnection extends WritablePlayerCookieConnection,
+      * @return client brand name
       */
-     <T> T getClientOption(ClientOption<T> type);
+     @Nullable String getClientBrandName();
 +
 +    // SparklyPaper start - assign unique ID for each connection
 +    long getConnectionId();

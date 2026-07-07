@@ -243,7 +243,7 @@ index 93a3538aeda08fc660b6befdfb3d60b04f3cb22d..81731dfef75c0cfa2996db7cc98a608e
          // Paper start - extra debug info
          if (entity.valid) {
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..86e3f37bc88b75cad24212f9fafa526e8a99a78c 100644
+index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..88886be7f2386ae02becedc0f4882b9b247ea2a5 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -478,6 +478,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -262,23 +262,23 @@ index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..86e3f37bc88b75cad24212f9fafa526e
          // CraftBukkit start
          if (this.joining) {
              this.joining = false;
-@@ -1495,13 +1497,14 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
-         if (this.isRemoved()) {
-             return null;
-         }
--
-         if (transition.missingRespawnBlock()) {
-             this.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.NO_RESPAWN_BLOCK_AVAILABLE, 0.0F));
-         }
+@@ -1502,6 +1504,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
  
          ServerLevel newLevel = transition.newLevel();
          ServerLevel oldLevel = this.level();
-+        ca.spottedleaf.moonrise.common.util.TickThread.ensureOnlyTickThread("Cannot change dimension of a player off-main, from world " + oldLevel.getWorld().getName() + " to world " + newLevel.getWorld().getName()); // SparklyPaper - parallel world ticking (additional concurrency issues logs)
 +
          ResourceKey<Level> lastDimension = oldLevel.dimension();
          // CraftBukkit start
          ResourceKey<net.minecraft.world.level.dimension.LevelStem> oldLevelTypeKey = oldLevel.getTypeKey();
-@@ -1869,6 +1872,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1548,6 +1551,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+             return this;
+         }
+ 
++        ca.spottedleaf.moonrise.common.util.TickThread.ensureOnlyTickThread("Cannot change dimension of a player off-main, from world " + oldLevel.getWorld().getName() + " to world " + newLevel.getWorld().getName()); // SparklyPaper - parallel world ticking (additional concurrency issues logs)
+         this.isChangingDimension = true;
+         LevelData levelData = newLevel.getLevelData();
+         this.connection.send(new ClientboundRespawnPacket(this.createCommonSpawnInfo(newLevel), ClientboundRespawnPacket.KEEP_ALL_DATA));
+@@ -1869,6 +1873,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
  
              return OptionalInt.empty();
          } else {
@@ -291,7 +291,7 @@ index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..86e3f37bc88b75cad24212f9fafa526e
              // CraftBukkit start
              this.containerMenu = menu; // Moved up
              if (!this.isImmobile()) {
-@@ -1964,6 +1973,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1964,6 +1974,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      }
      @Override
      public void closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason reason) {
