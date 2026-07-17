@@ -1,13 +1,5 @@
 --- a/src/main/java/com/destroystokyo/paper/MaterialTags.java
 +++ b/src/main/java/com/destroystokyo/paper/MaterialTags.java
-@@ -99,6 +_,7 @@
-      */
-     public static final MaterialSetTag CONCRETES = new MaterialSetTag(keyFor("concretes"))
-         .endsWith("_CONCRETE")
-+        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
-         .ensureSize("CONCRETES", 16).lock();
- 
-     /**
 @@ -183,6 +_,7 @@
          .endsWith("TERRACOTTA")
          .not(Material.TERRACOTTA)
