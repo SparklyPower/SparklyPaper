@@ -164,7 +164,7 @@ index 0d7584a94cef8790b53ddc6f6b20fb15b0a95bfd..e141faae7a954d5a5be1ab9e548b4614
          this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
          this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
 diff --git a/net/minecraft/server/level/ServerChunkCache.java b/net/minecraft/server/level/ServerChunkCache.java
-index c3adbe0753f6a4158f25126ed7443f8a958763d9..54ba4fd65e7c2d77d65e70ea62079cc4d471b01c 100644
+index 075e294333115738b25b64a390df323276cf39f9..393be27fd7bc39d8bf180f82a4fd328bd0015ee1 100644
 --- a/net/minecraft/server/level/ServerChunkCache.java
 +++ b/net/minecraft/server/level/ServerChunkCache.java
 @@ -175,7 +175,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
@@ -177,7 +177,7 @@ index c3adbe0753f6a4158f25126ed7443f8a958763d9..54ba4fd65e7c2d77d65e70ea62079cc4
              }
          }
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 93a3538aeda08fc660b6befdfb3d60b04f3cb22d..81731dfef75c0cfa2996db7cc98a608e8a79b45e 100644
+index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5eb78ecf1a 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -196,7 +196,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
@@ -199,7 +199,7 @@ index 93a3538aeda08fc660b6befdfb3d60b04f3cb22d..81731dfef75c0cfa2996db7cc98a608e
  
      // CraftBukkit start
      private final ResourceKey<LevelStem> typeKey;
-@@ -747,6 +748,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -748,6 +749,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          this.chunkDataController = new ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.ChunkDataController((ServerLevel)(Object)this, this.chunkTaskScheduler);
          // Paper end - rewrite chunk system
          this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
@@ -207,7 +207,7 @@ index 93a3538aeda08fc660b6befdfb3d60b04f3cb22d..81731dfef75c0cfa2996db7cc98a608e
      }
  
      // Paper start
-@@ -1360,7 +1362,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1361,7 +1363,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          }
          // Paper start - rewrite chunk system
          if ((++this.tickedBlocksOrFluids & 7L) != 0L) {
@@ -216,7 +216,7 @@ index 93a3538aeda08fc660b6befdfb3d60b04f3cb22d..81731dfef75c0cfa2996db7cc98a608e
          }
          // Paper end - rewrite chunk system
  
-@@ -1373,7 +1375,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1374,7 +1376,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          }
          // Paper start - rewrite chunk system
          if ((++this.tickedBlocksOrFluids & 7L) != 0L) {
@@ -225,7 +225,7 @@ index 93a3538aeda08fc660b6befdfb3d60b04f3cb22d..81731dfef75c0cfa2996db7cc98a608e
          }
          // Paper end - rewrite chunk system
  
-@@ -1624,6 +1626,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1625,6 +1627,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
      }
  
      private void addPlayer(final ServerPlayer player) {
@@ -233,7 +233,7 @@ index 93a3538aeda08fc660b6befdfb3d60b04f3cb22d..81731dfef75c0cfa2996db7cc98a608e
          Entity existing = this.getEntity(player.getUUID());
          if (existing != null) {
              LOGGER.warn("Force-added player with duplicate UUID {}", player.getUUID());
-@@ -1636,7 +1639,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1637,7 +1640,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
  
      // CraftBukkit start
      private boolean addEntity(final Entity entity, final org.bukkit.event.entity.CreatureSpawnEvent.@Nullable SpawnReason spawnReason) {
@@ -440,10 +440,10 @@ index b9748a392c9f76e61a1b673085b4dd74c007c70d..330383e9005cd2244d576d5dfe1aef4f
              if (isLocatorBarEnabledFor(player)) {
                  if (!connection.isBroken()) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 1530810cdb74810e37e3e22ce4fcda4ee7511055..27632a73dfac379b3c646ef04413caff6519ccbe 100644
+index 9323beb98dc2a86e67111c089aa4c7f0125bdfe1..c72d07d3b111959226bba8e6a24274a12d17d157 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -3577,6 +3577,7 @@ public abstract class Entity
+@@ -3578,6 +3578,7 @@ public abstract class Entity
      }
  
      protected void handlePortal() {
@@ -451,7 +451,7 @@ index 1530810cdb74810e37e3e22ce4fcda4ee7511055..27632a73dfac379b3c646ef04413caff
          if (this.level() instanceof ServerLevel level) {
              this.processPortalCooldown();
              if (this.portalProcess != null) {
-@@ -4175,6 +4176,7 @@ public abstract class Entity
+@@ -4176,6 +4177,7 @@ public abstract class Entity
      }
  
      private @Nullable Entity teleportCrossDimension(final ServerLevel oldLevel, final ServerLevel newLevel, final TeleportTransition transition) {

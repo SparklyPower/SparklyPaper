@@ -294,7 +294,7 @@ index 69cdd304d255d52c9b7dc9b6a33ffdb630b79abe..636ec7172e9b535f7b4f95b4a9743217
 +    // SparklyPaper end
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 335de83ba3e42ab0ac80d53a4efd0423e9a9965d..324cf29b66290d460d30cca7e73d27f0964281f7 100644
+index f3f068011abd8c6585463169d50634bf42a09497..60eb42bef5084e17eee1532d2d892243a5666cce 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -459,6 +459,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
@@ -353,7 +353,7 @@ index 335de83ba3e42ab0ac80d53a4efd0423e9a9965d..324cf29b66290d460d30cca7e73d27f0
          if (this.world.hasChunkAt(pos)) {
              net.minecraft.world.level.chunk.LevelChunk chunk = this.world.getChunkAt(pos);
  
-@@ -1858,6 +1865,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1863,6 +1870,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
  
      @Override
      public void sendGameEvent(Entity sourceEntity, org.bukkit.GameEvent gameEvent, Vector position) {
@@ -362,7 +362,7 @@ index 335de83ba3e42ab0ac80d53a4efd0423e9a9965d..324cf29b66290d460d30cca7e73d27f0
      }
      // Paper end
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
-index bf98fc87b0a2146455f7c56dca6584bb6ae6fb76..aeda1db2cdad3232ecb933a827e503a7017c4594 100644
+index afbf9c70f69b02e7b92a8382aa9fb9f1132b7bf8..1513daf286571a3caaf1b10e48352d71fbc98254 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
 @@ -78,6 +78,11 @@ public class CraftBlock implements Block {

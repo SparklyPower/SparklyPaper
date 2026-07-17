@@ -5,10 +5,10 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index e45f9514e4b593111e827a2fc083381aa8072f67..2cc75ca3367b50d0fcd1bbab0084b7d24fe3dce8 100644
+index e45f9514e4b593111e827a2fc083381aa8072f67..ce2a58bcc48afeb424dca6695c5319270bbc940d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-@@ -1339,4 +1339,15 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+@@ -1339,4 +1339,22 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
          return this.entity.get(io.papermc.paper.datacomponent.PaperDataComponentType.bukkitToMinecraft(type)) != null;
      }
  
@@ -20,7 +20,14 @@ index e45f9514e4b593111e827a2fc083381aa8072f67..2cc75ca3367b50d0fcd1bbab0084b7d2
 +
 +    @Override
 +    public void setTrackingRangeOverride(int trackingRange) {
++        if (this.entity.trackingRangeOverride == trackingRange) return;
 +        this.entity.trackingRangeOverride = trackingRange;
++        if (this.entity.level() instanceof net.minecraft.server.level.ServerLevel level) {
++            if (level.getChunkSource().hasEntityWithId(this.getHandle().getId())) {
++                level.getChunkSource().removeEntity(this.getHandle());
++                level.getChunkSource().addEntity(this.getHandle());
++            }
++        }
 +    }
 +    // SparklyPaper end
  }

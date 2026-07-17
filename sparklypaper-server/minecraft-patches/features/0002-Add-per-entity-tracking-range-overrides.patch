@@ -5,10 +5,10 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index b42bf0ecd381c07ff7c42dea3970f598ec426e98..517eb3ea1429f38ab800a7a08ca51949609a617d 100644
+index 7f0df1c26f93d53b5925c564374f3e5fa6d966b3..2460f3f63f37b74deaaf9f8fe42f0dfbc49330e4 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -994,6 +994,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -995,6 +995,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
              EntityType<?> type = entity.getType();
              int range = type.clientTrackingRange() * 16;
              range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Spigot
@@ -17,7 +17,7 @@ index b42bf0ecd381c07ff7c42dea3970f598ec426e98..517eb3ea1429f38ab800a7a08ca51949
                  int updateInterval = type.updateInterval();
                  if (this.entityMap.containsKey(entity.getId())) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 27632a73dfac379b3c646ef04413caff6519ccbe..c72d07d3b111959226bba8e6a24274a12d17d157 100644
+index 1530810cdb74810e37e3e22ce4fcda4ee7511055..9323beb98dc2a86e67111c089aa4c7f0125bdfe1 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -382,6 +382,7 @@ public abstract class Entity
