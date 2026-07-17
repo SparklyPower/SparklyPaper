@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 17 Jul 2026 18:44:34 -0300
+Subject: [PATCH] Add per-entity tracking range overrides
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
+index e45f9514e4b593111e827a2fc083381aa8072f67..2cc75ca3367b50d0fcd1bbab0084b7d24fe3dce8 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
+@@ -1339,4 +1339,15 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+         return this.entity.get(io.papermc.paper.datacomponent.PaperDataComponentType.bukkitToMinecraft(type)) != null;
+     }
+ 
++    // SparklyPaper start - per-entity tracking range override
++    @Override
++    public int getTrackingRangeOverride() {
++        return entity.trackingRangeOverride;
++    }
++
++    @Override
++    public void setTrackingRangeOverride(int trackingRange) {
++        this.entity.trackingRangeOverride = trackingRange;
++    }
++    // SparklyPaper end
+ }

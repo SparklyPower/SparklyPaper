@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 17 Jul 2026 18:38:10 -0300
+Subject: [PATCH] Add per-entity tracking range overrides
+
+
+diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
+index b42bf0ecd381c07ff7c42dea3970f598ec426e98..517eb3ea1429f38ab800a7a08ca51949609a617d 100644
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -994,6 +994,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+             EntityType<?> type = entity.getType();
+             int range = type.clientTrackingRange() * 16;
+             range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Spigot
++            if (entity.trackingRangeOverride != -1) range = entity.trackingRangeOverride; // SparklyPaper - per-entity tracking range override
+             if (range != 0) {
+                 int updateInterval = type.updateInterval();
+                 if (this.entityMap.containsKey(entity.getId())) {
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index 27632a73dfac379b3c646ef04413caff6519ccbe..c72d07d3b111959226bba8e6a24274a12d17d157 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -382,6 +382,7 @@ public abstract class Entity
+     private final int despawnTime; // Paper - entity despawn time limit
+     public int totalEntityAge; // Paper - age-like counter for all entities
+     public final io.papermc.paper.entity.activation.ActivationType activationType = io.papermc.paper.entity.activation.ActivationType.activationTypeFor(this); // Paper - EAR 2/tracking ranges
++    public int trackingRangeOverride = -1; // SparklyPaper - per-entity tracking range override
+     // Paper start - EAR 2
+     public final boolean defaultActivationState;
+     public long activatedTick = Integer.MIN_VALUE;

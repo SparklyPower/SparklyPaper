@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 17 Jul 2026 18:43:56 -0300
+Subject: [PATCH] Add per-entity tracking range overrides
+
+
+diff --git a/src/main/java/org/bukkit/entity/Entity.java b/src/main/java/org/bukkit/entity/Entity.java
+index e24744cc523f1ce3c7c8e27b14d3337a3f17f4bb..9c196d19f7dc72801b8821190a3b7e0b87c4d46c 100644
+--- a/src/main/java/org/bukkit/entity/Entity.java
++++ b/src/main/java/org/bukkit/entity/Entity.java
+@@ -1332,4 +1332,21 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
+      */
+     void broadcastHurtAnimation(@NotNull java.util.Collection<Player> players);
+     // Paper end - broadcast hurt animation
++
++    // SparklyPaper start - per-entity tracking range override
++
++    /**
++     * Sets a tracking range override for this entity.
++     *
++     * @param trackingRange the new tracking range override, or -1 to set to the default.
++     */
++    void setTrackingRangeOverride(int trackingRange);
++
++    /**
++     * Gets the current tracking range override for this entity.
++     *
++     * @return trackingRange the currently set tracking range override. If -1, the default tracking range is being used.
++     */
++    int getTrackingRangeOverride();
++    // SparklyPaper end
+ }
