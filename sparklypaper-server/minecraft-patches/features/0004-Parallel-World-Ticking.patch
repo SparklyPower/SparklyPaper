@@ -57,7 +57,7 @@ index 162d7890f204315b0476467e757de5c9dd84aeca..5a336e144aa573950dfb16f3f8892525
                  // Paper end
                  // CraftBukkit start
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..1461d1fac7c9ccc3a7e4fade3919843732f819cf 100644
+index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657dd161168 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -425,6 +425,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -121,13 +121,14 @@ index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..1461d1fac7c9ccc3a7e4fade39198437
 +                        throw new ReportedException(report);
 +                    } finally {
 +                        serverLevelTickingSemaphore.release();
++                        level.explosionDensityCache.clear(); // Paper - Optimize explosions
 +                    }
 +                }, level)
 +            );
  
              profiler.pop();
              profiler.pop();
-             level.explosionDensityCache.clear(); // Paper - Optimize explosions
+-            level.explosionDensityCache.clear(); // Paper - Optimize explosions
          }
 +
 +        while (!tasks.isEmpty()) {
