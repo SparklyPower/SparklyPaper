@@ -1,0 +1,41 @@
+name: Patch and Build
+
+on:
+  push:
+    branches: [ "**" ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Checkout Git Repository
+        uses: actions/checkout@v3
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Configure Git User Details
+        run: git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Apply Patches
+        run: ./gradlew applyAllPatches
+      - name: Build
+        run: ./gradlew build
+      - name: Publish publications and dev bundle
+        run: ./gradlew -PpublishDevBundle publishMavenPublicationToPerfectDreamsRepository :sparklypaper-server:publishDevBundlePublicationToPerfectDreamsRepository
+        env:
+          ORG_GRADLE_PROJECT_PerfectDreamsUsername: ${{ secrets.PERFECTDREAMS_REPO_USERNAME }}
+          ORG_GRADLE_PROJECT_PerfectDreamsPassword: ${{ secrets.PERFECTDREAMS_REPO_PASSWORD }}
+      - name: Create Paperclip JAR
+        run: ./gradlew createMojmapPaperclipJar
+      - uses: actions/upload-artifact@v4
+        name: "Upload Mojang Mappings Paperclip JAR"
+        with:
+          name: SparklyPaper Paperclip (Mojang Mappings - mojmap)
+          path: "sparklypaper-server/build/libs/sparklypaper-paperclip-*-mojmap.jar"
