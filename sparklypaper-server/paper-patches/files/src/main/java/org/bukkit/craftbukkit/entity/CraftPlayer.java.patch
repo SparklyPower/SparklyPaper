@@ -1,8 +1,8 @@
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3364,4 +_,70 @@
-         super.knockback(strength, directionX, directionZ);
-         this.entity.hurtMarked = true;
+@@ -3388,4 +_,70 @@
+         this.getHandle().fixedPose = false;
+         this.getHandle().updatePlayerPose();
      }
 +
 +    // SparklyPaper start - per-player chunk rate overrides
