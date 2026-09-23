@@ -41,6 +41,28 @@ index 05d374f679919d082064e8f2bb363a419bc9648e..3056b575ccf3f1fa59855481b66eedf3
          boolean ret = false;
  
          if (this.ticketLevelPropagator.hasPendingUpdates()) {
+diff --git a/io/papermc/paper/redstone/RedstoneWireTurbo.java b/io/papermc/paper/redstone/RedstoneWireTurbo.java
+index 8e03419df1469c6fecfaa82fcb319a58635b39f3..355d9a2f3ccd9069fc82a0a793b10b3e233b3360 100644
+--- a/io/papermc/paper/redstone/RedstoneWireTurbo.java
++++ b/io/papermc/paper/redstone/RedstoneWireTurbo.java
+@@ -827,14 +827,15 @@ public final class RedstoneWireTurbo {
+         j = getMaxCurrentStrength(upd, j);
+         int l = 0;
+ 
+-        wire.shouldSignal = false;
++        net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++        worldData.shouldSignal = false;
+         // Unfortunately, World.isBlockIndirectlyGettingPowered is complicated,
+         // and I'm not ready to try to replicate even more functionality from
+         // elsewhere in Minecraft into this accelerator.  So sadly, we must
+         // suffer the performance hit of this very expensive call.  If there
+         // is consistency to what this call returns, we may be able to cache it.
+         final int k = worldIn.getBestNeighborSignal(upd.self);
+-        wire.shouldSignal = true;
++        worldData.shouldSignal = true;
+ 
+         // The variable 'k' holds the maximum redstone power value of any adjacent blocks.
+         // If 'k' has the highest level of all neighbors, then the power level of this
 diff --git a/net/minecraft/core/dispenser/DispenseItemBehavior.java b/net/minecraft/core/dispenser/DispenseItemBehavior.java
 index 162d7890f204315b0476467e757de5c9dd84aeca..5a336e144aa573950dfb16f3f8892525e6d142d4 100644
 --- a/net/minecraft/core/dispenser/DispenseItemBehavior.java
@@ -57,19 +79,20 @@ index 162d7890f204315b0476467e757de5c9dd84aeca..5a336e144aa573950dfb16f3f8892525
                  // Paper end
                  // CraftBukkit start
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657dd161168 100644
+index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..19a25cb18d1496881e38ccaaf4a921deba4bed05 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -425,6 +425,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -425,6 +425,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          };
      }
      // Paper end - improve tick loop
 +    public java.util.concurrent.Semaphore serverLevelTickingSemaphore = null; // SparklyPaper - parallel world ticking
++    public final net.sparklypower.sparklypaper.threadedregions.GenericWorldData fallbackWorldData = new net.sparklypower.sparklypaper.threadedregions.GenericWorldData(); // SparklyPaper - parallel world ticking
 +
      // Paper start - rewrite chunk system
      private volatile Throwable chunkSystemCrash;
  
-@@ -1812,6 +1814,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1812,34 +1815,55 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          this.updateEffectiveRespawnData();
  
          this.isIteratingOverLevels = true; // Paper - Throw exception on world create while being ticked
@@ -79,7 +102,9 @@ index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657
          for (ServerLevel level : this.getAllLevels()) {
              level.hasPhysicsEvent = org.bukkit.event.block.BlockPhysicsEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - BlockPhysicsEvent
              level.hasEntityMoveEvent = io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - Add EntityMoveEvent
-@@ -1820,26 +1825,45 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             level.updateLagCompensationTick(); // Paper - lag compensation
+-            net.minecraft.world.level.block.entity.HopperBlockEntity.skipHopperEvents = level.paperConfig().hopper.disableMoveEvent || org.bukkit.event.inventory.InventoryMoveItemEvent.getHandlerList().getRegisteredListeners().length == 0; // Paper - Perf: Optimize Hoppers
++            level.regionizedWorldData.skipHopperEvents = level.paperConfig().hopper.disableMoveEvent || org.bukkit.event.inventory.InventoryMoveItemEvent.getHandlerList().getRegisteredListeners().length == 0; // Paper - Perf: Optimize Hoppers
              profiler.push(() -> level + " " + level.dimension().identifier());
              profiler.push("tick");
  
@@ -103,7 +128,6 @@ index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657
 +                level.tickExecutor.submit(() -> {
 +                    try {
 +                        ca.spottedleaf.moonrise.common.util.TickThread.ServerLevelTickThread currentThread = (ca.spottedleaf.moonrise.common.util.TickThread.ServerLevelTickThread) Thread.currentThread();
-+                        currentThread.currentlyTickingServerLevel = level;
 +
 +                        long i = Util.getNanos(); // SparklyPaper - track world's MSPT
 +                        level.tick(haveTime);
@@ -178,7 +202,7 @@ index 075e294333115738b25b64a390df323276cf39f9..393be27fd7bc39d8bf180f82a4fd328b
              }
          }
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5eb78ecf1a 100644
+index 98b329fccfc6e086edfc6854dc0083fb970aae60..e070688a89d48cfec8f9c5bc2e80876d150b1872 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -196,7 +196,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
@@ -190,25 +214,26 @@ index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5e
      private final ServerWaypointManager waypointManager;
      private EnvironmentAttributeSystem environmentAttributes;
      // Paper - rewrite chunk system
-@@ -220,7 +220,8 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -220,7 +220,9 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
      private final StructureManager structureManager;
      private final StructureCheck structureCheck;
      private final boolean tickTime;
 -    private final LevelDebugSynchronizers debugSynchronizers = new LevelDebugSynchronizers(this);
 +    final LevelDebugSynchronizers debugSynchronizers = new LevelDebugSynchronizers(this);
-+    public java.util.concurrent.ExecutorService tickExecutor; // SparklyPaper - parallel world ticking
++    public final java.util.concurrent.ExecutorService tickExecutor; // SparklyPaper - parallel world ticking
++    public final net.sparklypower.sparklypaper.threadedregions.GenericWorldData regionizedWorldData = new net.sparklypower.sparklypaper.threadedregions.GenericWorldData(); // SparklyPaper - parallel world ticking
  
      // CraftBukkit start
      private final ResourceKey<LevelStem> typeKey;
-@@ -748,6 +749,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -748,6 +750,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          this.chunkDataController = new ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.ChunkDataController((ServerLevel)(Object)this, this.chunkTaskScheduler);
          // Paper end - rewrite chunk system
          this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
-+        this.tickExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new net.sparklypower.sparklypaper.ServerLevelTickExecutorThreadFactory(getWorld().getName())); // SparklyPaper - parallel world ticking
++        this.tickExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new net.sparklypower.sparklypaper.ServerLevelTickExecutorThreadFactory(this)); // SparklyPaper - parallel world ticking
      }
  
      // Paper start
-@@ -1361,7 +1363,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1361,7 +1364,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          }
          // Paper start - rewrite chunk system
          if ((++this.tickedBlocksOrFluids & 7L) != 0L) {
@@ -217,7 +242,7 @@ index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5e
          }
          // Paper end - rewrite chunk system
  
-@@ -1374,7 +1376,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1374,7 +1377,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          }
          // Paper start - rewrite chunk system
          if ((++this.tickedBlocksOrFluids & 7L) != 0L) {
@@ -226,7 +251,7 @@ index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5e
          }
          // Paper end - rewrite chunk system
  
-@@ -1625,6 +1627,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1625,6 +1628,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
      }
  
      private void addPlayer(final ServerPlayer player) {
@@ -234,7 +259,7 @@ index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5e
          Entity existing = this.getEntity(player.getUUID());
          if (existing != null) {
              LOGGER.warn("Force-added player with duplicate UUID {}", player.getUUID());
-@@ -1637,7 +1640,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -1637,7 +1641,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
  
      // CraftBukkit start
      private boolean addEntity(final Entity entity, final org.bukkit.event.entity.CreatureSpawnEvent.@Nullable SpawnReason spawnReason) {
@@ -596,7 +621,7 @@ index 82ab930bf438e988d637786bdde88e34ea073a2f..4c602ff1e6b647814286fdaa9527e431
                  return value;
              })
 diff --git a/net/minecraft/world/level/block/RedStoneWireBlock.java b/net/minecraft/world/level/block/RedStoneWireBlock.java
-index 35e49078d8d36ae4683de26988435d971c7f0e89..4ebcb22c865fcb4180c8e87f0b73f63fb053024c 100644
+index 35e49078d8d36ae4683de26988435d971c7f0e89..ee57140e0ec0a76c0c2f6280331087e385f38c3a 100644
 --- a/net/minecraft/world/level/block/RedStoneWireBlock.java
 +++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
 @@ -271,7 +271,7 @@ public class RedStoneWireBlock extends Block {
@@ -626,6 +651,46 @@ index 35e49078d8d36ae4683de26988435d971c7f0e89..4ebcb22c865fcb4180c8e87f0b73f63f
                  }
              }
          }
+@@ -334,9 +334,10 @@ public class RedStoneWireBlock extends Block {
+     }
+ 
+     public int getBlockSignal(final Level level, final BlockPos pos) {
+-        this.shouldSignal = false;
++        net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++        worldData.shouldSignal = false;
+         int blockSignal = level.getBestNeighborSignal(pos);
+-        this.shouldSignal = true;
++        worldData.shouldSignal = true;
+         return blockSignal;
+     }
+ 
+@@ -430,12 +431,14 @@ public class RedStoneWireBlock extends Block {
+ 
+     @Override
+     protected int getDirectSignal(final BlockState state, final BlockGetter level, final BlockPos pos, final Direction direction) {
+-        return !this.shouldSignal ? Redstone.SIGNAL_MIN : state.getSignal(level, pos, direction);
++        net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++        return !worldData.shouldSignal ? Redstone.SIGNAL_MIN : state.getSignal(level, pos, direction);
+     }
+ 
+     @Override
+     protected int getSignal(final BlockState state, final BlockGetter level, final BlockPos pos, final Direction direction) {
+-        if (this.shouldSignal && direction != Direction.DOWN) {
++        net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++        if (worldData.shouldSignal && direction != Direction.DOWN) {
+             int power = this.ownSignal(state, level, pos);
+             if (power == 0) {
+                 return Redstone.SIGNAL_MIN;
+@@ -472,7 +475,8 @@ public class RedStoneWireBlock extends Block {
+ 
+     @Override
+     protected boolean isSignalSource(final BlockState state) {
+-        return this.shouldSignal;
++        net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++        return worldData.shouldSignal;
+     }
+ 
+     public static int getColorForPower(final int power) {
 diff --git a/net/minecraft/world/level/block/SaplingBlock.java b/net/minecraft/world/level/block/SaplingBlock.java
 index cbf7845ca64f1b716af3e50ac8716373d2ae3755..5e487733a1644a48f5be3554cb90ef67f41d71b5 100644
 --- a/net/minecraft/world/level/block/SaplingBlock.java
@@ -667,6 +732,122 @@ index 0e594121b60aa5a01b5bbe94b80350f2fc698b1a..d7fafbc6f7b23eb8ffe371974b5172e1
          return org.bukkit.craftbukkit.event.CraftEventFactory.callBlockLockCheckEvent(this, this.lockKey, this.getDisplayName(), player); // Paper - Call BlockLockCheckEvent
      }
  
+diff --git a/net/minecraft/world/level/block/entity/BlockEntity.java b/net/minecraft/world/level/block/entity/BlockEntity.java
+index ae0df53c3be7ebcf48886adbedfaa2c071a94023..07f79daa97f3972bee49ae35efa5d280f2aeb62a 100644
+--- a/net/minecraft/world/level/block/entity/BlockEntity.java
++++ b/net/minecraft/world/level/block/entity/BlockEntity.java
+@@ -40,6 +40,7 @@ import org.slf4j.Logger;
+ 
+ public abstract class BlockEntity implements DebugValueSource, TypedInstance<BlockEntityType<?>> {
+     static boolean ignoreBlockEntityUpdates; // Paper - Perf: Optimize Hoppers
++    static final ThreadLocal<Boolean> ignoreBlockEntityUpdatesTL = ThreadLocal.withInitial(() -> Boolean.FALSE); // SparklyPaper - parallel world ticking
+     // CraftBukkit start - data containers
+     private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
+     public final org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer persistentDataContainer;
+@@ -210,7 +211,7 @@ public abstract class BlockEntity implements DebugValueSource, TypedInstance<Blo
+ 
+     public void setChanged() {
+         if (this.level != null) {
+-            if (ignoreBlockEntityUpdates) return; // Paper - Perf: Optimize Hoppers
++            if (ignoreBlockEntityUpdatesTL.get()) return; // Paper - Perf: Optimize Hoppers // SparklyPaper - parallel world ticking
+             setChanged(this.level, this.worldPosition, this.blockState);
+         }
+     }
+diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index a03c26b2dc2536c2d4eb0fd28598028312f5cee7..887c1374159c7f9e8ac80230969a41e437d0096f 100644
+--- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -223,7 +223,8 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+     private static boolean skipPushModeEventFire;
+ 
+     private static boolean hopperPush(final Level level, final Container destination, final Direction direction, final HopperBlockEntity hopper) {
+-        skipPushModeEventFire = skipHopperEvents;
++        final net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++        worldData.skipPushModeEventFire = worldData.skipHopperEvents;
+         boolean foundItem = false;
+         for (int i = 0; i < hopper.getContainerSize(); ++i) {
+             final ItemStack item = hopper.getItem(i);
+@@ -246,7 +247,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+ 
+                 // We only need to fire the event once to give protection plugins a chance to cancel this event
+                 // Because nothing uses getItem, every event call should end up the same result.
+-                if (!skipPushModeEventFire) {
++                if (!worldData.skipPushModeEventFire) {
+                     movedItem = callPushMoveEvent(destination, movedItem, hopper);
+                     if (movedItem == null) { // cancelled
+                         origItemStack.setCount(originalItemCount);
+@@ -286,7 +287,8 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         container.setChanged(); // original logic always marks source inv as changed even if no move happens.
+         movedItem.setCount(movedItemCount);
+ 
+-        if (!skipPullModeEventFire) {
++        final net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++        if (!worldData.skipPullModeEventFire) {
+             movedItem = callPullMoveEvent(hopper, container, movedItem);
+             if (movedItem == null) { // cancelled
+                 origItemStack.setCount(originalItemCount);
+@@ -306,9 +308,9 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+                 origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
+             }
+ 
+-            ignoreBlockEntityUpdates = true;
++            ignoreBlockEntityUpdatesTL.set(true); // SparklyPaper - parallel world ticking
+             container.setItem(i, origItemStack);
+-            ignoreBlockEntityUpdates = false;
++            ignoreBlockEntityUpdatesTL.set(false); // SparklyPaper - parallel world ticking
+             container.setChanged();
+             return true;
+         }
+@@ -332,7 +334,8 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         );
+         final boolean result = event.callEvent();
+         if (!event.calledGetItem && !event.calledSetItem) {
+-            skipPushModeEventFire = true;
++            final net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
++            worldData.skipPushModeEventFire = true;
+         }
+         if (!result) {
+             applyCooldown(hopper);
+@@ -348,6 +351,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+ 
+     @Nullable
+     private static ItemStack callPullMoveEvent(final Hopper hopper, final Container container, final ItemStack itemstack) {
++        final net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
+         final org.bukkit.inventory.Inventory sourceInventory = getInventory(container);
+         final org.bukkit.inventory.Inventory destination = getInventory(hopper);
+ 
+@@ -355,7 +359,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         final io.papermc.paper.event.inventory.PaperInventoryMoveItemEvent event = new io.papermc.paper.event.inventory.PaperInventoryMoveItemEvent(sourceInventory, org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemstack), destination, false);
+         final boolean result = event.callEvent();
+         if (!event.calledGetItem && !event.calledSetItem) {
+-            skipPullModeEventFire = true;
++            worldData.skipPullModeEventFire = true;
+         }
+         if (!result) {
+             applyCooldown(hopper);
+@@ -523,8 +527,9 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         BlockState blockState = level.getBlockState(blockPos);
+         Container container = getSourceContainer(level, hopper, blockPos, blockState);
+         if (container != null) {
++            final net.sparklypower.sparklypaper.threadedregions.GenericWorldData worldData = net.sparklypower.sparklypaper.threadedregions.TickWorldScheduler.getCurrentRegionizedWorldData();
+             Direction direction = Direction.DOWN;
+-            skipPullModeEventFire = skipHopperEvents; // Paper - Perf: Optimize Hoppers
++            worldData.skipPullModeEventFire = worldData.skipHopperEvents; // Paper - Perf: Optimize Hoppers
+ 
+             for (int slot : getSlots(container, direction)) {
+                 if (tryTakeInItemFromSlot(hopper, container, slot, direction, level)) { // Spigot
+@@ -628,9 +633,9 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+                     itemStack = itemStack.split(container.getMaxStackSize());
+                 }
+                 // Spigot end
+-                ignoreBlockEntityUpdates = true; // Paper - Perf: Optimize Hoppers
++                ignoreBlockEntityUpdatesTL.set(true); // Paper - Perf: Optimize Hoppers // SparklyPaper - parallel world ticking
+                 container.setItem(slot, itemStack);
+-                ignoreBlockEntityUpdates = false; // Paper - Perf: Optimize Hoppers
++                ignoreBlockEntityUpdatesTL.set(false); // Paper - Perf: Optimize Hoppers // SparklyPaper - parallel world ticking
+                 itemStack = leftover; // Paper - Make hoppers respect inventory max stack size
+                 success = true;
+             } else if (canMergeItems(current, itemStack)) {
 diff --git a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java b/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
 index 4aa2d141eba2596e782fc4ab4890c5e2d80eb811..32298b1795d0d517d3f028d709c65744da924a8c 100644
 --- a/net/minecraft/world/level/block/entity/SculkCatalystBlockEntity.java
