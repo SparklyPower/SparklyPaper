@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 25 Sep 2026 18:32:42 -0300
+Subject: [PATCH] Add clickLocation to BlockPlaceEvent
+
+
+diff --git a/src/main/java/org/bukkit/event/block/BlockMultiPlaceEvent.java b/src/main/java/org/bukkit/event/block/BlockMultiPlaceEvent.java
+index 7f417d5b9f7fae3e0d75971355f008e3732ec445..abfcff206169cd9a6712ac450561a9ae25239f24 100644
+--- a/src/main/java/org/bukkit/event/block/BlockMultiPlaceEvent.java
++++ b/src/main/java/org/bukkit/event/block/BlockMultiPlaceEvent.java
+@@ -2,6 +2,8 @@ package org.bukkit.event.block;
+ 
+ import com.google.common.collect.ImmutableList;
+ import java.util.List;
++
++import org.bukkit.Location;
+ import org.bukkit.block.Block;
+ import org.bukkit.block.BlockState;
+ import org.bukkit.entity.Player;
+@@ -32,6 +34,14 @@ public class BlockMultiPlaceEvent extends BlockPlaceEvent {
+         this.replacedStates = ImmutableList.copyOf(replacedStates);
+     }
+ 
++    // SparklyPaper start - Add clickLocation to BlockPlaceEvent
++    @ApiStatus.Internal
++    public BlockMultiPlaceEvent(@NotNull List<BlockState> replacedStates, @NotNull Block clicked, @NotNull ItemStack itemInHand, @NotNull Player thePlayer, boolean canBuild, @NotNull org.bukkit.inventory.EquipmentSlot hand, @NotNull Location clickLocation) {
++        super(replacedStates.getFirst().getBlock(), replacedStates.getFirst(), clicked, itemInHand, thePlayer, canBuild, hand, clickLocation);
++        this.replacedStates = ImmutableList.copyOf(replacedStates);
++    }
++    // SparklyPaper end
++
+     /**
+      * Gets a list of blockstates for all blocks which were replaced by the
+      * placement of the new blocks. Most of these blocks will just have a
+diff --git a/src/main/java/org/bukkit/event/block/BlockPlaceEvent.java b/src/main/java/org/bukkit/event/block/BlockPlaceEvent.java
+index 394ae727e3eecd034cf3cfa35d0e9dfc9c70b145..8009e8608efdccdc38d7f55cbd0eb077bee659c3 100644
+--- a/src/main/java/org/bukkit/event/block/BlockPlaceEvent.java
++++ b/src/main/java/org/bukkit/event/block/BlockPlaceEvent.java
+@@ -1,5 +1,6 @@
+ package org.bukkit.event.block;
+ 
++import org.bukkit.Location;
+ import org.bukkit.block.Block;
+ import org.bukkit.block.BlockState;
+ import org.bukkit.entity.Player;
+@@ -25,6 +26,7 @@ public class BlockPlaceEvent extends BlockEvent implements Cancellable {
+     protected BlockState replacedState;
+     protected boolean canBuild;
+     protected EquipmentSlot hand;
++    protected Location clickLocation;
+ 
+     protected boolean cancelled;
+ 
+@@ -34,8 +36,14 @@ public class BlockPlaceEvent extends BlockEvent implements Cancellable {
+         this(placedBlock, replacedState, placedAgainst, itemInHand, thePlayer, canBuild, EquipmentSlot.HAND);
+     }
+ 
++    // SparklyPaper start - Add clickLocation to BlockPlaceEvent
+     @ApiStatus.Internal
+     public BlockPlaceEvent(@NotNull final Block placedBlock, @NotNull final BlockState replacedState, @NotNull final Block placedAgainst, @NotNull final ItemStack itemInHand, @NotNull final Player thePlayer, final boolean canBuild, @NotNull final EquipmentSlot hand) {
++        this(placedBlock, replacedState, placedAgainst, itemInHand, thePlayer, canBuild, hand, placedAgainst.getLocation());
++    }
++
++    @ApiStatus.Internal
++    public BlockPlaceEvent(@NotNull final Block placedBlock, @NotNull final BlockState replacedState, @NotNull final Block placedAgainst, @NotNull final ItemStack itemInHand, @NotNull final Player thePlayer, final boolean canBuild, @NotNull final EquipmentSlot hand, @NotNull final Location clickLocation) {
+         super(placedBlock);
+         this.placedAgainst = placedAgainst;
+         this.itemInHand = itemInHand;
+@@ -43,7 +51,9 @@ public class BlockPlaceEvent extends BlockEvent implements Cancellable {
+         this.replacedState = replacedState;
+         this.canBuild = canBuild;
+         this.hand = hand;
++        this.clickLocation = clickLocation;
+     }
++    // SparklyPaper end
+ 
+     /**
+      * Gets the block that this block was placed against
+@@ -130,6 +140,15 @@ public class BlockPlaceEvent extends BlockEvent implements Cancellable {
+         return this.hand;
+     }
+ 
++    /**
++     * Gets the location of where the block that was placed against was clicked
++     * @return the click location
++     */
++    @NotNull
++    public Location getClickLocation() {
++        return this.clickLocation;
++    }
++
+     @Override
+     public boolean isCancelled() {
+         return this.cancelled;

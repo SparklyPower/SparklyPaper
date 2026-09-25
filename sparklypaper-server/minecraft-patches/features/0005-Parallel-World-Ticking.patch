@@ -5,7 +5,7 @@ Subject: [PATCH] Parallel World Ticking
 
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-index 05d374f679919d082064e8f2bb363a419bc9648e..3056b575ccf3f1fa59855481b66eedf376964944 100644
+index e418820359c430b91bb91eb65d137b9cdbe2db4b..b8c6a0753c7dd06d29ff713dd2e9dec2625c86fa 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 @@ -1129,7 +1129,7 @@ public final class ChunkHolderManager {
@@ -57,7 +57,7 @@ index 162d7890f204315b0476467e757de5c9dd84aeca..5a336e144aa573950dfb16f3f8892525
                  // Paper end
                  // CraftBukkit start
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657dd161168 100644
+index 7dc9e3102169ac10b49a6cfba76fd2645fb8edc2..227e91de018cfd2889d5dea2f2b97faa2e12df9d 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -425,6 +425,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -69,7 +69,7 @@ index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657
      // Paper start - rewrite chunk system
      private volatile Throwable chunkSystemCrash;
  
-@@ -1812,6 +1814,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1811,6 +1813,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          this.updateEffectiveRespawnData();
  
          this.isIteratingOverLevels = true; // Paper - Throw exception on world create while being ticked
@@ -79,7 +79,7 @@ index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657
          for (ServerLevel level : this.getAllLevels()) {
              level.hasPhysicsEvent = org.bukkit.event.block.BlockPhysicsEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - BlockPhysicsEvent
              level.hasEntityMoveEvent = io.papermc.paper.event.entity.EntityMoveEvent.getHandlerList().getRegisteredListeners().length > 0; // Paper - Add EntityMoveEvent
-@@ -1820,26 +1825,45 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1819,26 +1824,45 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              profiler.push(() -> level + " " + level.dimension().identifier());
              profiler.push("tick");
  
@@ -141,7 +141,7 @@ index 97055cbbb6a4af81cd8b17ae008cf544b8f421d8..0a55ba390faa3d89eba5b131ece15657
          this.isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
  
          profiler.popPush("connection");
-@@ -1930,6 +1954,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1929,6 +1953,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          Map<ResourceKey<Level>, ServerLevel> oldLevels = this.levels;
          Map<ResourceKey<Level>, ServerLevel> newLevels = Maps.newLinkedHashMap(oldLevels);
          newLevels.remove(level.dimension());
@@ -178,7 +178,7 @@ index 075e294333115738b25b64a390df323276cf39f9..393be27fd7bc39d8bf180f82a4fd328b
              }
          }
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5eb78ecf1a 100644
+index cb2bd704404b71d7d7c7f0c0a80c77e2e63085c2..c54f5fe910cafe54cba6572fa91b382600fff68d 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -196,7 +196,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
@@ -244,7 +244,7 @@ index 98b329fccfc6e086edfc6854dc0083fb970aae60..398bc43fb169c0aafeff06d4853bbe5e
          // Paper start - extra debug info
          if (entity.valid) {
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..88886be7f2386ae02becedc0f4882b9b247ea2a5 100644
+index 6925a29556183125d615a4b19259468ec0d70704..203f565c9af11bfec60ee029190f5c60bd460484 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -478,6 +478,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -263,7 +263,7 @@ index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..88886be7f2386ae02becedc0f4882b9b
          // CraftBukkit start
          if (this.joining) {
              this.joining = false;
-@@ -1502,6 +1504,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1491,6 +1493,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
  
          ServerLevel newLevel = transition.newLevel();
          ServerLevel oldLevel = this.level();
@@ -271,7 +271,7 @@ index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..88886be7f2386ae02becedc0f4882b9b
          ResourceKey<Level> lastDimension = oldLevel.dimension();
          // CraftBukkit start
          ResourceKey<net.minecraft.world.level.dimension.LevelStem> oldLevelTypeKey = oldLevel.getTypeKey();
-@@ -1548,6 +1551,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1527,6 +1530,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
              return this;
          }
  
@@ -279,7 +279,7 @@ index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..88886be7f2386ae02becedc0f4882b9b
          this.isChangingDimension = true;
          LevelData levelData = newLevel.getLevelData();
          this.connection.send(new ClientboundRespawnPacket(this.createCommonSpawnInfo(newLevel), ClientboundRespawnPacket.KEEP_ALL_DATA));
-@@ -1869,6 +1873,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1848,6 +1852,12 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
  
              return OptionalInt.empty();
          } else {
@@ -292,7 +292,7 @@ index 360f51d9ce58ea7fe686eb2c269e32b92a14d904..88886be7f2386ae02becedc0f4882b9b
              // CraftBukkit start
              this.containerMenu = menu; // Moved up
              if (!this.isImmobile()) {
-@@ -1964,6 +1974,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -1943,6 +1953,11 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      }
      @Override
      public void closeContainer(org.bukkit.event.inventory.InventoryCloseEvent.Reason reason) {
@@ -441,10 +441,10 @@ index b9748a392c9f76e61a1b673085b4dd74c007c70d..330383e9005cd2244d576d5dfe1aef4f
              if (isLocatorBarEnabledFor(player)) {
                  if (!connection.isBroken()) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 9323beb98dc2a86e67111c089aa4c7f0125bdfe1..c72d07d3b111959226bba8e6a24274a12d17d157 100644
+index 6863cf758ca591a9a1ce607633f5385cfd7eccd2..033e12c01baef2ba0f6b40fa0d2042ce7c560902 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -3578,6 +3578,7 @@ public abstract class Entity
+@@ -3580,6 +3580,7 @@ public abstract class Entity
      }
  
      protected void handlePortal() {
@@ -452,7 +452,7 @@ index 9323beb98dc2a86e67111c089aa4c7f0125bdfe1..c72d07d3b111959226bba8e6a24274a1
          if (this.level() instanceof ServerLevel level) {
              this.processPortalCooldown();
              if (this.portalProcess != null) {
-@@ -4176,6 +4177,7 @@ public abstract class Entity
+@@ -4178,6 +4179,7 @@ public abstract class Entity
      }
  
      private @Nullable Entity teleportCrossDimension(final ServerLevel oldLevel, final ServerLevel newLevel, final TeleportTransition transition) {

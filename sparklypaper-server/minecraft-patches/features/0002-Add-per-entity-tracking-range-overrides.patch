@@ -5,7 +5,7 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index 7f0df1c26f93d53b5925c564374f3e5fa6d966b3..2460f3f63f37b74deaaf9f8fe42f0dfbc49330e4 100644
+index 7e9361407042ddaabe3f66ee8957ae84b6ef2317..391bd436badb099f60ebdeed7fbc0377666814ab 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
 @@ -995,6 +995,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
@@ -17,10 +17,10 @@ index 7f0df1c26f93d53b5925c564374f3e5fa6d966b3..2460f3f63f37b74deaaf9f8fe42f0dfb
                  int updateInterval = type.updateInterval();
                  if (this.entityMap.containsKey(entity.getId())) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 1530810cdb74810e37e3e22ce4fcda4ee7511055..9323beb98dc2a86e67111c089aa4c7f0125bdfe1 100644
+index d958c4717739e588c5f8985dec5d215c745f49fc..6863cf758ca591a9a1ce607633f5385cfd7eccd2 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -382,6 +382,7 @@ public abstract class Entity
+@@ -383,6 +383,7 @@ public abstract class Entity
      private final int despawnTime; // Paper - entity despawn time limit
      public int totalEntityAge; // Paper - age-like counter for all entities
      public final io.papermc.paper.entity.activation.ActivationType activationType = io.papermc.paper.entity.activation.ActivationType.activationTypeFor(this); // Paper - EAR 2/tracking ranges

@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -89,6 +_,7 @@
+@@ -106,6 +_,7 @@
  
      public static final CraftMagicNumbers INSTANCE = new CraftMagicNumbers();
      public static final boolean DISABLE_OLD_API_SUPPORT = Boolean.getBoolean("paper.disableOldApiSupport"); // Paper
@@ -8,7 +8,7 @@
  
      private final Commodore commodore = new Commodore();
  
-@@ -209,7 +_,7 @@
+@@ -226,7 +_,7 @@
      @Override
      public Material getMaterial(String material, int version) {
          Preconditions.checkArgument(material != null, "material == null");
@@ -17,7 +17,7 @@
  
          // Fastpath up to date materials
          if (version == this.getDataVersion()) {
-@@ -542,7 +_,7 @@
+@@ -614,7 +_,7 @@
  
          CompoundTag tag = MCUtil.deserializeTagFromBytes(data);
          int dataVersion = NbtUtils.getDataVersion(tag, 0);
