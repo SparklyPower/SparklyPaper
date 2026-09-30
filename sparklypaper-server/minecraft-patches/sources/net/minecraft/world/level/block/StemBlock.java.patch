@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/StemBlock.java
 +++ b/net/minecraft/world/level/block/StemBlock.java
-@@ -82,6 +_,56 @@
+@@ -64,6 +_,56 @@
      @Override
      protected void randomTick(BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
          if (level.getRawBrightness(pos, 0) >= 9) {
@@ -57,7 +57,7 @@
              float growthSpeed = CropBlock.getGrowthSpeed(this, level, pos);
              if (random.nextFloat() < ((this == Blocks.PUMPKIN_STEM ? level.spigotConfig.pumpkinModifier : level.spigotConfig.melonModifier) / (100.0F * (Math.floor((25.0F / growthSpeed) + 1))))) { // Spigot - SPIGOT-7159: Better modifier resolution
                  int age = state.getValue(AGE);
-@@ -108,6 +_,8 @@
+@@ -90,6 +_,8 @@
                  }
              }
          }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/CropBlock.java
 +++ b/net/minecraft/world/level/block/CropBlock.java
-@@ -80,6 +_,57 @@
+@@ -73,6 +_,57 @@
          if (level.getRawBrightness(pos, 0) >= 9) {
              int age = this.getAge(state);
              if (age < this.getMaxAge()) {
@@ -58,7 +58,7 @@
                  float growthSpeed = getGrowthSpeed(this, level, pos);
                  // Spigot start
                  int modifier = 100;
-@@ -102,6 +_,8 @@
+@@ -95,6 +_,8 @@
                      org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(level, pos, this.getStateForAge(age + 1), Block.UPDATE_CLIENTS); // CraftBukkit
                  }
              }

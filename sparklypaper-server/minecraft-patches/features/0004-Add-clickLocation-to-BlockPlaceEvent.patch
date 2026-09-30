@@ -5,10 +5,10 @@ Subject: [PATCH] Add clickLocation to BlockPlaceEvent
 
 
 diff --git a/net/minecraft/world/item/BlockItem.java b/net/minecraft/world/item/BlockItem.java
-index b94c4f0a6908a37d8a07dba6ff3ece7193aca1b5..c303347c220ecdb6d5605e92b85e6efd9c693f0f 100644
+index 68f1e9483b93ef071877a4c99f4bd14e0d363145..8d81a482ebe636d84c15f7c72e2b21fe5fe85c07 100644
 --- a/net/minecraft/world/item/BlockItem.java
 +++ b/net/minecraft/world/item/BlockItem.java
-@@ -95,7 +95,7 @@ public class BlockItem extends Item {
+@@ -103,7 +103,7 @@ public class BlockItem extends Item {
              placedState.getBlock().setPlacedBy(level, pos, placedState, player, itemStack);
              // CraftBukkit start - special case for handling block placement with water lilies, frog spawn and snow buckets
              if (player != null && (this instanceof PlaceOnWaterBlockItem || this instanceof SolidBucketItem)) {
@@ -18,18 +18,18 @@ index b94c4f0a6908a37d8a07dba6ff3ece7193aca1b5..c303347c220ecdb6d5605e92b85e6efd
                      ((org.bukkit.craftbukkit.block.CraftBlockState) previousState).revertPlace(false);
  
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index 95fd1ba6f9b246ca3e41c93ef20497125f82fb5d..99c42a9159d9ae4081e6b8133950e915488cf947 100644
+index 00861318771cd184c9f75a9a036deee9ec2ba310..e52d970069d2c4ebb7ca5138cc43ab50860c305e 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -444,9 +444,9 @@ public final class ItemStack implements DataComponentHolder, ItemInstance {
-             InteractionHand hand = context.getHand();
-             org.bukkit.event.block.BlockPlaceEvent placeEvent = null;
-             if (capturedBlockStates.size() > 1) {
--                placeEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockMultiPlaceEvent(level, player, hand, (List<org.bukkit.block.BlockState>) (List<? extends org.bukkit.block.BlockState>) capturedBlockStates, pos);
+@@ -445,9 +445,9 @@ public final class ItemStack implements DataComponentHolder, ItemInstance {
+                 InteractionHand hand = context.getHand();
+                 org.bukkit.event.block.BlockPlaceEvent placeEvent = null;
+                 if (capturedBlockStates.size() > 1) {
+-                    placeEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockMultiPlaceEvent(level, player, hand, (List<org.bukkit.block.BlockState>) (List<? extends org.bukkit.block.BlockState>) capturedBlockStates, pos);
 +                placeEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockMultiPlaceEvent(level, player, hand, (List<org.bukkit.block.BlockState>) (List<? extends org.bukkit.block.BlockState>) capturedBlockStates, pos, context.getClickLocation()); // SparklyPaper - Add clickLocation to BlockPlaceEvent
-             } else if (capturedBlockStates.size() == 1 && usedItem != Items.POWDER_SNOW_BUCKET) { // Paper - Fix cancelled powdered snow bucket placement
--                placeEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockPlaceEvent(level, player, hand, capturedBlockStates.getFirst(), pos);
+                 } else if (capturedBlockStates.size() == 1 && usedItem != Items.POWDER_SNOW_BUCKET) { // Paper - Fix cancelled powdered snow bucket placement
+-                    placeEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockPlaceEvent(level, player, hand, capturedBlockStates.getFirst(), pos);
 +                placeEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callBlockPlaceEvent(level, player, hand, capturedBlockStates.getFirst(), pos, context.getClickLocation()); // SparklyPaper - Add clickLocation to BlockPlaceEvent
-             }
+                 }
  
-             if (placeEvent != null && (placeEvent.isCancelled() || !placeEvent.canBuild())) {
+                 if (placeEvent != null && (placeEvent.isCancelled() || !placeEvent.canBuild())) {

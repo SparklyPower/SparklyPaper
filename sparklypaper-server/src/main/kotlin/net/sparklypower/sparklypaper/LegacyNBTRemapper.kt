@@ -1,6 +1,6 @@
 package net.sparklypower.sparklypaper
 
-import ca.spottedleaf.dataconverter.types.MapType
+import ca.spottedleaf.converter.types.MapType
 
 object LegacyNBTRemapper {
     /**

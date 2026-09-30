@@ -5,22 +5,22 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index 7e9361407042ddaabe3f66ee8957ae84b6ef2317..391bd436badb099f60ebdeed7fbc0377666814ab 100644
+index fd0b9f20fbdd523d51550fd6009b5011e6e7e6e6..e5ed420ceb476dcc357c2ee8ffd2279e459613a1 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -995,6 +995,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+@@ -994,6 +994,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
              EntityType<?> type = entity.getType();
              int range = type.clientTrackingRange() * 16;
              range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Spigot
 +            if (entity.trackingRangeOverride != -1) range = entity.trackingRangeOverride; // SparklyPaper - per-entity tracking range override
              if (range != 0) {
-                 int updateInterval = type.updateInterval();
                  if (this.entityMap.containsKey(entity.getId())) {
+                     throw (IllegalStateException)Util.pauseInIde(new IllegalStateException("Entity is already tracked!"));
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index d958c4717739e588c5f8985dec5d215c745f49fc..6863cf758ca591a9a1ce607633f5385cfd7eccd2 100644
+index cf3619b6de23f32e9e5a81fbe287fb438ecfcabc..f23731f37c2120797688d5f595580039ca2d7780 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -383,6 +383,7 @@ public abstract class Entity
+@@ -388,6 +388,7 @@ public abstract class Entity
      private final int despawnTime; // Paper - entity despawn time limit
      public int totalEntityAge; // Paper - age-like counter for all entities
      public final io.papermc.paper.entity.activation.ActivationType activationType = io.papermc.paper.entity.activation.ActivationType.activationTypeFor(this); // Paper - EAR 2/tracking ranges

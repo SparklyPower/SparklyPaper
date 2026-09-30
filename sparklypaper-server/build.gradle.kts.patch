@@ -26,7 +26,7 @@
      minecraftVersion = providers.gradleProperty("mcVersion")
      gitFilePatches = false
  
-@@ -104,7 +_,19 @@
+@@ -86,7 +_,19 @@
      }
  }
  
@@ -47,7 +47,7 @@
  configurations.named(log4jPlugins.compileClasspathConfigurationName) {
      extendsFrom(configurations.compileClasspath.get())
  }
-@@ -127,7 +_,12 @@
+@@ -109,7 +_,12 @@
  }
  
  dependencies {
@@ -58,10 +58,10 @@
 +    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 +    implementation("com.charleskorn.kaml:kaml:0.97.0")
 +    // SparklyPaper end
-     implementation("ca.spottedleaf:leafpile:1.0.0")
-     implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
-     implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -193,9 +_,14 @@
+     implementation(platform("ca.spottedleaf.leafpile:bom:1.2.4"))
+     implementation("ca.spottedleaf.leafpile:common")
+     implementation("ca.spottedleaf.leafpile:concurrentutil")
+@@ -169,9 +_,14 @@
          val build = System.getenv("BUILD_NUMBER") ?: null
          val buildTime = providers.environmentVariable("BUILD_STARTED_AT").map(Instant::parse).orElse(Instant.EPOCH).get()
          val gitHash = git.exec(providers, "rev-parse", "--short=7", "HEAD").get().trim()
@@ -77,7 +77,7 @@
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "Paper",
-@@ -204,8 +_,8 @@
+@@ -180,8 +_,8 @@
              "Specification-Title" to "Paper",
              "Specification-Version" to project.version,
              "Specification-Vendor" to "Paper Team",
@@ -88,7 +88,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -264,7 +_,7 @@
+@@ -249,7 +_,7 @@
      jvmArgumentProviders.add(provider)
  }
  

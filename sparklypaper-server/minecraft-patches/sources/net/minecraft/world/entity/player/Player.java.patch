@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -2060,6 +_,12 @@
+@@ -2055,6 +_,12 @@
              return ItemStack.EMPTY;
          }
  
 +        // SparklyPaper start - Add EntityGetProjectileForWeaponEvent
-+        net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(heldWeapon));
++        net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitMirror(heldWeapon));
 +        event.callEvent();
 +        if (event.getArrow() != null)
 +            return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());

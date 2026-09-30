@@ -8,10 +8,10 @@ It is useful when you need to "bootstrap" a connection, that is, you want to que
 Using the player's unique ID is not a good solution because of race conditions where a player may have multiple connections in flight, so using a unique ID per connection is more safe
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 9fbc7e93712672dbab67f931e2aee447d803607b..4d38aa84778fe5020731931f9d8c0ee83497ae52 100644
+index 936200d7620e1fe83eb45ddbcff86b6b6ecaab8f..b15449b56340513b4088259cc34d4df83c8e48ef 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -66,6 +66,10 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -65,6 +65,10 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
      private final PacketFlow receiving;
      private volatile boolean sendLoginDisconnect = true;
      private final Queue<WrappedConsumer> pendingActions = Queues.newConcurrentLinkedQueue(); // Paper - Optimize network
@@ -22,7 +22,7 @@ index 9fbc7e93712672dbab67f931e2aee447d803607b..4d38aa84778fe5020731931f9d8c0ee8
      public Channel channel;
      public SocketAddress address;
      // Spigot start
-@@ -881,7 +885,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -892,7 +896,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
                      /* Player was logged in, either game listener or configuration listener */
                      final com.mojang.authlib.GameProfile profile = commonPacketListener.getOwner();
                      new com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent(profile.id(),
@@ -31,7 +31,7 @@ index 9fbc7e93712672dbab67f931e2aee447d803607b..4d38aa84778fe5020731931f9d8c0ee8
                  } else if (packetListener instanceof net.minecraft.server.network.ServerLoginPacketListenerImpl loginListener) {
                      /* Player is login stage */
                      switch (loginListener.state) {
-@@ -891,7 +895,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -902,7 +906,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
                          case ACCEPTED:
                              final com.mojang.authlib.GameProfile profile = loginListener.authenticatedProfile; /* Should be non-null at this stage */
                              new com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent(profile.id(), profile.name(),

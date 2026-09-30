@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/block/Blocks.java
 +++ b/net/minecraft/world/level/block/Blocks.java
-@@ -5846,6 +_,52 @@
+@@ -5771,6 +_,52 @@
              .sound(SoundType.SWEET_BERRY_BUSH)
-             .pushReaction(PushReaction.DESTROY)
+             .pushReaction(PushReaction.POPPED)
      );
 +    // SparklyPaper start - SparklyPower Survival custom blocks
 +    // Blocks' strength should be synced with the replaced block on the client side!

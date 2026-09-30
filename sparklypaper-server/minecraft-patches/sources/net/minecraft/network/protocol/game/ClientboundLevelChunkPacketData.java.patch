@@ -1,8 +1,8 @@
 --- a/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 +++ b/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-@@ -30,7 +_,7 @@
+@@ -39,7 +_,7 @@
+         ClientboundLevelChunkPacketData::new
      );
-     private static final int TWO_MEGABYTES = 2097152; // Paper - diff on change - if this changes, update PacketEncoder
      private final Map<Heightmap.Types, long[]> heightmaps;
 -    private final byte[] buffer;
 +    public byte[] buffer; // SparklyPaper - Helpful NMS packet changes: remove final and make public
