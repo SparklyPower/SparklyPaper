@@ -196,7 +196,7 @@ index c4cfb53e145d69666ffc27ef4ee0c50b54eb9143..48dbda1457c14f411de8d76bbb71be2d
              }
          }
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index b09d608074628fafaeb6c543fca0f2e3cba5650d..8c6ab1590ec38c80960411be6b991979b0ee8733 100644
+index b09d608074628fafaeb6c543fca0f2e3cba5650d..0a62850b30081220a57483117a924eb8926883e8 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -197,7 +197,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
@@ -223,7 +223,7 @@ index b09d608074628fafaeb6c543fca0f2e3cba5650d..8c6ab1590ec38c80960411be6b991979
          this.chunkDataController = new ca.spottedleaf.moonrise.patches.chunk_system.io.datacontroller.ChunkDataController((ServerLevel)(Object)this, this.chunkTaskScheduler);
          // Paper end - rewrite chunk system
          this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
-+        this.tickExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new net.sparklypower.sparklypaper.ServerLevelTickExecutorThreadFactory(getWorld().getName())); // SparklyPaper - parallel world ticking
++        this.tickExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new net.sparklypower.sparklypaper.ServerLevelTickExecutorThreadFactory(this)); // SparklyPaper - parallel world ticking
      }
  
      // Paper start
