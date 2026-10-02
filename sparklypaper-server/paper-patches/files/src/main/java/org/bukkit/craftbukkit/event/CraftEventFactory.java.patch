@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -1440,6 +_,23 @@
+@@ -1441,6 +_,23 @@
          Bukkit.getPluginManager().callEvent(crafterCraftEvent);
          return crafterCraftEvent;
      }
@@ -10,10 +10,10 @@
 +        org.bukkit.inventory.ItemStack[] matrix = new org.bukkit.inventory.ItemStack[container.getItems().size()];
 +        int i = 0;
 +        for (ItemStack item : container.getItems()) {
-+            matrix[i] = CraftItemStack.asCraftMirror(item);
++            matrix[i] = CraftItemStack.asBukkitMirror(item);
 +            i++;
 +        }
-+        org.bukkit.inventory.ItemStack bukkitResult = CraftItemStack.asCraftMirror(result);
++        org.bukkit.inventory.ItemStack bukkitResult = CraftItemStack.asBukkitMirror(result);
 +
 +        net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent event = new net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent(matrix, recipe, bukkitResult);
 +        Bukkit.getPluginManager().callEvent(event);

@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -69,6 +_,7 @@
+@@ -68,6 +_,7 @@
      public final boolean transferred; // Paper
      public boolean iKnowThisMayNotBeTheBestIdeaButPleaseDisableUsernameValidation = false; // Paper - username validation overriding
      private int velocityLoginMessageId = -1; // Paper - Add Velocity IP Forwarding Support
@@ -8,7 +8,7 @@
      public java.util.@Nullable UUID requestedUuid; // Paper
      private final io.papermc.paper.connection.PaperPlayerLoginConnection paperLoginConnection; // Paper - Config API
  
-@@ -179,12 +_,24 @@
+@@ -178,12 +_,24 @@
              } else {
                  // Paper start - Add Velocity IP Forwarding Support
                  if (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) {
@@ -39,7 +39,7 @@
                  }
                  // Paper end - Add Velocity IP Forwarding Support
                  // Paper start - Virtual authenticator threads
-@@ -318,7 +_,9 @@
+@@ -319,7 +_,9 @@
      // CraftBukkit start
      private GameProfile callPlayerPreLoginEvents(GameProfile gameprofile) throws Exception { // Paper - Add more fields to AsyncPlayerPreLoginEvent
          // Paper start - Add Velocity IP Forwarding Support

@@ -1,6 +1,6 @@
---- a/src/main/java/io/papermc/paper/command/MSPTCommand.java
-+++ b/src/main/java/io/papermc/paper/command/MSPTCommand.java
-@@ -82,6 +_,46 @@
+--- a/src/main/java/io/papermc/paper/command/PaperMSPTCommand.java
++++ b/src/main/java/io/papermc/paper/command/PaperMSPTCommand.java
+@@ -76,6 +_,46 @@
                  )
              )
          );
@@ -44,10 +44,10 @@
 +            );
 +        }
 +        // SparklyPaper end
-         return true;
+         return Command.SINGLE_SUCCESS;
      }
  
-@@ -92,6 +_,23 @@
+@@ -86,6 +_,23 @@
          double maxD = reportData == null ? 0.0 : reportData.timePerTickData().segmentAll().greatest() * 1.0E-6D;
          return Arrays.asList(getColor(avgD), getColor(minD), getColor(maxD));
      }
@@ -70,4 +70,4 @@
 +    // SparklyPaper end
  
      private static Component getColor(double avg) {
-         return text(ONE_DECIMAL_PLACES.get().format(avg), avg >= 50 ? RED : avg >= 40 ? YELLOW : GREEN);
+         return text(DF.format(avg), avg >= 50 ? RED : avg >= 40 ? YELLOW : GREEN);

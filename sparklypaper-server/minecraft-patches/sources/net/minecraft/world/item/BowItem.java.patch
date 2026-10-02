@@ -5,7 +5,7 @@
              int timeHeld = this.getUseDuration(itemStack, entity) - remainingTime;
              float pow = getPowerForTime(timeHeld);
 +            // SparklyPaper start - Add PreEntityShootBowEvent
-+            net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent preShootEvent = new net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent(player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(itemStack), player.getUsedItemHand() == InteractionHand.MAIN_HAND ? org.bukkit.inventory.EquipmentSlot.HAND : org.bukkit.inventory.EquipmentSlot.OFF_HAND, pow);
++            net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent preShootEvent = new net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent(player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitMirror(itemStack), player.getUsedItemHand() == InteractionHand.MAIN_HAND ? org.bukkit.inventory.EquipmentSlot.HAND : org.bukkit.inventory.EquipmentSlot.OFF_HAND, pow);
 +            if (!preShootEvent.callEvent())
 +                return false;
 +            // SparklyPaper end

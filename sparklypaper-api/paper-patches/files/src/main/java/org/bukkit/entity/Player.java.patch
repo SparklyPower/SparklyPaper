@@ -1,9 +1,9 @@
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -4020,4 +_,104 @@
-     default ObjectContents asObjectContents() {
-         return this.getPlayerProfile().asObjectContents();
-     }
+@@ -4084,4 +_,104 @@
+      * @return the post-effects
+      */
+     PlayerPostEffects postEffects();
 +
 +    // SparklyPaper start - per-player chunk rate overrides
 +    /**

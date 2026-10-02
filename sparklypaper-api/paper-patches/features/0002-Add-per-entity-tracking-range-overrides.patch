@@ -5,10 +5,10 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/src/main/java/org/bukkit/entity/Entity.java b/src/main/java/org/bukkit/entity/Entity.java
-index e24744cc523f1ce3c7c8e27b14d3337a3f17f4bb..9c196d19f7dc72801b8821190a3b7e0b87c4d46c 100644
+index 00376681df7492ac0e080dcb86284ce15d5acf70..10ec994b0516f0a7244ee0f216eb96f39236bbda 100644
 --- a/src/main/java/org/bukkit/entity/Entity.java
 +++ b/src/main/java/org/bukkit/entity/Entity.java
-@@ -1332,4 +1332,21 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
+@@ -1359,4 +1359,21 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
       */
      void broadcastHurtAnimation(@NotNull java.util.Collection<Player> players);
      // Paper end - broadcast hurt animation

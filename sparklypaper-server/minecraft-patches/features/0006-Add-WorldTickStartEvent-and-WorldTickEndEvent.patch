@@ -5,12 +5,12 @@ Subject: [PATCH] Add WorldTickStartEvent and WorldTickEndEvent
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 19a25cb18d1496881e38ccaaf4a921deba4bed05..b298659a06df923449a922ae8d9c852f220e416c 100644
+index 626f563464d6a63028de293c0307f9a25ab35500..4fcccf994632db7f0ec54ed7ffbb00882fd8062c 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1832,11 +1832,15 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-                     try {
+@@ -1813,11 +1813,15 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                          ca.spottedleaf.moonrise.common.util.TickThread.ServerLevelTickThread currentThread = (ca.spottedleaf.moonrise.common.util.TickThread.ServerLevelTickThread) Thread.currentThread();
+                         currentThread.currentlyTickingServerLevel = level;
  
 +                        new net.sparklypower.sparklypaper.event.world.WorldTickStartEvent(level.getWorld(), this.tickCount).callEvent();
 +

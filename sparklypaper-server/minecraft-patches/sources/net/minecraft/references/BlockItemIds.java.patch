@@ -1,6 +1,6 @@
 --- a/net/minecraft/references/BlockItemIds.java
 +++ b/net/minecraft/references/BlockItemIds.java
-@@ -788,4 +_,13 @@
+@@ -815,4 +_,13 @@
      private static WeatheringCopperCollection<BlockItemId> createSimpleCopper(final String baseName) {
          return WeatheringCopperCollection.prefixWithState(WeatheringCopperCollection.create(baseName)).map(BlockItemId::create);
      }

@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 25 Sep 2026 18:33:00 -0300
+Subject: [PATCH] Add clickLocation to BlockPlaceEvent
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+index a9a82b12fb9865f75f648e2fd7edb00552a29a50..656df012f8033d9b951c46c166747360434a4ab1 100644
+--- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
++++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+@@ -501,7 +501,7 @@ public class CraftEventFactory {
+         return event.getResonatedEntities().stream().map((bukkitEntity) -> ((CraftLivingEntity) bukkitEntity).getHandle());
+     }
+ 
+-    public static BlockMultiPlaceEvent callBlockMultiPlaceEvent(ServerLevel level, net.minecraft.world.entity.player.Player player, InteractionHand hand, List<BlockState> blockStates, BlockPos clickedPos) {
++    public static BlockMultiPlaceEvent callBlockMultiPlaceEvent(ServerLevel level, net.minecraft.world.entity.player.Player player, InteractionHand hand, List<BlockState> blockStates, BlockPos clickedPos, Vec3 clickLocation) { // SparklyPaper - Add clickLocation to BlockPlaceEvent
+         Player cplayer = (Player) player.getBukkitEntity();
+         Block clickedBlock = CraftBlock.at(level, clickedPos);
+ 
+@@ -514,13 +514,13 @@ public class CraftEventFactory {
+         }
+ 
+         EquipmentSlot handSlot = CraftEquipmentSlot.getHand(hand);
+-        BlockMultiPlaceEvent event = new BlockMultiPlaceEvent(blockStates, clickedBlock, cplayer.getInventory().getItem(handSlot), cplayer, canBuild, handSlot);
++        BlockMultiPlaceEvent event = new BlockMultiPlaceEvent(blockStates, clickedBlock, cplayer.getInventory().getItem(handSlot), cplayer, canBuild, handSlot, org.bukkit.craftbukkit.util.CraftLocation.toBukkit(clickLocation, level)); // SparklyPaper - Add clickLocation to BlockPlaceEvent
+         event.callEvent();
+ 
+         return event;
+     }
+ 
+-    public static BlockPlaceEvent callBlockPlaceEvent(ServerLevel level, net.minecraft.world.entity.player.Player player, InteractionHand hand, BlockState replacedState, BlockPos clickedPos) {
++    public static BlockPlaceEvent callBlockPlaceEvent(ServerLevel level, net.minecraft.world.entity.player.Player player, InteractionHand hand, BlockState replacedState, BlockPos clickedPos, Vec3 clickLocation) { // SparklyPaper - Add clickLocation to BlockPlaceEvent
+         Player cplayer = (Player) player.getBukkitEntity();
+ 
+         Block clickedBlock = CraftBlock.at(level, clickedPos);
+@@ -529,7 +529,7 @@ public class CraftEventFactory {
+         boolean canBuild = canBuild(level, cplayer, placedBlock.getX(), placedBlock.getZ());
+ 
+         EquipmentSlot handSlot = CraftEquipmentSlot.getHand(hand);
+-        BlockPlaceEvent event = new BlockPlaceEvent(placedBlock, replacedState, clickedBlock, cplayer.getInventory().getItem(handSlot), cplayer, canBuild, handSlot);
++        BlockPlaceEvent event = new BlockPlaceEvent(placedBlock, replacedState, clickedBlock, cplayer.getInventory().getItem(handSlot), cplayer, canBuild, handSlot, org.bukkit.craftbukkit.util.CraftLocation.toBukkit(clickLocation, level)); // SparklyPaper - Add clickLocation to BlockPlaceEvent
+         event.callEvent();
+ 
+         return event;

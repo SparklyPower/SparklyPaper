@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java
 +++ b/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java
-@@ -22,6 +_,12 @@
+@@ -26,6 +_,12 @@
  
      @Override
      public void apply(final ServerLevel serverLevel, final int enchantmentLevel, final EnchantedItemInUse item, final Entity entity, final Vec3 position) {
 +        // SparklyPaper start - Add EntityApplyEnchantmentImpulseEvent
-+        net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent event = new net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(item.itemStack()));
++        net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent event = new net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitMirror(item.itemStack()));
 +        if (!event.callEvent())
 +            return;
 +        // SparklyPaper end
 +
-         Vec3 look = entity.getLookAngle();
-         Vec3 direction = look.addLocalCoordinates(this.direction).multiply(this.coordinateScale).scale(this.magnitude.calculate(enchantmentLevel));
-         entity.addDeltaMovement(direction);
+         Quaternionf look = entity.getLookQuaternion();
+         Vector3d direction = look.transform(this.direction.x, this.direction.y, this.direction.z, new Vector3d())
+             .mul(this.coordinateScale.x, this.coordinateScale.y, this.coordinateScale.z)

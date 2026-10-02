@@ -8,10 +8,10 @@ It is useful when you need to "bootstrap" a connection, that is, you want to que
 Using the player's unique ID is not a good solution because of race conditions where a player may have multiple connections in flight, so using a unique ID per connection is more safe
 
 diff --git a/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java b/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java
-index 49ea407cd91297cd5df98ecf23aa2aa54196facb..ada3e9cda4500a751790262c48c879aa4554436a 100644
+index a49fcd92382fadc55bf95edcb41da128bb3b8fb7..42b7e61fb7021458a7c2fd70a556ec0ef7d8c044 100644
 --- a/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java
 +++ b/src/main/java/io/papermc/paper/connection/PaperPlayerConfigurationConnection.java
-@@ -153,4 +153,11 @@ public class PaperPlayerConfigurationConnection extends PaperCommonConnection<Se
+@@ -176,4 +176,11 @@ public class PaperPlayerConfigurationConnection extends PaperCommonConnection<Se
      public boolean isConnected() {
          return this.packetListener.connection.isConnected();
      }
