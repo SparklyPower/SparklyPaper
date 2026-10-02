@@ -281,15 +281,15 @@ index 69cdd304d255d52c9b7dc9b6a33ffdb630b79abe..636ec7172e9b535f7b4f95b4a9743217
 +
 +    // SparklyPaper start - parallel world ticking
 +    public static class ServerLevelTickThread extends TickThread {
-+        public ServerLevelTickThread(String name) {
-+            super(name);
++        public final net.minecraft.server.level.ServerLevel currentlyTickingServerLevel;
++        public ServerLevelTickThread(net.minecraft.server.level.ServerLevel world) {
++            super(String.format("serverlevel-tick-worker [%s]", world.dimension().identifier()));
++            this.currentlyTickingServerLevel = world;
 +        }
-+
-+        public ServerLevelTickThread(Runnable run, String name) {
-+            super(run, name);
++        public ServerLevelTickThread(Runnable run, net.minecraft.server.level.ServerLevel world) {
++            super(run, String.format("serverlevel-tick-worker [%s]", world.dimension().identifier()));
++            this.currentlyTickingServerLevel = world;
 +        }
-+
-+        public net.minecraft.server.level.ServerLevel currentlyTickingServerLevel;
      }
 +    // SparklyPaper end
  }
