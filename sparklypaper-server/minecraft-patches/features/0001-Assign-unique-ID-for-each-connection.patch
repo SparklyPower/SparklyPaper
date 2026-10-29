@@ -8,7 +8,7 @@ It is useful when you need to "bootstrap" a connection, that is, you want to que
 Using the player's unique ID is not a good solution because of race conditions where a player may have multiple connections in flight, so using a unique ID per connection is more safe
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 936200d7620e1fe83eb45ddbcff86b6b6ecaab8f..b15449b56340513b4088259cc34d4df83c8e48ef 100644
+index 76596e87945f0b95af8032338a64817a8faed4d0..bfb31a4e6ec6eac47ef8bd204e77e0da280ba7c1 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -65,6 +65,10 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -26,8 +26,8 @@ index 936200d7620e1fe83eb45ddbcff86b6b6ecaab8f..b15449b56340513b4088259cc34d4df8
                      /* Player was logged in, either game listener or configuration listener */
                      final com.mojang.authlib.GameProfile profile = commonPacketListener.getOwner();
                      new com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent(profile.id(),
--                        profile.name(), ((InetSocketAddress) this.address).getAddress(), false).callEvent();
-+                        profile.name(), ((InetSocketAddress) this.address).getAddress(), false, this.connectionId).callEvent(); // SparklyPaper - assign unique ID for each connection
+-                        profile.name(), this.address, false).callEvent();
++                        profile.name(), this.address, false, this.connectionId).callEvent(); // SparklyPaper - assign unique ID for each connection
                  } else if (packetListener instanceof net.minecraft.server.network.ServerLoginPacketListenerImpl loginListener) {
                      /* Player is login stage */
                      switch (loginListener.state) {
@@ -35,8 +35,8 @@ index 936200d7620e1fe83eb45ddbcff86b6b6ecaab8f..b15449b56340513b4088259cc34d4df8
                          case ACCEPTED:
                              final com.mojang.authlib.GameProfile profile = loginListener.authenticatedProfile; /* Should be non-null at this stage */
                              new com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent(profile.id(), profile.name(),
--                                ((InetSocketAddress) this.address).getAddress(), false).callEvent();
-+                                ((InetSocketAddress) this.address).getAddress(), false, this.connectionId).callEvent(); // SparklyPaper - assign unique ID for each connection
+-                                this.address, false).callEvent();
++                                this.address, false, this.connectionId).callEvent(); // SparklyPaper - assign unique ID for each connection
                      }
                  }
                  // Paper end - Add PlayerConnectionCloseEvent

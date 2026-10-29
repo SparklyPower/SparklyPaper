@@ -1,6 +1,6 @@
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3402,4 +_,70 @@
+@@ -3405,4 +_,70 @@
      public PlayerPostEffects postEffects() {
          return new PaperPlayerPostEffects(this.getHandle());
      }

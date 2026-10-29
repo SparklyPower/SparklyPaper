@@ -5,11 +5,11 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 078083c88f336afd8bfe69c770c6d3ac486e826f..de5823a141e984edb2328988d7b1634c083da437 100644
+index 58fdb79adf624bc5a575e1ec296a9bd18c3d1801..5715d64eeef3645fe8143c17d5a7e2e232ee19c1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-@@ -1367,4 +1367,22 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
-         return this.getHandleRaw().get(PaperDataComponentType.bukkitToMinecraft(type)) != null;
+@@ -1441,4 +1441,22 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+             .removeIf(entry -> entry.getKey().namespace().equals(nameSpaced.namespace()));
      }
  
 +    // SparklyPaper start - per-entity tracking range override

@@ -5,10 +5,10 @@ Subject: [PATCH] Add clickLocation to BlockPlaceEvent
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index a9a82b12fb9865f75f648e2fd7edb00552a29a50..656df012f8033d9b951c46c166747360434a4ab1 100644
+index a9e131e2d81d5615fc8fc438c3aec0c85bac3a11..d6c8d804819c50c151164029f6d48f298d64f163 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -501,7 +501,7 @@ public class CraftEventFactory {
+@@ -507,7 +507,7 @@ public class CraftEventFactory {
          return event.getResonatedEntities().stream().map((bukkitEntity) -> ((CraftLivingEntity) bukkitEntity).getHandle());
      }
  
@@ -17,7 +17,7 @@ index a9a82b12fb9865f75f648e2fd7edb00552a29a50..656df012f8033d9b951c46c166747360
          Player cplayer = (Player) player.getBukkitEntity();
          Block clickedBlock = CraftBlock.at(level, clickedPos);
  
-@@ -514,13 +514,13 @@ public class CraftEventFactory {
+@@ -520,13 +520,13 @@ public class CraftEventFactory {
          }
  
          EquipmentSlot handSlot = CraftEquipmentSlot.getHand(hand);
@@ -33,7 +33,7 @@ index a9a82b12fb9865f75f648e2fd7edb00552a29a50..656df012f8033d9b951c46c166747360
          Player cplayer = (Player) player.getBukkitEntity();
  
          Block clickedBlock = CraftBlock.at(level, clickedPos);
-@@ -529,7 +529,7 @@ public class CraftEventFactory {
+@@ -535,7 +535,7 @@ public class CraftEventFactory {
          boolean canBuild = canBuild(level, cplayer, placedBlock.getX(), placedBlock.getZ());
  
          EquipmentSlot handSlot = CraftEquipmentSlot.getHand(hand);

@@ -8,18 +8,18 @@ It is useful when you need to "bootstrap" a connection, that is, you want to que
 Using the player's unique ID is not a good solution because of race conditions where a player may have multiple connections in flight, so using a unique ID per connection is more safe
 
 diff --git a/src/main/java/com/destroystokyo/paper/event/player/PlayerConnectionCloseEvent.java b/src/main/java/com/destroystokyo/paper/event/player/PlayerConnectionCloseEvent.java
-index 5f5afcdb3c9e669ed0e730c720ad91d16b95602c..941893faaf3ed892607c73f481247b107e3210ac 100644
+index 1d0e39a1854c5d9a90c61f02e05f79bd3f4a7fce..412eae37a88f3ca88479ec7fe6e4d976b8072449 100644
 --- a/src/main/java/com/destroystokyo/paper/event/player/PlayerConnectionCloseEvent.java
 +++ b/src/main/java/com/destroystokyo/paper/event/player/PlayerConnectionCloseEvent.java
-@@ -42,13 +42,15 @@ public class PlayerConnectionCloseEvent extends Event {
+@@ -44,13 +44,15 @@ public class PlayerConnectionCloseEvent extends Event {
      private final UUID playerUniqueId;
      private final String playerName;
-     private final InetAddress ipAddress;
+     private final SocketAddress ipAddress;
 +    private final long connectionId; // SparklyPaper - assign unique ID for each connection
  
      @ApiStatus.Internal
--    public PlayerConnectionCloseEvent(final UUID playerUniqueId, final String playerName, final InetAddress ipAddress, final boolean async) {
-+    public PlayerConnectionCloseEvent(final UUID playerUniqueId, final String playerName, final InetAddress ipAddress, final boolean async, final long connectionId) { // SparklyPaper - assign unique ID for each connection
+-    public PlayerConnectionCloseEvent(final UUID playerUniqueId, final String playerName, final SocketAddress ipAddress, final boolean async) {
++    public PlayerConnectionCloseEvent(final UUID playerUniqueId, final String playerName, final SocketAddress ipAddress, final boolean async, final long connectionId) { // SparklyPaper - assign unique ID for each connection
          super(async);
          this.playerUniqueId = playerUniqueId;
          this.playerName = playerName;
@@ -28,7 +28,7 @@ index 5f5afcdb3c9e669ed0e730c720ad91d16b95602c..941893faaf3ed892607c73f481247b10
      }
  
      /**
-@@ -80,4 +82,11 @@ public class PlayerConnectionCloseEvent extends Event {
+@@ -92,4 +94,11 @@ public class PlayerConnectionCloseEvent extends Event {
      public static HandlerList getHandlerList() {
          return HANDLER_LIST;
      }

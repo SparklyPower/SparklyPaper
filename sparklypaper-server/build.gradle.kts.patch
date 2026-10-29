@@ -58,7 +58,7 @@
 +    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 +    implementation("com.charleskorn.kaml:kaml:0.97.0")
 +    // SparklyPaper end
-     implementation(platform("ca.spottedleaf.leafpile:bom:1.2.4"))
+     implementation(platform("ca.spottedleaf.leafpile:bom:1.3.2"))
      implementation("ca.spottedleaf.leafpile:common")
      implementation("ca.spottedleaf.leafpile:concurrentutil")
 @@ -169,9 +_,14 @@
@@ -88,8 +88,8 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -249,7 +_,7 @@
-     jvmArgumentProviders.add(provider)
+@@ -259,7 +_,7 @@
+     )
  }
  
 -val generatedDir: java.nio.file.Path = layout.projectDirectory.dir("src/generated/java").asFile.toPath()

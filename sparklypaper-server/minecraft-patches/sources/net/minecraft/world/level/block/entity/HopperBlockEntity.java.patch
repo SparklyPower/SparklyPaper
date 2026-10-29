@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -228,7 +_,15 @@
-         for (int i = 0; i < hopper.getContainerSize(); ++i) {
+@@ -230,7 +_,15 @@
+             if (isSlotDisallowed(disallowedSlots, i)) continue; // Paper - Add PrepareHopperTransferEvent
              final ItemStack item = hopper.getItem(i);
              if (!item.isEmpty()) {
 +                // SparklyPaper start - InventoryPreMoveItemEvent
@@ -16,7 +16,7 @@
                  ItemStack origItemStack = item;
                  ItemStack movedItem = origItemStack;
  
-@@ -268,6 +_,10 @@
+@@ -270,6 +_,10 @@
      }
  
      private static boolean hopperPull(final Level level, final Hopper hopper, final Container container, ItemStack origItemStack, final int i) {
@@ -27,10 +27,19 @@
          ItemStack movedItem = origItemStack;
          final int originalItemCount = origItemStack.getCount();
          final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
-@@ -357,6 +_,36 @@
-         }
-     }
+@@ -417,6 +_,7 @@
  
+         Direction direction = self.facing.getOpposite();
+         if (isFullContainer(container, direction)) {
++            if (level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull() != 0) self.setCooldown(level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull()); // SparklyPaper - Allow throttling hopper checks if the target container is full
+             return false;
+         }
+ 
+@@ -436,6 +_,36 @@
+     private static boolean isSlotDisallowed(final long disallowedSlots, final int slot) {
+         return (disallowedSlots & (1L << slot)) != 0;
+     }
++
 +    // SparklyPaper start - InventoryPreMoveItemEvent
 +    private static boolean callPushPreMoveEvent(Container destination, HopperBlockEntity hopper) {
 +        final org.bukkit.inventory.Inventory destinationInventory = getInventory(destination);
@@ -60,15 +69,6 @@
 +        return result;
 +    }
 +    // SparklyPaper end
-+
+ 
      private static org.bukkit.inventory.Inventory getInventory(final Container container) {
          final org.bukkit.inventory.Inventory sourceInventory;
-         if (container instanceof net.minecraft.world.CompoundContainer compoundContainer) {
-@@ -425,6 +_,7 @@
- 
-         Direction direction = self.facing.getOpposite();
-         if (isFullContainer(container, direction)) {
-+            if (level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull() != 0) self.setCooldown(level.sparklyPaperConfig.getTicksPer().getHopperCooldownWhenTargetContainerIsFull()); // SparklyPaper - Allow throttling hopper checks if the target container is full
-             return false;
-         }
- 
