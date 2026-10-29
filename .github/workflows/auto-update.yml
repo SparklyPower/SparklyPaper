@@ -5,15 +5,20 @@ on:
     - cron: "0 0 * * *"
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+
       - name: Checkout SparklyPaper Repository
         uses: actions/checkout@v3
         with:
-          path: 'SparklyPaper'
           ref: 'ver/26.3'
           token: ${{ secrets.LORITTA_PAT }}
-        
+
       - name: Checkout Paper Repository
         uses: actions/checkout@v3
         with:
@@ -21,36 +26,57 @@ jobs:
           repository: "PaperMC/Paper"
           ref: 'main'
           token: ${{ secrets.LORITTA_PAT }}
-      
-      - name: Get Paper Latest Commit Hash
-        id: paperRef
+
+      - name: Get Latest Paper Version
+        id: upstreamVersion
         run: |
           ls
           cd Paper
-          echo "::set-output name=paperRef::$(git rev-parse HEAD)"
+          echo "paperRef=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "mcVersion=$(cat gradle.properties | perl -ne 'if (m/mcVersion=([0-9\.]+)/) { print $1 }')" >> "$GITHUB_OUTPUT"
           cd ..
 
-      - name: Get Paper Latest Commit Hash (short)
-        id: paperShortRef
-        run: |
-          ls
-          cd Paper
-          echo "::set-output name=paperShortRef::$(git rev-parse --short HEAD)"
-          cd ..
-          
-      - name: Update paperRef in SparklyPaper 
-        run: |
-          sed -i "s/\paperRef=.*/paperRef=$PAPER_REF/" SparklyPaper/gradle.properties
+      - name: Update paperRef to Paper's latest commit
         env:
-          PAPER_REF: ${{ steps.paperRef.outputs.paperRef }}
-          
-      - name: Write to repository
-        env:
-          PAPER_SHORT_REF: ${{ steps.paperShortRef.outputs.paperShortRef }}
+          UPSTREAM_PAPERREF: ${{needs.upstreamVersion.outputs.paperRef}}
+          UPSTREAM_MCVERSION: ${{needs.upstreamVersion.outputs.mcVersion}}
+        id: update
         run: |
-          cd SparklyPaper
-          git add gradle.properties
+          echo "currentPaperRef=$(cat gradle.properties | perl -ne 'if (m/paperRef=([0-9a-f]+)/) { print $1 }')" >> "$GITHUB_OUTPUT"
+          echo "currentMCVersion=$(cat gradle.properties | perl -ne 'if (m/mcVersion=([0-9\.]+)/) { print $1 }')" >> "$GITHUB_OUTPUT"
+          
+          if [[ "$UPSTREAM_MCVERSION" != "$currentMCVersion" ]]; then
+            echo "Mismatched Minecraft Versions! Upstream is using $mcVersion while we are using $currentMCVersion"
+            exit 1
+          fi
+
+          if [[ "$UPSTREAM_PAPERREF" == "$currentPaperRef" ]]; then
+            echo "We are already up to date :)"
+            exit 1
+          fi
+          
+          sed -i "s/^paperRef=.*/paperRef=$UPSTREAM_PAPERREF/" gradle.properties
+
+      - name: Configure Git User Details
+        run: git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      # If the patches don't apply or the server doesn't compile anymore, the workflow fails here and nothing is pushed,
+      # so the branch stays on the last Paper commit that works and the update needs to be done manually
+      - name: Apply Patches
+        run: |
+          chmod +x gradlew
+          ./gradlew applyAllPatches
+
+      - name: Build
+        run: ./gradlew build -x test
+
+      - name: Commit and push
+        run: |
+          chmod +x commit_upstream_update.sh
           git config user.name "Loritta Morenitta"
           git config user.email 47356322+LorittaMorenitta@users.noreply.github.com
-          git commit -m "Updated Upstream (Paper / $PAPER_SHORT_REF)"
+          ./commit_upstream_update.sh --allow-unchanged
           git push
