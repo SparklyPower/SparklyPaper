@@ -51,7 +51,7 @@ jobs:
           fi
 
           if [[ "$UPSTREAM_PAPERREF" == "$currentPaperRef" ]]; then
-            echo "We are already up to date :)"
+            echo "We are already up to date :) Upstream is using $UPSTREAM_PAPERREF while we are using $currentPaperRef"
             exit 1
           fi
           
