@@ -32,26 +32,25 @@ jobs:
         run: |
           ls
           cd Paper
-          echo "paperRef=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "mcVersion=$(cat gradle.properties | perl -ne 'if (m/mcVersion=([0-9\.]+)/) { print $1 }')" >> "$GITHUB_OUTPUT"
+          echo "paperRef=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "mcVersion=$(cat gradle.properties | perl -ne 'if (m/mcVersion=([0-9\.]+)/) { print $1 }')" >> $GITHUB_OUTPUT
           cd ..
 
       - name: Update paperRef to Paper's latest commit
-        env:
-          UPSTREAM_PAPERREF: ${{steps.upstreamVersion.outputs.paperRef}}
-          UPSTREAM_MCVERSION: ${{steps.upstreamVersion.outputs.mcVersion}}
         id: update
         run: |
+          upstreamPaperRef=${{steps.upstreamVersion.outputs.paperRef}}
+          upstreamMCVersion=${{steps.upstreamVersion.outputs.mcVersion}}
           currentPaperRef=$(cat gradle.properties | perl -ne 'if (m/paperRef=([0-9a-f]+)/) { print $1 }')"
           currentMCVersion=$(cat gradle.properties | perl -ne 'if (m/mcVersion=([0-9\.]+)/) { print $1 }')"
           
-          if [[ "$UPSTREAM_MCVERSION" != "$currentMCVersion" ]]; then
-            echo "Mismatched Minecraft Versions! Upstream is using $mcVersion while we are using $currentMCVersion"
+          if [[ "$upstreamMCVersion" != "$currentMCVersion" ]]; then
+            echo "Mismatched Minecraft Versions! Upstream is using $upstreamMCVersion while we are using $currentMCVersion"
             exit 1
           fi
 
-          if [[ "$UPSTREAM_PAPERREF" == "$currentPaperRef" ]]; then
-            echo "We are already up to date :) Upstream is using $UPSTREAM_PAPERREF while we are using $currentPaperRef"
+          if [[ "$upstreamPaperRef" == "$currentPaperRef" ]]; then
+            echo "We are already up to date :) Upstream is using $upstreamPaperRef while we are using $currentPaperRef"
             exit 1
           fi
           
