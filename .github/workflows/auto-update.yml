@@ -38,8 +38,8 @@ jobs:
 
       - name: Update paperRef to Paper's latest commit
         env:
-          UPSTREAM_PAPERREF: ${{needs.upstreamVersion.outputs.paperRef}}
-          UPSTREAM_MCVERSION: ${{needs.upstreamVersion.outputs.mcVersion}}
+          UPSTREAM_PAPERREF: ${{steps.upstreamVersion.outputs.paperRef}}
+          UPSTREAM_MCVERSION: ${{steps.upstreamVersion.outputs.mcVersion}}
         id: update
         run: |
           currentPaperRef=$(cat gradle.properties | perl -ne 'if (m/paperRef=([0-9a-f]+)/) { print $1 }')"
