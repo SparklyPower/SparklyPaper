@@ -42,8 +42,8 @@ jobs:
           UPSTREAM_MCVERSION: ${{needs.upstreamVersion.outputs.mcVersion}}
         id: update
         run: |
-          echo "currentPaperRef=$(cat gradle.properties | perl -ne 'if (m/paperRef=([0-9a-f]+)/) { print $1 }')" >> "$GITHUB_OUTPUT"
-          echo "currentMCVersion=$(cat gradle.properties | perl -ne 'if (m/mcVersion=([0-9\.]+)/) { print $1 }')" >> "$GITHUB_OUTPUT"
+          currentPaperRef=$(cat gradle.properties | perl -ne 'if (m/paperRef=([0-9a-f]+)/) { print $1 }')"
+          currentMCVersion=$(cat gradle.properties | perl -ne 'if (m/mcVersion=([0-9\.]+)/) { print $1 }')"
           
           if [[ "$UPSTREAM_MCVERSION" != "$currentMCVersion" ]]; then
             echo "Mismatched Minecraft Versions! Upstream is using $mcVersion while we are using $currentMCVersion"
