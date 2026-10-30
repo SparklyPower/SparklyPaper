@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:48 -0300
+Subject: [PATCH] Per-player statistic tracking opt-out
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 4d45435d16b5dea2afa59a12df0eedc6d9d28f2e..e0b31a1a6bf495b88c67a6dc852a30f07b0afec2 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -3457,4 +3457,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+         return this.getHandle().maxConcurrentChunkGeneratesOverride;
+     }
+     // SparklyPaper end
++
++    // SparklyPaper start - per-player statistic tracking opt-out
++    @Override
++    public void trackStatistic(org.bukkit.Statistic statistic, boolean tracked) {
++        com.google.common.base.Preconditions.checkNotNull(statistic, "statistic");
++        this.getHandle().getStats().setStatisticTracked(statistic, tracked);
++    }
++
++    @Override
++    public boolean isStatisticTracked(org.bukkit.Statistic statistic) {
++        com.google.common.base.Preconditions.checkNotNull(statistic, "statistic");
++        return this.getHandle().getStats().isStatisticTracked(statistic);
++    }
++    // SparklyPaper end - per-player statistic tracking opt-out
+ }

@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] Add PlayerMoveControllableVehicleEvent
+
+
+diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index f8541b86e20fe6c39613d7e7f1ac450d519ddd99..dc9dd21791a703ad4ea036da233fa3c42ad7d0c7 100644
+--- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -663,6 +663,31 @@ public class ServerGamePacketListenerImpl
+                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", vehicle.getPlainTextName(), this.player.getPlainTextName(), Math.sqrt(movedDist));
+                 }
+ 
++                // SparklyPaper start - Add PlayerMoveControllableVehicleEvent
++                org.bukkit.entity.Player craftPlayer = this.getCraftPlayer();
++                org.bukkit.entity.Entity bukkitVehicle = vehicle.getBukkitEntity();
++                if (bukkitVehicle instanceof org.bukkit.entity.Vehicle) {
++                    net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent playerMoveControllableVehicleEvent = new net.sparklypower.sparklypaper.event.player.PlayerMoveControllableVehicleEvent(
++                        craftPlayer,
++                        (org.bukkit.entity.Vehicle) bukkitVehicle,
++                        new org.bukkit.Location(craftPlayer.getWorld(), oldX, oldY, oldZ, targetYRot, targetXRot),
++                        new org.bukkit.Location(craftPlayer.getWorld(), targetX, targetY, targetZ, targetYRot, targetXRot)
++                    );
++                    if (!playerMoveControllableVehicleEvent.callEvent()) {
++                        // Cancelled, move back!
++                        vehicle.absSnapTo(oldX, oldY, oldZ, targetYRot, targetXRot);
++                        this.player.absSnapTo(oldX, oldY, oldZ, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
++                        this.send(ClientboundMoveVehiclePacket.fromEntity(vehicle));
++                        return;
++                    }
++                    targetX = playerMoveControllableVehicleEvent.getTo().x();
++                    targetY = playerMoveControllableVehicleEvent.getTo().y();
++                    targetZ = playerMoveControllableVehicleEvent.getTo().z();
++                    targetYRot = playerMoveControllableVehicleEvent.getTo().getYaw();
++                    targetXRot = playerMoveControllableVehicleEvent.getTo().getPitch();
++                }
++                // SparklyPaper end
++
+                 // Paper start - optimise out extra getCubes
+                 boolean teleportBack = fail;
+                 if (!teleportBack) {

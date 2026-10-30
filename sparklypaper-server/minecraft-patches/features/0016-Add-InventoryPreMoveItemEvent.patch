@@ -1,0 +1,74 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] Add InventoryPreMoveItemEvent
+
+
+diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index 7937e1084262b083fe59a4d1011e41ffaef15072..73fd64a5830615b843efe5dcae52fed2be76f6d0 100644
+--- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -230,7 +230,15 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+             if (isSlotDisallowed(disallowedSlots, i)) continue; // Paper - Add PrepareHopperTransferEvent
+             final ItemStack item = hopper.getItem(i);
+             if (!item.isEmpty()) {
++                // SparklyPaper start - InventoryPreMoveItemEvent
++                if (!foundItem) {
++                    // Only call it once per push, instead of per item
++                    if (!callPushPreMoveEvent(destination, hopper))
++                        return false;
++                }
++                // SparklyPaper end
+                 foundItem = true;
++
+                 ItemStack origItemStack = item;
+                 ItemStack movedItem = origItemStack;
+ 
+@@ -270,6 +278,10 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+     }
+ 
+     private static boolean hopperPull(final Level level, final Hopper hopper, final Container container, ItemStack origItemStack, final int i) {
++        // SparklyPaper start - InventoryPreMoveItemEvent
++        if (!callPullPreMoveEvent(hopper, container))
++            return true;
++        // SparklyPaper end
+         ItemStack movedItem = origItemStack;
+         final int originalItemCount = origItemStack.getCount();
+         final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
+@@ -438,6 +450,36 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         return (disallowedSlots & (1L << slot)) != 0;
+     }
+ 
++    // SparklyPaper start - InventoryPreMoveItemEvent
++    private static boolean callPushPreMoveEvent(Container destination, HopperBlockEntity hopper) {
++        final org.bukkit.inventory.Inventory destinationInventory = getInventory(destination);
++        final net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent event = new net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent(
++            hopper.getOwner(false).getInventory(),
++            destinationInventory,
++            true
++        );
++        final boolean result = event.callEvent();
++        if (!result) {
++            applyCooldown(hopper);
++        }
++
++        return result;
++    }
++
++    private static boolean callPullPreMoveEvent(final Hopper hopper, final Container container) {
++        final org.bukkit.inventory.Inventory sourceInventory = getInventory(container);
++        final org.bukkit.inventory.Inventory destination = getInventory(hopper);
++
++        // Mirror is safe as no plugins ever use this item
++        final net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent event = new net.sparklypower.sparklypaper.event.inventory.InventoryPreMoveItemEvent(sourceInventory, destination, false);
++        final boolean result = event.callEvent();
++        if (!result)
++            applyCooldown(hopper);
++
++        return result;
++    }
++    // SparklyPaper end
++
+     private static org.bukkit.inventory.Inventory getInventory(final Container container) {
+         final org.bukkit.inventory.Inventory sourceInventory;
+         if (container instanceof net.minecraft.world.CompoundContainer compoundContainer) {

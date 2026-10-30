@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:48 -0300
+Subject: [PATCH] SparklyPaper config files
+
+
+diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
+index 68675926ee85f738b3693a76fc29b80b80c717ed..c6255f79f369c8618282307db5ae0c9c7a49fce9 100644
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -234,6 +234,15 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         org.spigotmc.SpigotConfig.init((java.io.File) this.options.valueOf("spigot-settings"));
+         org.spigotmc.SpigotConfig.registerCommands();
+         // Spigot end
++        // SparklyPaper start - config files
++        try {
++            net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.init((java.io.File) options.valueOf("sparklypaper-settings"));
++        } catch (Exception e) {
++            DedicatedServer.LOGGER.error("Unable to load server configuration", e);
++            return false;
++        }
++        net.sparklypower.sparklypaper.SparklyPaperCommands.INSTANCE.registerCommands(this);
++        // SparklyPaper end
+         // Paper start - initialize global and world-defaults configuration
+         this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
+         this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
+diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
+index c14996f1d8a9ed77a845a464c1789bab0715741b..d49c024c024ba4ce8f0287b4bbccc80e1b319805 100644
+--- a/net/minecraft/world/level/Level.java
++++ b/net/minecraft/world/level/Level.java
+@@ -145,6 +145,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+ 
+     // CraftBukkit start
+     public final io.papermc.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
++    public net.sparklypower.sparklypaper.configs.SparklyPaperConfig.SparklyPaperWorldConfig sparklyPaperConfig; // SparklyPaper - config files
+     private final CraftWorld world;
+     public org.bukkit.generator.@Nullable ChunkGenerator generator;
+ 
+@@ -851,6 +852,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+         final org.bukkit.NamespacedKey worldKey = CraftNamespacedKey.fromMinecraft(dimension.identifier()); // Paper
+         this.spigotConfig = new org.spigotmc.SpigotWorldConfig(bukkitName, worldKey); // Spigot
+         this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
++        this.sparklyPaperConfig = net.sparklypower.sparklypaper.configs.SparklyPaperConfigUtils.INSTANCE.getWorldSettings(((net.minecraft.world.level.storage.ServerLevelData) levelData).getLevelName()); // SparklyPaper - config files
+         this.generator = generator;
+         this.world = new CraftWorld((ServerLevel) this, worldKey, biomeProvider, environment);
+ 

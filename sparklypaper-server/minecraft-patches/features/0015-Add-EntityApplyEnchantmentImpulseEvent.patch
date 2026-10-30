@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] Add EntityApplyEnchantmentImpulseEvent
+
+Useful to block lunge enchantments
+
+diff --git a/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java b/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java
+index 170db4a73cbfdc8d6bb1875a9823a277d01ae9fb..ffbfcb0938a817de8e81742d2abf884623512c04 100644
+--- a/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java
++++ b/net/minecraft/world/item/enchantment/effects/ApplyEntityImpulse.java
+@@ -26,6 +26,12 @@ public record ApplyEntityImpulse(Vec3 direction, Vec3 coordinateScale, LevelBase
+ 
+     @Override
+     public void apply(final ServerLevel serverLevel, final int enchantmentLevel, final EnchantedItemInUse item, final Entity entity, final Vec3 position) {
++        // SparklyPaper start - Add EntityApplyEnchantmentImpulseEvent
++        net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent event = new net.sparklypower.sparklypaper.event.entity.EntityApplyEnchantmentImpulseEvent(entity.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitMirror(item.itemStack()));
++        if (!event.callEvent())
++            return;
++        // SparklyPaper end
++
+         Quaternionf look = entity.getLookQuaternion();
+         Vector3d direction = look.transform(this.direction.x, this.direction.y, this.direction.z, new Vector3d())
+             .mul(this.coordinateScale.x, this.coordinateScale.y, this.coordinateScale.z)

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] Add PreEntityShootBowEvent
+
+
+diff --git a/net/minecraft/world/item/BowItem.java b/net/minecraft/world/item/BowItem.java
+index c79f895ebc95ebbee1cfdf371f9544d351333938..8913c5944bd0f46c84beadace307c0373aab7913 100644
+--- a/net/minecraft/world/item/BowItem.java
++++ b/net/minecraft/world/item/BowItem.java
+@@ -32,6 +32,11 @@ public class BowItem extends ProjectileWeaponItem {
+ 
+             int timeHeld = this.getUseDuration(itemStack, entity) - remainingTime;
+             float pow = getPowerForTime(timeHeld);
++            // SparklyPaper start - Add PreEntityShootBowEvent
++            net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent preShootEvent = new net.sparklypower.sparklypaper.event.entity.PreEntityShootBowEvent(player.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitMirror(itemStack), player.getUsedItemHand() == InteractionHand.MAIN_HAND ? org.bukkit.inventory.EquipmentSlot.HAND : org.bukkit.inventory.EquipmentSlot.OFF_HAND, pow);
++            if (!preShootEvent.callEvent())
++                return false;
++            // SparklyPaper end
+             if (pow < 0.1) {
+                 return false;
+             }

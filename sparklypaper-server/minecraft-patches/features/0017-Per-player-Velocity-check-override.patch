@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] Per-player Velocity check override
+
+
+diff --git a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+index eea7dd596eb9ac75dee29d843d786493d44034f3..6e48f02c64a6873779f3816ee5d011193f250594 100644
+--- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+@@ -68,6 +68,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+     public final boolean transferred; // Paper
+     public boolean iKnowThisMayNotBeTheBestIdeaButPleaseDisableUsernameValidation = false; // Paper - username validation overriding
+     private int velocityLoginMessageId = -1; // Paper - Add Velocity IP Forwarding Support
++    private boolean bypassVelocityForwarding = false; // SparklyPaper - Per-player Velocity check override
+     public java.util.@Nullable UUID requestedUuid; // Paper
+     private final io.papermc.paper.connection.PaperPlayerLoginConnection paperLoginConnection; // Paper - Config API
+ 
+@@ -178,12 +179,24 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+             } else {
+                 // Paper start - Add Velocity IP Forwarding Support
+                 if (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) {
+-                    this.velocityLoginMessageId = java.util.concurrent.ThreadLocalRandom.current().nextInt();
+-                    net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+-                    buf.writeByte(com.destroystokyo.paper.proxy.VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION);
+-                    net.minecraft.network.protocol.login.ClientboundCustomQueryPacket packet1 = new net.minecraft.network.protocol.login.ClientboundCustomQueryPacket(this.velocityLoginMessageId, new net.minecraft.network.protocol.login.ClientboundCustomQueryPacket.PlayerInfoChannelPayload(com.destroystokyo.paper.proxy.VelocityProxy.PLAYER_INFO_CHANNEL, buf));
+-                    this.connection.send(packet1);
+-                    return;
++                    // SparklyPaper start - Per-player Velocity check override
++                    net.sparklypower.sparklypaper.event.connection.PlayerVelocityProxyCheckEvent velocityCheckEvent = new net.sparklypower.sparklypaper.event.connection.PlayerVelocityProxyCheckEvent(this.paperLoginConnection, this.requestedUuid, this.requestedUsername, this.transferred);
++                    org.bukkit.Bukkit.getServer().getPluginManager().callEvent(velocityCheckEvent);
++
++                    if (velocityCheckEvent.isVelocityForwardingRequired()) {
++                        // SparklyPaper end - Per-player Velocity check override
++                        this.velocityLoginMessageId = java.util.concurrent.ThreadLocalRandom.current().nextInt();
++                        net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
++                        buf.writeByte(com.destroystokyo.paper.proxy.VelocityProxy.MAX_SUPPORTED_FORWARDING_VERSION);
++                        net.minecraft.network.protocol.login.ClientboundCustomQueryPacket packet1 = new net.minecraft.network.protocol.login.ClientboundCustomQueryPacket(this.velocityLoginMessageId, new net.minecraft.network.protocol.login.ClientboundCustomQueryPacket.PlayerInfoChannelPayload(com.destroystokyo.paper.proxy.VelocityProxy.PLAYER_INFO_CHANNEL, buf));
++                        this.connection.send(packet1);
++                        return;
++                        // SparklyPaper start - Per-player Velocity check override
++                    } else {
++                        this.bypassVelocityForwarding = true;
++                        LOGGER.info("Velocity forwarding bypassed for {} by plugin", this.requestedUsername);
++                    }
++                    // SparklyPaper end - Per-player Velocity check override
+                 }
+                 // Paper end - Add Velocity IP Forwarding Support
+                 // Paper start - Virtual authenticator threads
+@@ -319,7 +332,9 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+     // CraftBukkit start
+     private GameProfile callPlayerPreLoginEvents(GameProfile gameprofile) throws Exception { // Paper - Add more fields to AsyncPlayerPreLoginEvent
+         // Paper start - Add Velocity IP Forwarding Support
+-        if (ServerLoginPacketListenerImpl.this.velocityLoginMessageId == -1 && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) {
++        if (ServerLoginPacketListenerImpl.this.velocityLoginMessageId == -1
++            && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled
++            && !ServerLoginPacketListenerImpl.this.bypassVelocityForwarding) { // SparklyPaper - Per-player Velocity check override
+             this.disconnect("This server requires you to connect with Velocity.");
+             return gameprofile;
+         }

@@ -1,0 +1,132 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:48 -0300
+Subject: [PATCH] Helpful NMS packet changes
+
+Some nice changes to the packet internals to make packet sending and manipulation easier for us to avoid Reflection and JVM internals (ooo theUnsafe spooky) usage
+
+diff --git a/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java b/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
+index 0ab4080c8e30d5ee14ce5fcbac64b0316ea6a949..3935c6db208caa5224727ac918f0998cfcdc3e7d 100644
+--- a/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
+@@ -20,7 +20,7 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+     );
+     private final int id;
+     private final UUID uuid;
+-    private final EntityType<?> type;
++    public EntityType<?> type; // SparklyPaper - Helpful NMS packet changes: remove final and make public
+     private final double x;
+     private final double y;
+     private final double z;
+@@ -172,6 +172,20 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+         return Mth.unpackDegrees(this.yHeadRot);
+     }
+ 
++    // SparklyPaper - Helpful NMS packet changes: expose raw rotational fields
++    public byte getXRotRaw() {
++        return this.xRot;
++    }
++
++    public byte getYRotRaw() {
++        return this.yRot;
++    }
++
++    public byte getYHeadRotRaw() {
++        return this.yHeadRot;
++    }
++    // SparklyPaper end
++
+     public int getData() {
+         return this.data;
+     }
+diff --git a/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java b/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+index 838b1e38ae2d84576014a00ac293867f75b943e3..d48438156cb9dd09f9fd9a27682023ec438a7caa 100644
+--- a/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+@@ -19,7 +19,7 @@ public class ClientboundBlockUpdatePacket implements Packet<ClientGamePacketList
+         ClientboundBlockUpdatePacket::new
+     );
+     private final BlockPos pos;
+-    private final BlockState blockState;
++    public BlockState blockState; // SparklyPaper - Helpful NMS packet changes: remove final
+ 
+     public ClientboundBlockUpdatePacket(final BlockPos pos, final BlockState state) {
+         this.pos = pos;
+diff --git a/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+index 06f0088b4bdbd86c5942d523889386a81764a240..2153e70a8ee42151965d6677674c3ed3cf5fec2a 100644
+--- a/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
++++ b/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+@@ -39,7 +39,7 @@ public class ClientboundLevelChunkPacketData {
+         ClientboundLevelChunkPacketData::new
+     );
+     private final Map<Heightmap.Types, long[]> heightmaps;
+-    private final byte[] buffer;
++    public byte[] buffer; // SparklyPaper - Helpful NMS packet changes: remove final and make public
+     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
+     // Paper start - Handle oversized block entities in chunks
+     private final java.util.List<net.minecraft.network.protocol.Packet<?>> extraPackets = new java.util.ArrayList<>();
+diff --git a/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java b/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
+index f324a42371a143bcfe922d980786ee7365bd575a..51f5d08ec0edecc9c372e94f9891e3434a067f76 100644
+--- a/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
+@@ -21,6 +21,13 @@ public class ClientboundRotateHeadPacket implements Packet<ClientGamePacketListe
+         this.yHeadRot = yHeadRot;
+     }
+ 
++    // SparklyPaper start - Helpful NMS packet changes: add entity ID constructor
++    public ClientboundRotateHeadPacket(int entityId, byte headYaw) {
++        this.entityId = entityId;
++        this.yHeadRot = headYaw;
++    }
++    // SparklyPaper end
++
+     private ClientboundRotateHeadPacket(final FriendlyByteBuf input) {
+         this.entityId = input.readVarInt();
+         this.yHeadRot = input.readByte();
+diff --git a/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java b/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
+index a66d8fe21b7c162340ea2f6ac0b02de6093ad3b8..afb1173eca4756aa5faa294e6595065e20744820 100644
+--- a/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
+@@ -17,9 +17,9 @@ public class ClientboundSectionBlocksUpdatePacket implements Packet<ClientGamePa
+         ClientboundSectionBlocksUpdatePacket::write, ClientboundSectionBlocksUpdatePacket::new
+     );
+     private static final int POS_IN_SECTION_BITS = 12;
+-    private final SectionPos sectionPos;
+-    private final short[] positions;
+-    private final BlockState[] states;
++    public SectionPos sectionPos; // SparklyPaper - Helpful NMS packet changes: remove final and make public
++    public short[] positions; // SparklyPaper - Helpful NMS packet changes: remove final and make public
++    public BlockState[] states; // SparklyPaper - Helpful NMS packet changes: remove final and make public
+ 
+     public ClientboundSectionBlocksUpdatePacket(final SectionPos sectionPos, final ShortSet changes, final LevelChunkSection section) {
+         this.sectionPos = sectionPos;
+diff --git a/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java b/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
+index 095b6de365471a82d5ebdc9ba4a6bd8c3ff437aa..93d25d2760a95f9ba28c4ddb13143baee2bf892d 100644
+--- a/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundSetCameraPacket.java
+@@ -22,6 +22,12 @@ public class ClientboundSetCameraPacket implements Packet<ClientGamePacketListen
+         this.cameraId = input.readVarInt();
+     }
+ 
++    // SparklyPaper - Helpful NMS packet changes: add direct entityId constructor
++    public ClientboundSetCameraPacket(int entityId) {
++        this.cameraId = entityId;
++    }
++    // SparklyPaper end
++
+     private void write(final FriendlyByteBuf output) {
+         output.writeVarInt(this.cameraId);
+     }
+diff --git a/net/minecraft/world/entity/Display.java b/net/minecraft/world/entity/Display.java
+index 3aa01e7bbf4314b4ac5b3258f545b50f3dd7929c..756418fa5ae870680c1b4e5c6f463d6f2f57af9f 100644
+--- a/net/minecraft/world/entity/Display.java
++++ b/net/minecraft/world/entity/Display.java
+@@ -677,7 +677,7 @@ public abstract class Display extends Entity {
+         private static final byte INITIAL_TEXT_OPACITY = -1;
+         public static final int INITIAL_BACKGROUND = 1073741824;
+         private static final int INITIAL_LINE_WIDTH = 200;
+-        private static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT);
++        public static final EntityDataAccessor<Component> DATA_TEXT_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.COMPONENT); // SparklyPaper - Helpful NMS packet changes: make public
+         public static final EntityDataAccessor<Integer> DATA_LINE_WIDTH_ID = SynchedEntityData.defineId(Display.TextDisplay.class, EntityDataSerializers.INT);
+         public static final EntityDataAccessor<Integer> DATA_BACKGROUND_COLOR_ID = SynchedEntityData.defineId(
+             Display.TextDisplay.class, EntityDataSerializers.INT

@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] Add EntityGetProjectileForWeaponEvent
+
+
+diff --git a/net/minecraft/world/entity/monster/Monster.java b/net/minecraft/world/entity/monster/Monster.java
+index de58564416d985fab7b946fbf9e867e89bb14163..787ccd659083a8d8b9df6187405f0bbc5a902dd7 100644
+--- a/net/minecraft/world/entity/monster/Monster.java
++++ b/net/minecraft/world/entity/monster/Monster.java
+@@ -144,6 +144,12 @@ public abstract class Monster extends PathfinderMob implements Enemy {
+     @Override
+     public ItemStack getProjectile(final ItemStack heldWeapon) {
+         if (heldWeapon.getItem() instanceof ProjectileWeaponItem) {
++            // SparklyPaper start - Add EntityGetProjectileForWeaponEvent
++            net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitMirror(heldWeapon));
++            event.callEvent();
++            if (event.getArrow() != null)
++                return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());
++            // SparklyPaper end
+             Predicate<ItemStack> supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getSupportedHeldProjectiles();
+             ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedProjectiles);
+             return heldProjectile.isEmpty() ? new ItemStack(Items.ARROW) : heldProjectile;
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index 4ba3fb85b0473b4e7aa237701034d25f84e955cd..39ad3f7950fb363e75e778f496b6afe21bb8f2ba 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -2055,6 +2055,12 @@ public abstract class Player extends Avatar implements ContainerUser {
+             return ItemStack.EMPTY;
+         }
+ 
++        // SparklyPaper start - Add EntityGetProjectileForWeaponEvent
++        net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent event = new net.sparklypower.sparklypaper.event.entity.EntityGetProjectileForWeaponEvent(this.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitMirror(heldWeapon));
++        event.callEvent();
++        if (event.getArrow() != null)
++            return org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(event.getArrow());
++        // SparklyPaper end
+         final org.apache.commons.lang3.mutable.MutableBoolean anyEventCancelled = new org.apache.commons.lang3.mutable.MutableBoolean(); // Paper - PlayerReadyArrowEvent
+         Predicate<ItemStack> supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getSupportedHeldProjectiles().and(item -> this.tryReadyArrow(heldWeapon, item, anyEventCancelled)); // Paper - PlayerReadyArrowEvent
+         ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedProjectiles);

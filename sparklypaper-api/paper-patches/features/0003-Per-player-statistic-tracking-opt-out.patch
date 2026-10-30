@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:48 -0300
+Subject: [PATCH] Per-player statistic tracking opt-out
+
+
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index 6ac4eadde5154979058306872f7fcc78363ccd11..6d99d235c6ab937d4e4db5f708c411cc7d9c50d5 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -4172,4 +4172,27 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+      */
+     @Nullable Long getMaxConcurrentChunkGeneratesOverride();
+     // SparklyPaper end
++
++    // SparklyPaper start - per-player statistic tracking opt-out
++    /**
++     * Sets whether the given statistic should be tracked for this player.
++     * <p>
++     * When a statistic is not tracked, any attempts to increment, decrement or set its value through the vanilla statistics system are silently dropped.
++     * Direct reads ({@link #getStatistic(org.bukkit.Statistic)}) and explicit writes via the Bukkit API are not affected.
++     * <p>
++     * Statistics are tracked by default.
++     *
++     * @param statistic the statistic to configure
++     * @param tracked {@code true} to track the statistic, {@code false} to ignore it
++     */
++    void trackStatistic(org.bukkit.Statistic statistic, boolean tracked);
++
++    /**
++     * Gets whether the given statistic is currently being tracked for this player.
++     *
++     * @param statistic the statistic to query
++     * @return {@code true} if the statistic is tracked, {@code false} otherwise
++     */
++    boolean isStatisticTracked(org.bukkit.Statistic statistic);
++    // SparklyPaper end - per-player statistic tracking opt-out
+ }

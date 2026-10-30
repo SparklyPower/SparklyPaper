@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] SPARKLYPOWER Remap SparklyPower hacky legacy NBT tags
+
+This is only useful for us in SparklyPower, but yeah...
+
+diff --git a/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java b/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
+index 63fabac22ce4bbf443ce73500ce59fceea0f8d50..55a72fecd71a0d0db37ac665bbadfdc9c9669f18 100644
+--- a/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
++++ b/ca/spottedleaf/dataconverter/minecraft/converters/itemstack/ConverterItemStackToDataComponents.java
+@@ -1230,6 +1230,7 @@ public final class ConverterItemStackToDataComponents {
+             ret.setString("id", this.id);
+             ret.setInt("count", this.count);
+             if (!this.tag.isEmpty()) {
++                net.sparklypower.sparklypaper.LegacyNBTRemapper.INSTANCE.remap(this.tag); // SparklyPaper - Remap SparklyPower hacky legacy NBT tags
+                 this.components.setMap("minecraft:custom_data", this.tag);
+             }
+ 

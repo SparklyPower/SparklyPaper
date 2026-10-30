@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:48 -0300
+Subject: [PATCH] SPARKLYPOWER Add custom blocks
+
+
+diff --git a/src/main/java/com/destroystokyo/paper/MaterialTags.java b/src/main/java/com/destroystokyo/paper/MaterialTags.java
+index ca44077640061585221b46fd3e015478fc908033..1e94167d4c11fe3e06a0e0b64bc5afc3ddf5e460 100644
+--- a/src/main/java/com/destroystokyo/paper/MaterialTags.java
++++ b/src/main/java/com/destroystokyo/paper/MaterialTags.java
+@@ -184,6 +184,7 @@ public class MaterialTags {
+         .endsWith("TERRACOTTA")
+         .not(Material.TERRACOTTA)
+         .notEndsWith("GLAZED_TERRACOTTA")
++        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
+         .ensureSize("STAINED_TERRACOTTA", 16).lock();
+ 
+     /**
+@@ -191,6 +192,7 @@ public class MaterialTags {
+      */
+     public static final MaterialSetTag TERRACOTTA = new MaterialSetTag(keyFor("terracotta"))
+         .endsWith("TERRACOTTA")
++        .notStartsWith("SPARKLYPOWER_") // SparklyPaper - custom blocks
+         .ensureSize("TERRACOTTA", 33).lock();
+ 
+     /**
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 08aa172138b386042e5d72d9f541265296e4bfc8..a5d6fc3d31c3521e6932d093555a430c69c6aa70 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -1966,6 +1966,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     ZOMBIE_HEAD(-1, Skull.class),
+     ZOMBIE_WALL_HEAD(-1, WallSkull.class),
+     // End generate - Blocks
++    // SparklyPaper start - SparklyPower Survival custom blocks
++    // The IDs themselves doesn't have any correlation with anything, Spigot invented that for backwards compatibility
++    SPARKLYPOWER_RAINBOW_WOOL(-1),
++    SPARKLYPOWER_RAINBOW_CONCRETE(-1),
++    SPARKLYPOWER_RAINBOW_TERRACOTTA(-1),
++    SPARKLYPOWER_ASPHALT_SERVER(-1),
++    SPARKLYPOWER_ASPHALT_SERVER_SLAB(-1, Slab.class),
++    SPARKLYPOWER_ASPHALT_PLAYER(-1),
++    SPARKLYPOWER_ASPHALT_PLAYER_SLAB(-1, Slab.class),
++    // SparklyPaper end
+     // ----- Legacy Separator -----
+     @Deprecated(since = "1.13", forRemoval = true)
+     LEGACY_AIR(0),
+diff --git a/src/main/java/org/bukkit/block/BlockType.java b/src/main/java/org/bukkit/block/BlockType.java
+index f8cc6c85c52494d821bc5e4183807d9d219b7165..fd98fa3d2038b9621accf4fde1038cb58b4511a1 100644
+--- a/src/main/java/org/bukkit/block/BlockType.java
++++ b/src/main/java/org/bukkit/block/BlockType.java
+@@ -2768,6 +2768,16 @@ public interface BlockType extends Keyed, Translatable, net.kyori.adventure.tran
+     BlockType.Typed<WallSkull> ZOMBIE_WALL_HEAD = getBlockType("zombie_wall_head");
+     // End generate - BlockType
+     //</editor-fold>
++    
++    // SparklyPaper start - SparklyPower Survival custom blocks
++    BlockType.Typed<BlockData> SPARKLYPOWER_RAINBOW_WOOL = getBlockType("sparklypower_rainbow_wool");
++    BlockType.Typed<BlockData> SPARKLYPOWER_RAINBOW_CONCRETE = getBlockType("sparklypower_rainbow_concrete");
++    BlockType.Typed<BlockData> SPARKLYPOWER_RAINBOW_TERRACOTTA = getBlockType("sparklypower_rainbow_terracotta");
++    BlockType.Typed<BlockData> SPARKLYPOWER_ASPHALT_SERVER = getBlockType("sparklypower_asphalt_server");
++    BlockType.Typed<Slab> SPARKLYPOWER_ASPHALT_SERVER_SLAB = getBlockType("sparklypower_asphalt_server_slab");
++    BlockType.Typed<BlockData> SPARKLYPOWER_ASPHALT_PLAYER = getBlockType("sparklypower_asphalt_player");
++    BlockType.Typed<Slab> SPARKLYPOWER_ASPHALT_PLAYER_SLAB = getBlockType("sparklypower_asphalt_player_slab");
++    // SparklyPaper end
+ 
+     @SuppressWarnings("unchecked")
+     private static <B extends BlockType> B getBlockType(@KeyPattern.Value final String key) {

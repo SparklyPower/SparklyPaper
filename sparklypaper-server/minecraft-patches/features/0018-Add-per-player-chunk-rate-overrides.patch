@@ -1,0 +1,68 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:49 -0300
+Subject: [PATCH] Add per-player chunk rate overrides
+
+
+diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
+index 45c927417d34ddd48c92116efd9b5777bfc52e35..dc5d9d4be4e4562ea5bd3f96a12bb10d301dd80c 100644
+--- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
++++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
+@@ -581,26 +581,26 @@ public final class RegionizedPlayerChunkLoader {
+         }
+ 
+         private double getMaxChunkLoadRate() {
+-            final double configRate = PlatformHooks.get().configPlayerMaxLoadRate();
++            final double configRate = this.player.chunkLoadRateOverride != null ? this.player.chunkLoadRateOverride : PlatformHooks.get().configPlayerMaxLoadRate(); // SparklyPaper - per-player chunk rate overrides
+ 
+             return configRate <= 0.0 || configRate > (double)MAX_RATE ? (double)MAX_RATE : Math.max(1.0, configRate);
+         }
+ 
+         private double getMaxChunkGenRate() {
+-            final double configRate = PlatformHooks.get().configPlayerMaxGenRate();
++            final double configRate = this.player.chunkGenRateOverride != null ? this.player.chunkGenRateOverride : PlatformHooks.get().configPlayerMaxGenRate(); // SparklyPaper - per-player chunk rate overrides
+ 
+             return configRate <= 0.0 || configRate > (double)MAX_RATE ? (double)MAX_RATE : Math.max(1.0, configRate);
+         }
+ 
+         private double getMaxChunkSendRate() {
+-            final double configRate = PlatformHooks.get().configPlayerMaxSendRate();
++            final double configRate = this.player.chunkSendRateOverride != null ? this.player.chunkSendRateOverride : PlatformHooks.get().configPlayerMaxSendRate(); // SparklyPaper - per-player chunk rate overrides
+ 
+             return configRate <= 0.0 || configRate > (double)MAX_RATE ? (double)MAX_RATE : Math.max(1.0, configRate);
+         }
+ 
+         private long getMaxChunkLoads() {
+             final long radiusChunks = (2L * this.lastLoadDistance + 1L) * (2L * this.lastLoadDistance + 1L);
+-            long configLimit = (long)PlatformHooks.get().configPlayerMaxConcurrentLoads();
++            long configLimit = this.player.maxConcurrentChunkLoadsOverride != null ? this.player.maxConcurrentChunkLoadsOverride : (long)PlatformHooks.get().configPlayerMaxConcurrentLoads(); // SparklyPaper - per-player chunk rate overrides
+             if (configLimit == 0L) {
+                 // by default, only allow 1/5th of the chunks in the view distance to be concurrently active
+                 configLimit = Math.max(5L, radiusChunks / 5L);
+@@ -614,7 +614,7 @@ public final class RegionizedPlayerChunkLoader {
+ 
+         private long getMaxChunkGenerates() {
+             final long radiusChunks = (2L * this.lastLoadDistance + 1L) * (2L * this.lastLoadDistance + 1L);
+-            long configLimit = (long)PlatformHooks.get().configPlayerMaxConcurrentGens();
++            long configLimit = this.player.maxConcurrentChunkGeneratesOverride != null ? this.player.maxConcurrentChunkGeneratesOverride : (long)PlatformHooks.get().configPlayerMaxConcurrentGens(); // SparklyPaper - per-player chunk rate overrides
+             if (configLimit == 0L) {
+                 // by default, only allow 1/5th of the chunks in the view distance to be concurrently active
+                 configLimit = Math.max(5L, radiusChunks / 5L);
+diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
+index 1137be30f125cb79f05f3e5c104cdf8cca979ff1..4e3292ca91553e82068e37a514408c80cba9c317 100644
+--- a/net/minecraft/server/level/ServerPlayer.java
++++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -476,6 +476,13 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+         return this.viewDistanceHolder;
+     }
+     // Paper end - rewrite chunk system
++    // SparklyPaper start - per-player chunk rate overrides
++    public @Nullable Double chunkLoadRateOverride = null;
++    public @Nullable Double chunkGenRateOverride = null;
++    public @Nullable Double chunkSendRateOverride = null;
++    public @Nullable Long maxConcurrentChunkLoadsOverride = null;
++    public @Nullable Long maxConcurrentChunkGeneratesOverride = null;
++    // SparklyPaper end
+ 
+     public ServerPlayer(final MinecraftServer server, final ServerLevel level, final GameProfile gameProfile, final ClientInformation clientInformation) {
+         super(level, gameProfile);

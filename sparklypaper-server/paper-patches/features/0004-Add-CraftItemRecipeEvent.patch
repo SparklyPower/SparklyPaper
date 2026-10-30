@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 30 Oct 2026 01:31:48 -0300
+Subject: [PATCH] Add CraftItemRecipeEvent
+
+Used when a player OR a crafter block crafts an item, as an alternative to PrepareItemCraftEvent and CraftItemEvent, because both events are not triggered when a item is crafted from a crafter
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+index f5b3086986c7a53dc65926b5882df4ef9b04350d..a9e131e2d81d5615fc8fc438c3aec0c85bac3a11 100644
+--- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
++++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+@@ -1445,6 +1445,23 @@ public class CraftEventFactory {
+         Bukkit.getPluginManager().callEvent(crafterCraftEvent);
+         return crafterCraftEvent;
+     }
++    
++    // SparklyPaper start - add CraftItemRecipeEvent
++    public static net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent callCraftItemRecipeEvent(net.minecraft.world.inventory.CraftingContainer container, Recipe recipe, ItemStack result) {
++        org.bukkit.inventory.ItemStack[] matrix = new org.bukkit.inventory.ItemStack[container.getItems().size()];
++        int i = 0;
++        for (ItemStack item : container.getItems()) {
++            matrix[i] = CraftItemStack.asBukkitMirror(item);
++            i++;
++        }
++        org.bukkit.inventory.ItemStack bukkitResult = CraftItemStack.asBukkitMirror(result);
++
++        net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent event = new net.sparklypower.sparklypaper.event.inventory.CraftItemRecipeEvent(matrix, recipe, bukkitResult);
++        Bukkit.getPluginManager().callEvent(event);
++
++        return event;
++    }
++    // SparklyPaper end
+ 
+     // Paper start
+     @Deprecated

@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MrPowerGamerBR <git@mrpowergamerbr.com>
+Date: Fri, 17 Jul 2026 18:38:10 -0300
+Subject: [PATCH] Add per-entity tracking range overrides
+
+
+diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
+index fd0b9f20fbdd523d51550fd6009b5011e6e7e6e6..e5ed420ceb476dcc357c2ee8ffd2279e459613a1 100644
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -994,6 +994,7 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
+             EntityType<?> type = entity.getType();
+             int range = type.clientTrackingRange() * 16;
+             range = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, range); // Spigot
++            if (entity.trackingRangeOverride != -1) range = entity.trackingRangeOverride; // SparklyPaper - per-entity tracking range override
+             if (range != 0) {
+                 if (this.entityMap.containsKey(entity.getId())) {
+                     throw (IllegalStateException)Util.pauseInIde(new IllegalStateException("Entity is already tracked!"));
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index 267be9e775b8bb8c816c79fb4357a3ef23317b40..d4afbb735ac8063c7e622c193a62639fa8a0cc77 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -388,6 +388,7 @@ public abstract class Entity
+     private final int despawnTime; // Paper - entity despawn time limit
+     public int totalEntityAge; // Paper - age-like counter for all entities
+     public final io.papermc.paper.entity.activation.ActivationType activationType = io.papermc.paper.entity.activation.ActivationType.activationTypeFor(this); // Paper - EAR 2/tracking ranges
++    public int trackingRangeOverride = -1; // SparklyPaper - per-entity tracking range override
+     // Paper start - EAR 2
+     public final boolean defaultActivationState;
+     public long activatedTick = Integer.MIN_VALUE;
