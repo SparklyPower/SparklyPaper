@@ -1,6 +1,6 @@
 --- a/paper-server/build.gradle.kts
 +++ b/paper-server/build.gradle.kts
-@@ -5,6 +_,8 @@
+@@ -5,10 +_,11 @@
  
  plugins {
      `java-library`
@@ -9,7 +9,11 @@
      `maven-publish`
      idea
      id("io.papermc.paperweight.core")
-@@ -19,6 +_,16 @@
+-    id("io.papermc.paperweight.paper-checkstyle")
+     id("io.papermc.fill.gradle") version "1.0.14"
+ }
+ 
+@@ -20,6 +_,16 @@
  }
  
  paperweight {
@@ -26,7 +30,18 @@
      minecraftVersion = providers.gradleProperty("mcVersion")
      gitFilePatches = false
  
-@@ -86,7 +_,19 @@
+@@ -28,10 +_,6 @@
+     }
+ }
+ 
+-paperCheckstyle {
+-    directoriesToSkipFile = layout.projectDirectory.file(".checkstyle/ignored_directories.txt")
+-}
+-
+ tasks.generateDevelopmentBundle {
+     libraryRepositories.addAll(
+         "https://repo.maven.apache.org/maven2/",
+@@ -91,7 +_,19 @@
      }
  }
  
@@ -47,7 +62,7 @@
  configurations.named(log4jPlugins.compileClasspathConfigurationName) {
      extendsFrom(configurations.compileClasspath.get())
  }
-@@ -109,7 +_,12 @@
+@@ -114,7 +_,12 @@
  }
  
  dependencies {
@@ -61,7 +76,7 @@
      implementation(platform("ca.spottedleaf.leafpile:bom:1.3.2"))
      implementation("ca.spottedleaf.leafpile:common")
      implementation("ca.spottedleaf.leafpile:concurrentutil")
-@@ -169,9 +_,14 @@
+@@ -174,9 +_,14 @@
          val build = System.getenv("BUILD_NUMBER") ?: null
          val buildTime = providers.environmentVariable("BUILD_STARTED_AT").map(Instant::parse).orElse(Instant.EPOCH).get()
          val gitHash = git.exec(providers, "rev-parse", "--short=7", "HEAD").get().trim()
@@ -77,7 +92,7 @@
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "Paper",
-@@ -180,8 +_,8 @@
+@@ -185,8 +_,8 @@
              "Specification-Title" to "Paper",
              "Specification-Version" to project.version,
              "Specification-Vendor" to "Paper Team",
@@ -88,7 +103,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -259,7 +_,7 @@
+@@ -264,7 +_,7 @@
      )
  }
  

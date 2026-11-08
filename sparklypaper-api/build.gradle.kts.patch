@@ -61,7 +61,7 @@
          }
      }
  }
-@@ -198,7 +_,7 @@
+@@ -193,7 +_,7 @@
  
  tasks.withType<Javadoc>().configureEach {
      val options = options as StandardJavadocDocletOptions
@@ -70,7 +70,7 @@
      options.use()
      options.isDocFilesSubDirs = true
      options.links(
-@@ -213,7 +_,7 @@
+@@ -208,7 +_,7 @@
          "https://logging.apache.org/log4j/2.x/javadoc/log4j-api/",
          "https://www.javadocs.dev/org.apache.maven.resolver/maven-resolver-api/1.7.3",
      )
@@ -79,7 +79,7 @@
  
      inputs.files(javadocSourcepath).ignoreEmptyDirectories().withPropertyName(javadocSourcepath.name + "-configuration")
      val javadocSourcepathElements = javadocSourcepath.elements
-@@ -225,11 +_,11 @@
+@@ -220,11 +_,11 @@
      }
  
      // workaround for https://github.com/gradle/gradle/issues/4046
