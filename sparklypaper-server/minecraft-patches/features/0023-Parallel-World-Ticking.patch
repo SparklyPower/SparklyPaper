@@ -460,10 +460,10 @@ index b9748a392c9f76e61a1b673085b4dd74c007c70d..330383e9005cd2244d576d5dfe1aef4f
              if (isLocatorBarEnabledFor(player)) {
                  if (!connection.isBroken()) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index d4afbb735ac8063c7e622c193a62639fa8a0cc77..909b8857fcea95f6ac5821eca8c67302e61fcc44 100644
+index fe3b38d536aaaa8db56c1c5478863fe9f2c87ba1..88e0f2d01ab17a963d1bb098357d0b3a78a012ae 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -3671,6 +3671,7 @@ public abstract class Entity
+@@ -3676,6 +3676,7 @@ public abstract class Entity
      }
  
      protected void handlePortal() {
@@ -471,7 +471,7 @@ index d4afbb735ac8063c7e622c193a62639fa8a0cc77..909b8857fcea95f6ac5821eca8c67302
          if (this.level() instanceof ServerLevel level) {
              this.processPortalCooldown();
              if (this.portalProcess != null) {
-@@ -4287,6 +4288,7 @@ public abstract class Entity
+@@ -4292,6 +4293,7 @@ public abstract class Entity
      }
  
      private @Nullable Entity teleportCrossDimension(final ServerLevel oldLevel, final ServerLevel newLevel, final TeleportTransition transition) {
@@ -514,7 +514,7 @@ index e52d970069d2c4ebb7ca5138cc43ab50860c305e..7f1a2a01cce3db04aa6d7b69da580cf7
  
              DataComponentPatch newPatch = this.components.asPatch();
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 11156e3f9a095c077215d9f2c5a7b1b72bd57ed2..4d2a5bb05d985de329d9d661bc1bce82cdb6eae8 100644
+index 3ac1966c84a93f459a1aee724d20ed71cd802747..ef8072abc713507d98961abd10b5532726ec52ca 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
 @@ -171,6 +171,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
@@ -727,7 +727,7 @@ index c2f8479eef826efca3ed2993973b2cfc2c51ed00..e4a9601ba09284fad2225447a5eb3a97
      }
  
 diff --git a/net/minecraft/world/level/block/entity/BlockEntity.java b/net/minecraft/world/level/block/entity/BlockEntity.java
-index ddda24a55201de2136fc6dd2cb863d609925d0ca..cc9a658ca0d0ed745333c44ebc09579d79208635 100644
+index 37f5c96a0b00f56b06b04d4fa8f5562ee6055865..ef09133cb939ebca4eab1c760335274a7d0f7090 100644
 --- a/net/minecraft/world/level/block/entity/BlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BlockEntity.java
 @@ -40,6 +40,7 @@ import org.slf4j.Logger;
@@ -738,10 +738,10 @@ index ddda24a55201de2136fc6dd2cb863d609925d0ca..cc9a658ca0d0ed745333c44ebc09579d
      // CraftBukkit start - data containers
      private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
      public final org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer persistentDataContainer;
-@@ -210,7 +211,7 @@ public abstract class BlockEntity implements DebugValueSource, TypedInstance<Blo
+@@ -211,7 +212,7 @@ public abstract class BlockEntity implements DebugValueSource, TypedInstance<Blo
  
      public void setChanged() {
-         if (this.level != null) {
+         if (this.level != null && this.real) { // Paper - don't broadcast for fake block entities
 -            if (ignoreBlockEntityUpdates) return; // Paper - Perf: Optimize Hoppers
 +            if (ignoreBlockEntityUpdatesTL.get()) return; // Paper - Perf: Optimize Hoppers // SparklyPaper - parallel world ticking
              setChanged(this.level, this.worldPosition, this.blockState);
