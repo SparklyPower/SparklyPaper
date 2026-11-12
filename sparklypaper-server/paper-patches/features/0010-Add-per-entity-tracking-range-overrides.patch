@@ -5,10 +5,10 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 58fdb79adf624bc5a575e1ec296a9bd18c3d1801..5715d64eeef3645fe8143c17d5a7e2e232ee19c1 100644
+index 53d93ded4ce448d833861c10f6d4a7b9700f6b54..2fdfa1b8d88285eaf217b68467aa96859f491244 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-@@ -1441,4 +1441,22 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+@@ -1453,4 +1453,22 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
              .removeIf(entry -> entry.getKey().namespace().equals(nameSpaced.namespace()));
      }
  

@@ -566,10 +566,10 @@ index ec3343ecbe68b1c2a33f85edb3b527363affa9ba..c9a57666f17f1c3da6be124cd62ea251
          net.minecraft.world.item.ItemStack item = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(tool);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index d6c8d804819c50c151164029f6d48f298d64f163..fa896c77491ae704ccf08c29dc5b691660093e3e 100644
+index b69fcc7b94a7f0e9055bd5b8731c9c532b725cf4..2cf56e338bf8f15965583ed69481b936319bdd38 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-@@ -940,7 +940,7 @@ public class CraftEventFactory {
+@@ -941,7 +941,7 @@ public class CraftEventFactory {
          return false;
      }
  
@@ -578,7 +578,7 @@ index d6c8d804819c50c151164029f6d48f298d64f163..fa896c77491ae704ccf08c29dc5b6916
  
      public static boolean handleBlockSpreadEvent(LevelAccessor level, BlockPos source, BlockPos target, net.minecraft.world.level.block.state.BlockState state, @net.minecraft.world.level.block.Block.UpdateFlags int flags) {
          return handleBlockSpreadEvent(level, source, target, state, flags, false);
-@@ -956,7 +956,7 @@ public class CraftEventFactory {
+@@ -957,7 +957,7 @@ public class CraftEventFactory {
          CraftBlockState snapshot = CraftBlockStates.getBlockState(level, target);
          snapshot.setBlock(state);
  

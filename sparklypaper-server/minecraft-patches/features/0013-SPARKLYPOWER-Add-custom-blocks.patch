@@ -5,10 +5,10 @@ Subject: [PATCH] SPARKLYPOWER Add custom blocks
 
 
 diff --git a/net/minecraft/references/BlockItemIds.java b/net/minecraft/references/BlockItemIds.java
-index 4a17efd3f7915893dc277c05aed0bdadec150389..76560fdc1489318903e48711cc74b8452f26c741 100644
+index 4a17efd3f7915893dc277c05aed0bdadec150389..3809be7027c48ebdb4a74f1fca4df869eb646cf9 100644
 --- a/net/minecraft/references/BlockItemIds.java
 +++ b/net/minecraft/references/BlockItemIds.java
-@@ -815,4 +815,13 @@ public class BlockItemIds {
+@@ -815,4 +815,14 @@ public class BlockItemIds {
      private static WeatheringCopperCollection<BlockItemId> createSimpleCopper(final String baseName) {
          return WeatheringCopperCollection.prefixWithState(WeatheringCopperCollection.create(baseName)).map(BlockItemId::create);
      }
@@ -21,12 +21,13 @@ index 4a17efd3f7915893dc277c05aed0bdadec150389..76560fdc1489318903e48711cc74b845
 +    public static final BlockItemId SPARKLYPOWER_ASPHALT_SERVER_SLAB = BlockItemId.create("sparklypower_asphalt_server_slab");
 +    public static final BlockItemId SPARKLYPOWER_ASPHALT_PLAYER = BlockItemId.create("sparklypower_asphalt_player");
 +    public static final BlockItemId SPARKLYPOWER_ASPHALT_PLAYER_SLAB = BlockItemId.create("sparklypower_asphalt_player_slab");
++    public static final BlockItemId SPARKLYPOWER_ENDER_HOPPER = BlockItemId.create("sparklypower_ender_hopper");
  }
 diff --git a/net/minecraft/world/level/block/Blocks.java b/net/minecraft/world/level/block/Blocks.java
-index 71ff3e831bbe4c49e946664c7ca22634a4e9fecc..8efeaf79a62d77db480463128bc25cd1835de4c3 100644
+index 71ff3e831bbe4c49e946664c7ca22634a4e9fecc..f74a3aaa8ac359a8c0b6a36aae16ed160c396017 100644
 --- a/net/minecraft/world/level/block/Blocks.java
 +++ b/net/minecraft/world/level/block/Blocks.java
-@@ -5771,6 +5771,52 @@ public class Blocks {
+@@ -5771,6 +5771,57 @@ public class Blocks {
              .sound(SoundType.SWEET_BERRY_BUSH)
              .pushReaction(PushReaction.POPPED)
      );
@@ -75,7 +76,25 @@ index 71ff3e831bbe4c49e946664c7ca22634a4e9fecc..8efeaf79a62d77db480463128bc25cd1
 +        SlabBlock::new,
 +        BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(2.0F, 6.0F)
 +    );
++    public static final Block SPARKLYPOWER_ENDER_HOPPER = register(
++        BlockItemIds.SPARKLYPOWER_ENDER_HOPPER,
++        HopperBlock::new,
++        BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(3.0F, 4.8F).sound(SoundType.METAL).noOcclusion()
++    );
 +    // SparklyPaper end
  
      private static ToIntFunction<BlockState> litBlockEmission(final int lightEmission) {
          return state -> state.getValue(BlockStateProperties.LIT) ? lightEmission : 0;
+diff --git a/net/minecraft/world/level/block/entity/BlockEntityTypes.java b/net/minecraft/world/level/block/entity/BlockEntityTypes.java
+index b7a9d07e49511773ba6d9ceb6603be3596e9ba53..1affdbd5c89dcad16ec9a59c87732e658a5e2027 100644
+--- a/net/minecraft/world/level/block/entity/BlockEntityTypes.java
++++ b/net/minecraft/world/level/block/entity/BlockEntityTypes.java
+@@ -128,7 +128,7 @@ public class BlockEntityTypes {
+     public static final BlockEntityType<DaylightDetectorBlockEntity> DAYLIGHT_DETECTOR = register(
+         BlockEntityTypeIds.DAYLIGHT_DETECTOR, DaylightDetectorBlockEntity::new, Blocks.DAYLIGHT_DETECTOR
+     );
+-    public static final BlockEntityType<HopperBlockEntity> HOPPER = register(BlockEntityTypeIds.HOPPER, HopperBlockEntity::new, Blocks.HOPPER);
++    public static final BlockEntityType<HopperBlockEntity> HOPPER = register(BlockEntityTypeIds.HOPPER, HopperBlockEntity::new, Blocks.HOPPER, Blocks.SPARKLYPOWER_ENDER_HOPPER);
+     public static final BlockEntityType<ComparatorBlockEntity> COMPARATOR = register(
+         BlockEntityTypeIds.COMPARATOR, ComparatorBlockEntity::new, Blocks.COMPARATOR
+     );

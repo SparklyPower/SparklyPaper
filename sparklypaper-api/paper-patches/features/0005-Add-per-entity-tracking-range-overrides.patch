@@ -5,10 +5,10 @@ Subject: [PATCH] Add per-entity tracking range overrides
 
 
 diff --git a/src/main/java/org/bukkit/entity/Entity.java b/src/main/java/org/bukkit/entity/Entity.java
-index 91e73dd4779bf97da7f029c56f95c4d9b9b2d5c8..76cb0e1b65054d1476a461eb008728ef251deb9b 100644
+index 4fc8c0a0daef042c79eb709c58b55fcc3b274265..3f4c908613e857d0958b18345838a7ef70b62a6d 100644
 --- a/src/main/java/org/bukkit/entity/Entity.java
 +++ b/src/main/java/org/bukkit/entity/Entity.java
-@@ -1450,4 +1450,21 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
+@@ -1473,4 +1473,21 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
       * @param namespaced the namespaced of the rule
       */
      void removeAdditionalAlliedRule(@NotNull Namespaced namespaced);

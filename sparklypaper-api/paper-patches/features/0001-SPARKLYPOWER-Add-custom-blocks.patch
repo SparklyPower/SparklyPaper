@@ -5,7 +5,7 @@ Subject: [PATCH] SPARKLYPOWER Add custom blocks
 
 
 diff --git a/src/main/java/com/destroystokyo/paper/MaterialTags.java b/src/main/java/com/destroystokyo/paper/MaterialTags.java
-index ca44077640061585221b46fd3e015478fc908033..1e94167d4c11fe3e06a0e0b64bc5afc3ddf5e460 100644
+index cc1a85bb83685a1fbf3aa7fc4e3b75edf3ab2fd3..6cb2f91b8574e062fd7b9325dd22eba01daf5fad 100644
 --- a/src/main/java/com/destroystokyo/paper/MaterialTags.java
 +++ b/src/main/java/com/destroystokyo/paper/MaterialTags.java
 @@ -184,6 +184,7 @@ public class MaterialTags {
@@ -25,10 +25,10 @@ index ca44077640061585221b46fd3e015478fc908033..1e94167d4c11fe3e06a0e0b64bc5afc3
  
      /**
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 08aa172138b386042e5d72d9f541265296e4bfc8..a5d6fc3d31c3521e6932d093555a430c69c6aa70 100644
+index 08aa172138b386042e5d72d9f541265296e4bfc8..374764041276c6a1e7c801896931be7c445b184c 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -1966,6 +1966,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -1966,6 +1966,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      ZOMBIE_HEAD(-1, Skull.class),
      ZOMBIE_WALL_HEAD(-1, WallSkull.class),
      // End generate - Blocks
@@ -41,15 +41,16 @@ index 08aa172138b386042e5d72d9f541265296e4bfc8..a5d6fc3d31c3521e6932d093555a430c
 +    SPARKLYPOWER_ASPHALT_SERVER_SLAB(-1, Slab.class),
 +    SPARKLYPOWER_ASPHALT_PLAYER(-1),
 +    SPARKLYPOWER_ASPHALT_PLAYER_SLAB(-1, Slab.class),
++    SPARKLYPOWER_ENDER_HOPPER(-1, Hopper.class),
 +    // SparklyPaper end
      // ----- Legacy Separator -----
      @Deprecated(since = "1.13", forRemoval = true)
      LEGACY_AIR(0),
 diff --git a/src/main/java/org/bukkit/block/BlockType.java b/src/main/java/org/bukkit/block/BlockType.java
-index f8cc6c85c52494d821bc5e4183807d9d219b7165..fd98fa3d2038b9621accf4fde1038cb58b4511a1 100644
+index f8cc6c85c52494d821bc5e4183807d9d219b7165..90f491cf19c59ca743a6f30fddfc93615a0668b4 100644
 --- a/src/main/java/org/bukkit/block/BlockType.java
 +++ b/src/main/java/org/bukkit/block/BlockType.java
-@@ -2768,6 +2768,16 @@ public interface BlockType extends Keyed, Translatable, net.kyori.adventure.tran
+@@ -2768,6 +2768,17 @@ public interface BlockType extends Keyed, Translatable, net.kyori.adventure.tran
      BlockType.Typed<WallSkull> ZOMBIE_WALL_HEAD = getBlockType("zombie_wall_head");
      // End generate - BlockType
      //</editor-fold>
@@ -62,6 +63,7 @@ index f8cc6c85c52494d821bc5e4183807d9d219b7165..fd98fa3d2038b9621accf4fde1038cb5
 +    BlockType.Typed<Slab> SPARKLYPOWER_ASPHALT_SERVER_SLAB = getBlockType("sparklypower_asphalt_server_slab");
 +    BlockType.Typed<BlockData> SPARKLYPOWER_ASPHALT_PLAYER = getBlockType("sparklypower_asphalt_player");
 +    BlockType.Typed<Slab> SPARKLYPOWER_ASPHALT_PLAYER_SLAB = getBlockType("sparklypower_asphalt_player_slab");
++    BlockType.Typed<Hopper> SPARKLYPOWER_ENDER_HOPPER = getBlockType("sparklypower_ender_hopper");
 +    // SparklyPaper end
  
      @SuppressWarnings("unchecked")
